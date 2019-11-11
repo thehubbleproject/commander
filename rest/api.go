@@ -7,12 +7,12 @@ import (
 type (
 	// TxReceiver represents the tx received from user
 	TxReceiver struct {
-		To        string `json:"to"`
-		From      string `json:"from"`
+		To        string
+		From      string
 		Amount    uint64
 		Nonce     uint64
-		fee       uint64
-		Type      uint64
+		Fee       uint64
+		TxType    uint64
 		Signature string
 	}
 )
