@@ -2,74 +2,61 @@
 
 
 [[projects]]
-  digest = "1:f343e6f508aa6d4d98c55eb9d1e9c0f99f51c34a4921f5b8d6171de7a25d5fa0"
-  name = "github.com/allegro/bigcache"
-  packages = [
-    ".",
-    "queue",
-  ]
-  pruneopts = "UT"
-  revision = "2cf8c0b01a0c01c2c0363d348aa7042f6542ed27"
-  version = "v2.1.1"
-
-[[projects]]
   branch = "master"
-  digest = "1:7d191fd0c54ff370eaf6116a14dafe2a328df487baea280699f597aae858d00d"
-  name = "github.com/aristanetworks/goarista"
-  packages = ["monotime"]
-  pruneopts = "UT"
-  revision = "f096da5361bb3eed74ed2ab9637a1eacac58ed0f"
-
-[[projects]]
-  digest = "1:3c72c4b4159f7ef8e897c4ed14ca7d491ecaa53a3285d12debc923ff1f197963"
-  name = "github.com/btcsuite/btcd"
-  packages = ["btcec"]
-  pruneopts = "UT"
-  revision = "a41498d578a99c1619037746abd916176ea61052"
-  version = "v0.20.0-beta"
-
-[[projects]]
-  digest = "1:2b2daa41f40acd66f4aa0ae213bfd286096663c999a26deb773127b7864c6bd0"
-  name = "github.com/elastic/gosigar"
+  digest = "1:78102ee4d536347316bc42e818340cc50902e45dbd7fdd524c5a1fc0cb07b588"
+  name = "github.com/globalsign/mgo"
   packages = [
     ".",
-    "sys/windows",
+    "bson",
+    "internal/json",
+    "internal/sasl",
+    "internal/scram",
   ]
   pruneopts = "UT"
-  revision = "7aef3366157f2bfdf3e068f73ce7193573e88e0c"
-  version = "v0.10.5"
+  revision = "eeefdecb41b842af6dc652aaea4026e8403e62df"
 
 [[projects]]
-  digest = "1:9434c9b78d892a717917d365a3ff72b45c91d086e07eab680c5f31b7e3589394"
-  name = "github.com/ethereum/go-ethereum"
+  digest = "1:342e605326dbcb362c94e705d058d51f43b127558f64258114c411075546f5a9"
+  name = "github.com/go-kit/kit"
   packages = [
-    ".",
-    "common",
-    "common/hexutil",
-    "common/math",
-    "common/mclock",
-    "common/prque",
-    "core/types",
-    "crypto",
-    "crypto/secp256k1",
-    "ethdb",
     "log",
-    "metrics",
-    "params",
-    "rlp",
-    "trie",
+    "log/level",
+    "log/term",
   ]
   pruneopts = "UT"
-  revision = "bd05968077f27f7eb083404dd8448157996a8788"
-  version = "v1.9.6"
+  revision = "150a65a7ec6156b4b640c1fd55f26fd3d475d656"
+  version = "v0.9.0"
 
 [[projects]]
-  digest = "1:586ea76dbd0374d6fb649a91d70d652b7fe0ccffb8910a77468e7702e7901f3d"
-  name = "github.com/go-stack/stack"
+  digest = "1:4062bc6de62d73e2be342243cf138cf499b34d558876db8d9430e2149388a4d8"
+  name = "github.com/go-logfmt/logfmt"
   packages = ["."]
   pruneopts = "UT"
-  revision = "2fee6af1a9795aafbe0253a0cfbdf668e1fb8a9a"
-  version = "v1.8.0"
+  revision = "07c9b44f60d7ffdfb7d8efe1ad539965737836dc"
+  version = "v0.4.0"
+
+[[projects]]
+  digest = "1:2fc13c72e191ca921adb98f9f4991b1a036d5431b4128fa21dbdd974b9b45822"
+  name = "github.com/gogo/protobuf"
+  packages = [
+    "gogoproto",
+    "jsonpb",
+    "proto",
+    "protoc-gen-gogo/descriptor",
+    "sortkeys",
+    "types",
+  ]
+  pruneopts = "UT"
+  revision = "5628607bb4c51c3157aacc3a50f0ab707582b805"
+  version = "v1.3.1"
+
+[[projects]]
+  digest = "1:573ca21d3669500ff845bdebee890eb7fc7f0f50c59f2132f2a0c6b03d85086a"
+  name = "github.com/golang/protobuf"
+  packages = ["proto"]
+  pruneopts = "UT"
+  revision = "6c65a5562fc06764971b7c5d05c76c75e84bdbf7"
+  version = "v1.3.2"
 
 [[projects]]
   digest = "1:cbec35fe4d5a4fba369a656a8cd65e244ea2c743007d8f6c1ccb132acf9d1296"
@@ -80,20 +67,12 @@
   version = "v1.7.3"
 
 [[projects]]
-  digest = "1:0ba2632215132e946413632241c2f9e67439addbe5f243b86bb81199bd15c8e9"
-  name = "github.com/jinzhu/gorm"
+  branch = "master"
+  digest = "1:a64e323dc06b73892e5bb5d040ced475c4645d456038333883f58934abbf6f72"
+  name = "github.com/kr/logfmt"
   packages = ["."]
   pruneopts = "UT"
-  revision = "81c17a7e2529c59efc4e74c5b32c1fb71fb12fa2"
-  version = "v1.9.11"
-
-[[projects]]
-  digest = "1:01ed62f8f4f574d8aff1d88caee113700a2b44c42351943fa73cc1808f736a50"
-  name = "github.com/jinzhu/inflection"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "f5c5f50e6090ae76a29240b61ae2a90dd810112e"
-  version = "v1.0.0"
+  revision = "b84e30acd515aadc4b783ad4ff83aff3299bdfe0"
 
 [[projects]]
   digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
@@ -104,49 +83,36 @@
   version = "v0.8.1"
 
 [[projects]]
-  digest = "1:266e2f508feb9a9a765bfeb74d116a88514248b2f8428788dcce574bd026b9c0"
-  name = "github.com/steakknife/bloomfilter"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "99ee86d9200fcc2ffde62f508329bd6627c0a307"
-  version = "1.0.4"
-
-[[projects]]
-  digest = "1:5ca4bdccd72e66aaba5b52f9c4a21f1021102f0919432fe138ad5d48abf06833"
-  name = "github.com/steakknife/hamming"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "003c143a81c25ea5e263d692919c611c7122ae6b"
-  version = "0.2.5"
-
-[[projects]]
-  branch = "master"
-  digest = "1:0a098e49634c82146af53b34c63954a3bdca849a9a1ab479a677e6e66cbb16bb"
-  name = "golang.org/x/crypto"
-  packages = ["sha3"]
-  pruneopts = "UT"
-  revision = "c7e5f84aec591254278750bee18f39e5dd19cdb5"
-
-[[projects]]
-  branch = "master"
-  digest = "1:92c957c2713e817f2c5e25735152837312e3e0458e784a5e168d725474ac8995"
-  name = "golang.org/x/sys"
+  digest = "1:815bc173e72651aa903bac654584b15ef2e7101266447d7d179bcf8421564cea"
+  name = "github.com/tendermint/tendermint"
   packages = [
-    "cpu",
-    "unix",
-    "windows",
+    "libs/common",
+    "libs/log",
   ]
   pruneopts = "UT"
-  revision = "ac3223d8017937d8cd94de35a801ea2459f6d5a0"
+  revision = "7b67ee408bb198574863f6acec6f3c791a4c0385"
+  version = "v0.32.7"
+
+[[projects]]
+  branch = "v2"
+  digest = "1:2642fd0b6900c77247d61d80cf2eb59a374ef4ffc2d25a1b95b87dc355b2894e"
+  name = "gopkg.in/mgo.v2"
+  packages = [
+    "bson",
+    "internal/json",
+  ]
+  pruneopts = "UT"
+  revision = "a6b53ec6cb22a3699387a57a161566f9402ee85b"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/ethereum/go-ethereum",
-    "github.com/ethereum/go-ethereum/common",
+    "github.com/globalsign/mgo",
     "github.com/gorilla/mux",
-    "github.com/jinzhu/gorm",
+    "github.com/tendermint/tendermint/libs/common",
+    "github.com/tendermint/tendermint/libs/log",
+    "gopkg.in/mgo.v2/bson",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

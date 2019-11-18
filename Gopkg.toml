@@ -33,6 +33,10 @@
   name = "github.com/gorilla/mux"
   version = "1.7.3"
 
-[[constraint]]
-  name = "github.com/jinzhu/gorm"
-  version = "1.9.11"
+[[override]]
+  name = "github.com/ethereum/go-ethereum"
+  version = "1.8.19"
+
+[[prune.project]]
+    name = "github.com/ethereum/go-ethereum"
+    unused-packages = false

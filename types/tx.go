@@ -1,42 +1,62 @@
 package types
 
 import (
-	"bytes"
+	"errors"
+	"fmt"
+	"time"
 
 	"github.com/BOPR/common"
-	ethCommon "github.com/ethereum/go-ethereum/common"
+	db "github.com/BOPR/db"
 )
 
 // Tx represets the transaction on BOPRU
 type Tx struct {
-	To     string
-	From   string
-	Amount uint64
-	Nonce  uint64
+	To     uint64 `bson:"to"`
+	From   uint64 `bson:"from"`
+	Amount uint64 `bson:"amount"`
+	Nonce  uint64 `bson:"nonce"`
 	// Fee       uint64
-	TxType    uint64
-	Signature string
+	TxType    uint64    `bson:"type"`
+	Signature string    `bson:"sig"`
+	Status    string    `bson:"status"`
+	Timestamp time.Time `bson:"timestamp"`
 }
 
 // NewTx creates a new transaction
-func NewTx(to ethCommon.Address, from ethCommon.Address, amount uint64, nonce uint64, sig string) Tx {
-	if bytes.Equal(to.Bytes(), common.WithdrawAddress) {
-		txType := 1
+func NewTx(to uint64, from uint64, amount uint64, nonce uint64, sig string) Tx {
+	if to == 0 {
+		// its a withdraw tx
+		// txType := 1
 	}
 	return Tx{
-		To:     to,
-		From:   from,
-		Amount: amount,
-		Nonce:  nonce,
-		TxType: 1,
+		To:        to,
+		From:      from,
+		Amount:    amount,
+		Nonce:     nonce,
+		TxType:    1,
+		Status:    "pending",
+		Timestamp: time.Now(),
 	}
 }
 
 // ValidateTx validates a transaction
-func (t *Tx) ValidateTx() bool {
+func (t *Tx) ValidateTx() error {
 	// signature len verification
-
-	// amount > 0 verification
+	if len(t.Signature) != 65 {
+		return errors.New("Signature invalid")
+	}
 
 	// signature to from account verification
+	return nil
+}
+
+// Insert tx into the DB
+func (t *Tx) Insert() error {
+	session := db.MgoSession.Copy()
+	defer session.Close()
+	if err := session.GetCollection(common.DATABASE, common.TRANSACTION_COLLECTION).Insert(t); err != nil {
+		fmt.Println("Unable to insert", "error", err)
+		return err
+	}
+	return nil
 }
