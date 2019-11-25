@@ -42,7 +42,7 @@ func (a *Aggregator) OnStart() error {
 	a.cancelAggregating = cancelAggregating
 
 	// start polling for checkpoint in buffer
-	go a.startAggregating(ctx, 1*time.Second)
+	go a.startAggregating(ctx, 5*time.Second)
 	a.Logger.Info("Starting aggregator")
 	return nil
 }
@@ -63,7 +63,6 @@ func (a *Aggregator) startAggregating(ctx context.Context, interval time.Duratio
 	for {
 		select {
 		case <-ticker.C:
-			fmt.Println("Ticker!")
 			pickBatch()
 			// pick batch from DB
 		case <-ctx.Done():
@@ -80,11 +79,17 @@ func pickBatch() {
 	query := bson.M{"status": "pending"}
 	var txs []types.Tx
 
+	// selector := bson.M{"status": "pending"}
+	// update := bson.M{"$set": bson.M{"status": "processed"}}
+
 	//Select Limit
 	iter := session.GetCollection(common.DATABASE, common.TRANSACTION_COLLECTION).Find(query).Limit(2).Iter()
 	err := iter.All(&txs)
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(types.ContractCallerObj)
+	// iter := session.GetCollection(common.DATABASE, common.TRANSACTION_COLLECTION).UpdateAll(selector, update).Limit(2)
+
 	fmt.Println("Found ", txs)
 }

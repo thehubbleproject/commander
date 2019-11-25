@@ -10,6 +10,7 @@ import (
 	db "github.com/BOPR/db"
 	"github.com/BOPR/poller"
 	"github.com/BOPR/rest"
+	"github.com/BOPR/types"
 
 	"github.com/gorilla/mux"
 )
@@ -20,8 +21,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to connect to DB")
 	}
+
 	db.MgoSession = *session
 	aggregator := poller.NewAggregator()
+	types.ContractCallerObj, err = types.NewContractCaller()
+	if err != nil {
+		panic(err)
+	}
 
 	// go routine to catch signal
 	catchSignal := make(chan os.Signal, 1)
