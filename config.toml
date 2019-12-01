@@ -1,0 +1,16 @@
+# This is a TOML config file.
+# For more information, see https://github.com/toml-lang/toml
+
+##### RPC configrations #####
+
+# RPC endpoint for ethereum chain
+eth_RPC_URL = "http://localhost:8545"
+
+##### DB configrations #####
+mongo_DB_url = "mongodb://localhost:27017"
+
+##### Server configrations #####
+server_port = "8080"
+polling_interval = "5s"
+
+confirmation_blocks = "5"

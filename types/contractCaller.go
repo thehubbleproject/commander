@@ -3,7 +3,7 @@ package types
 import (
 	"strings"
 
-	"github.com/cosmos-sdk/types"
+	"github.com/BOPR/types"
 	"github.com/ethereum/go-ethereum/rpc"
 
 	"github.com/BOPR/contracts/rollup"
