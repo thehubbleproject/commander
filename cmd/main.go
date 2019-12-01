@@ -92,6 +92,8 @@ func StartCmd() *cobra.Command {
 				log.Fatalln("Unable to unmarshall config", "Error", err)
 			}
 
+			config.GlobalCfg = cfg
+
 			// create mgo session
 			session, err := db.NewSession(cfg.MongoDB)
 			if err != nil {

@@ -10,6 +10,8 @@ const (
 	DefaultConfirmationBlocks = 5
 )
 
+var GlobalCfg Configuration
+
 // Configuration represents heimdall config
 type Configuration struct {
 	MongoDB            string        `mapstructure:"mongo_DB_url"`
