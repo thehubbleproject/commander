@@ -1,5 +1,8 @@
 dep:
 	dep ensure -v
+	rm -rf vendor/github.com/ethereum
+	mkdir -p vendor/github.com/ethereum
+	git clone -b v1.9.0 --single-branch --depth 1 https://github.com/ethereum/go-ethereum vendor/github.com/ethereum/go-ethereum
 	
 contracts:
 	abigen --abi=contracts/rollup/rollup.abi --pkg=rollup --out=contracts/rollup/rollup.go

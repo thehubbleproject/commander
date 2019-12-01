@@ -3,7 +3,6 @@ package types
 import (
 	"strings"
 
-	"github.com/BOPR/types"
 	"github.com/ethereum/go-ethereum/rpc"
 
 	"github.com/BOPR/contracts/rollup"
@@ -16,7 +15,7 @@ var ContractCallerObj ContractCaller
 
 // IContractCaller represents contract caller
 type IContractCaller interface {
-	SubmitBatch(txs []types.Tx)
+	SubmitBatch(txs []Tx)
 }
 
 // ContractCaller contract caller

@@ -342,14 +342,6 @@
   version = "v0.0.6"
 
 [[projects]]
-  digest = "1:5d231480e1c64a726869bc4142d270184c419749d34f167646baa21008eb0a79"
-  name = "github.com/mitchellh/go-homedir"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "af06845cf3004701891bf4fdb884bfe4920b3727"
-  version = "v1.1.0"
-
-[[projects]]
   digest = "1:53bc4cd4914cd7cd52139990d5170d6dc99067ae31c56530621b18b35fc30318"
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
@@ -433,14 +425,9 @@
   version = "v1.3.0"
 
 [[projects]]
-  digest = "1:8df08a5fb5241fcd71da41f08462e84a45ce4017a81958c15bde0c308689e9e4"
+  digest = "1:e096613fb7cf34743d49af87d197663cfccd61876e2219853005a57baedfa562"
   name = "github.com/spf13/cobra"
-  packages = [
-    ".",
-    "cobra",
-    "cobra/cmd",
-    "cobra/tpl",
-  ]
+  packages = ["."]
   pruneopts = "UT"
   revision = "f2b07da1e2c38d5f12845a4f607e2e1018cbb1f5"
   version = "v0.0.5"
@@ -663,7 +650,7 @@
     "github.com/ethereum/go-ethereum/rpc",
     "github.com/globalsign/mgo",
     "github.com/gorilla/mux",
-    "github.com/spf13/cobra/cobra",
+    "github.com/spf13/cobra",
     "github.com/spf13/viper",
     "github.com/tendermint/tendermint/libs/common",
     "github.com/tendermint/tendermint/libs/log",
