@@ -13,4 +13,8 @@ mongo_DB_url = "mongodb://localhost:27017"
 server_port = "8080"
 polling_interval = "5s"
 
+
 confirmation_blocks = "5"
+
+##### Contract Addresses #####
+rollup_address = "0x0000000000000000000000000000000000000000"

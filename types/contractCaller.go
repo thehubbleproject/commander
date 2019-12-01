@@ -5,6 +5,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/rpc"
 
+	"github.com/BOPR/config"
 	"github.com/BOPR/contracts/rollup"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	ethCmn "github.com/ethereum/go-ethereum/common"
@@ -29,7 +30,7 @@ type ContractCaller struct {
 
 // NewContractCaller contract caller
 func NewContractCaller() (contractCaller ContractCaller, err error) {
-	if RPCClient, err := rpc.Dial("https://ropsten.infura.io/v3/73d0b3b9a4b2499da81c71a2b2a473a9"); err != nil {
+	if RPCClient, err := rpc.Dial(config.GlobalCfg.EthRPC); err != nil {
 		return contractCaller, err
 	} else {
 		contractCaller.ethClient = ethclient.NewClient(RPCClient)

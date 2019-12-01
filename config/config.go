@@ -1,6 +1,10 @@
 package config
 
-import "time"
+import (
+	"time"
+
+	ethCmn "github.com/ethereum/go-ethereum/common"
+)
 
 const (
 	DefaultMongoDB            = "mongodb://localhost:27017"
@@ -19,6 +23,7 @@ type Configuration struct {
 	PollingInterval    time.Duration `mapstructure:"polling_interval"`
 	ServerPort         string        `mapstructure:"server_port"`
 	ConfirmationBlocks uint64        `mapstructure:"confirmation_blocks"` // Number of blocks for confirmation
+	RollupAddress      string        `mapstructure:"rollup_address"`
 }
 
 // GetDefaultConfig returns the default configration options
@@ -29,5 +34,6 @@ func GetDefaultConfig() Configuration {
 		PollingInterval:    DefaultPollingInterval,
 		ServerPort:         DefaultSeverPort,
 		ConfirmationBlocks: DefaultConfirmationBlocks,
+		RollupAddress:      ethCmn.Address{}.String(),
 	}
 }

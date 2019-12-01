@@ -11,7 +11,6 @@ import (
 // Note: any changes to the comments/variables/mapstructure
 // must be reflected in the appropriate struct in helper/config.go
 const defaultConfigTemplate = `# This is a TOML config file.
-# For more information, see https://github.com/toml-lang/toml
 
 ##### RPC configrations #####
 
@@ -25,7 +24,11 @@ mongo_DB_url = "{{ .MongoDB }}"
 server_port = "{{ .ServerPort }}"
 polling_interval = "{{ .PollingInterval }}"
 
+
 confirmation_blocks = "{{ .ConfirmationBlocks }}"
+
+##### Contract Addresses #####
+rollup_address = "{{ .RollupAddress }}"
 `
 
 var configTemplate *template.Template
