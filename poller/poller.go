@@ -2,7 +2,6 @@ package poller
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/BOPR/common"
@@ -63,7 +62,7 @@ func (a *Aggregator) startAggregating(ctx context.Context, interval time.Duratio
 	for {
 		select {
 		case <-ticker.C:
-			pickBatch()
+			a.pickBatch()
 			// pick batch from DB
 		case <-ctx.Done():
 			ticker.Stop()
@@ -72,7 +71,7 @@ func (a *Aggregator) startAggregating(ctx context.Context, interval time.Duratio
 	}
 }
 
-func pickBatch() {
+func (a *Aggregator) pickBatch() {
 	session := db.MgoSession.Copy()
 	defer session.Close()
 
@@ -82,14 +81,26 @@ func pickBatch() {
 	// selector := bson.M{"status": "pending"}
 	// update := bson.M{"$set": bson.M{"status": "processed"}}
 
+	// STEP-1 Get transactions from the DB
 	//Select Limit
 	iter := session.GetCollection(common.DATABASE, common.TRANSACTION_COLLECTION).Find(query).Limit(2).Iter()
 	err := iter.All(&txs)
 	if err != nil {
-		panic(err)
+		a.Logger.Error("Error iterating over transactions", "Error", err)
+		return
 	}
-	fmt.Println(types.ContractCallerObj)
 	// iter := session.GetCollection(common.DATABASE, common.TRANSACTION_COLLECTION).UpdateAll(selector, update).Limit(2)
 
-	fmt.Println("Found ", txs)
+	// Step-2
+	// 1. Loop  all transactions
+	// 2. Run verify_tx on them and update the leafs in DB according to result
+	for i, tx := range txs {
+		a.Logger.Debug("Verifing transaction", "index", i, "tx", tx.String())
+		// TODO Run verify tx from contract
+
+	}
+
+	// Step-3
+	// Finally create a merkel root of all updated leafs and push batch on-chain
+
 }

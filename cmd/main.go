@@ -20,6 +20,7 @@ import (
 
 const (
 	WithConfigPathFlag = "config-path"
+	ConfigFileName     = "config"
 )
 
 // Executor wraps the cobra Command with a nicer Execute method
@@ -80,7 +81,7 @@ func StartCmd() *cobra.Command {
 				log.Fatal(err)
 			}
 
-			viperObj.SetConfigName("config") // name of config file (without extension)
+			viperObj.SetConfigName(ConfigFileName) // name of config file (without extension)
 			viperObj.AddConfigPath(dir)
 			err = viperObj.ReadInConfig()
 			if err != nil { // Handle errors reading the config file
@@ -127,10 +128,10 @@ func StartCmd() *cobra.Command {
 			if err := aggregator.Start(); err != nil {
 				log.Fatalln("Unable to start aggregator", "error", err)
 			}
-			// start server
-			fmt.Printf("Starting server")
+
 			// TODO replace this with port from config
 			http.ListenAndServe(":8080", r)
+			fmt.Println("Server started on port 8080 🎉")
 		},
 	}
 }

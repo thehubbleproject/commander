@@ -60,3 +60,7 @@ func (t *Tx) Insert() error {
 	}
 	return nil
 }
+
+func (t *Tx) String() string {
+	return fmt.Sprintf("To: %v From: %v Amount: %v Nonce: %v Type:%v Status:%v", t.To, t.From, t.Amount, t.Nonce, t.Status)
+}
