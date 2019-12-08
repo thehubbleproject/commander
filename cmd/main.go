@@ -108,6 +108,9 @@ func StartCmd() *cobra.Command {
 				panic(err)
 			}
 
+			// TODO: Before starting services check if we are on latest batch and our root matches
+			//  then start other services 
+
 			// go routine to catch signal
 			catchSignal := make(chan os.Signal, 1)
 			signal.Notify(catchSignal, os.Interrupt)
