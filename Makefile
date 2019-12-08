@@ -14,4 +14,6 @@ build: clean
 	mkdir -p build
 	go build -o build/bopr cmd/main.go
 
+init:
+	./build/bopr init
 .PHONY: contracts dep build clean
