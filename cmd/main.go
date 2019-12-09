@@ -105,18 +105,19 @@ func StartCmd() *cobra.Command {
 			batchCount, err := types.ContractCallerObj.TotalBatches()
 			common.PanicIfError(err)
 
+			// If 0, dump to DB and start building on itd
 			if batchCount == 0 {
 				root, err := types.ContractCallerObj.FetchBalanceTreeRoot()
 				common.PanicIfError(err)
 
 				fmt.Println(root)
-				// persist root
+				// persist root to DB
 				err = db.InsertBatchRoot(root, batchCount)
 				common.PanicIfError(err)
 			}
-			// If 0, dump to DB and start building on it
 
 			// If !0, start syncer to sync all the blocks
+			// TODO start syncer
 
 			// go routine to catch signal
 			catchSignal := make(chan os.Signal, 1)
