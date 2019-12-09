@@ -1,5 +1,55 @@
 [
 	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "merkleTreeLib",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "bytes32",
+				"name": "root",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "NewAccount",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "bytes32",
+				"name": "txroot",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"internalType": "bytes32",
+				"name": "updatedRoot",
+				"type": "bytes32"
+			}
+		],
+		"name": "NewBatch",
+		"type": "event"
+	},
+	{
 		"constant": true,
 		"inputs": [],
 		"name": "ZERO_BYTES32",
@@ -15,60 +65,9 @@
 		"type": "function"
 	},
 	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "bytes",
-				"name": "tx_sig",
-				"type": "bytes"
-			},
-			{
-				"internalType": "address",
-				"name": "tx_from",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "tx_to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "tx_amount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bytes",
-				"name": "proof_from",
-				"type": "bytes"
-			},
-			{
-				"internalType": "bytes",
-				"name": "proof_to",
-				"type": "bytes"
-			}
-		],
-		"name": "updateTx",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "bytes[]",
-				"name": "_txs",
-				"type": "bytes[]"
-			},
-			{
-				"internalType": "bytes32",
-				"name": "updatedRoot",
-				"type": "bytes32"
-			}
-		],
-		"name": "submitBatch",
+		"constant": true,
+		"inputs": [],
+		"name": "balanceTreeRoot",
 		"outputs": [
 			{
 				"internalType": "bytes32",
@@ -77,7 +76,7 @@
 			}
 		],
 		"payable": false,
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -128,23 +127,58 @@
 	},
 	{
 		"constant": true,
-		"inputs": [],
-		"name": "GENESIS_BALANCE_TREE",
-		"outputs": [
+		"inputs": [
 			{
-				"internalType": "bytes32",
-				"name": "",
-				"type": "bytes32"
+				"internalType": "bytes",
+				"name": "tx_bytes",
+				"type": "bytes"
 			}
 		],
+		"name": "decodeTx",
+		"outputs": [],
 		"payable": false,
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "initAccounts",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
 		"constant": true,
 		"inputs": [],
-		"name": "ACCOUNT_TREE_STATE",
+		"name": "numberOfBatches",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "bytes[]",
+				"name": "_txs",
+				"type": "bytes[]"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "updatedRoot",
+				"type": "bytes32"
+			}
+		],
+		"name": "submitBatch",
 		"outputs": [
 			{
 				"internalType": "bytes32",
@@ -153,38 +187,77 @@
 			}
 		],
 		"payable": false,
-		"stateMutability": "view",
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
+		"constant": false,
 		"inputs": [
 			{
-				"internalType": "address",
-				"name": "merkleTreeLib",
-				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "bytes32",
-				"name": "txroot",
-				"type": "bytes32"
+				"internalType": "bytes",
+				"name": "tx_sig",
+				"type": "bytes"
 			},
 			{
-				"indexed": false,
-				"internalType": "bytes32",
-				"name": "updatedRoot",
-				"type": "bytes32"
+				"internalType": "uint256",
+				"name": "tx_from",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tx_to",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tx_amount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bytes",
+				"name": "proof_from",
+				"type": "bytes"
+			},
+			{
+				"internalType": "bytes",
+				"name": "proof_to",
+				"type": "bytes"
 			}
 		],
-		"name": "NewBatch",
-		"type": "event"
+		"name": "updateTx",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "bytes",
+				"name": "_tx",
+				"type": "bytes"
+			},
+			{
+				"internalType": "uint256",
+				"name": "latest_batch_index",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bytes[]",
+				"name": "to_merkel_proof",
+				"type": "bytes[]"
+			},
+			{
+				"internalType": "bytes[]",
+				"name": "from_merkel_proof",
+				"type": "bytes[]"
+			}
+		],
+		"name": "verifyTx",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
 	}
 ]

@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 	db "github.com/BOPR/db"
 
@@ -77,39 +78,45 @@ func StartCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			viperObj := viper.New()
 			dir, err := os.Getwd()
-			if err != nil {
-				log.Fatal(err)
-			}
+			common.PanicIfError(err)
 
 			viperObj.SetConfigName(ConfigFileName) // name of config file (without extension)
 			viperObj.AddConfigPath(dir)
 			err = viperObj.ReadInConfig()
-			if err != nil { // Handle errors reading the config file
-				log.Fatal(err)
-			}
+			common.PanicIfError(err)
 
 			var cfg config.Configuration
 			if err = viperObj.UnmarshalExact(&cfg); err != nil {
-				log.Fatalln("Unable to unmarshall config", "Error", err)
+				common.PanicIfError(err)
 			}
 
 			config.GlobalCfg = cfg
 
 			// create mgo session
 			session, err := db.NewSession(cfg.MongoDB)
-			if err != nil {
-				log.Fatalf("Unable to connect to DB")
-			}
+			common.PanicIfError(err)
 
 			db.MgoSession = *session
 			aggregator := poller.NewAggregator()
 			types.ContractCallerObj, err = types.NewContractCaller()
-			if err != nil {
-				panic(err)
-			}
+			common.PanicIfError(err)
 
-			// TODO: Before starting services check if we are on latest batch and our root matches
-			//  then start other services 
+			// fetch number of batches
+			batchCount, err := types.ContractCallerObj.TotalBatches()
+			common.PanicIfError(err)
+
+			if batchCount == 0 {
+				root, err := types.ContractCallerObj.FetchBalanceTreeRoot()
+				common.PanicIfError(err)
+
+				fmt.Println(root)
+				// persist root
+				err = db.InsertBatchRoot(root, batchCount)
+				common.PanicIfError(err)
+			}
+			// If 0, dump to DB and start building on it
+
+			// If !0, start syncer to sync all the blocks
 
 			// go routine to catch signal
 			catchSignal := make(chan os.Signal, 1)

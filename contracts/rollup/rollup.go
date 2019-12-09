@@ -28,7 +28,7 @@ var (
 )
 
 // RollupABI is the input ABI used to generate the binding from.
-const RollupABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"ZERO_BYTES32\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"tx_sig\",\"type\":\"bytes\"},{\"internalType\":\"address\",\"name\":\"tx_from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"tx_to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tx_amount\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"proof_from\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"proof_to\",\"type\":\"bytes\"}],\"name\":\"updateTx\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes[]\",\"name\":\"_txs\",\"type\":\"bytes[]\"},{\"internalType\":\"bytes32\",\"name\":\"updatedRoot\",\"type\":\"bytes32\"}],\"name\":\"submitBatch\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"batches\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"stateRoot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"withdraw_root\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"committer\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"account_tree_state\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"txRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"GENESIS_BALANCE_TREE\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ACCOUNT_TREE_STATE\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"merkleTreeLib\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txroot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"updatedRoot\",\"type\":\"bytes32\"}],\"name\":\"NewBatch\",\"type\":\"event\"}]"
+const RollupABI = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"merkleTreeLib\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"root\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"NewAccount\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txroot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"updatedRoot\",\"type\":\"bytes32\"}],\"name\":\"NewBatch\",\"type\":\"event\"},{\"constant\":true,\"inputs\":[],\"name\":\"ZERO_BYTES32\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"balanceTreeRoot\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"batches\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"stateRoot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"withdraw_root\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"committer\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"account_tree_state\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"txRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"tx_bytes\",\"type\":\"bytes\"}],\"name\":\"decodeTx\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"initAccounts\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"numberOfBatches\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes[]\",\"name\":\"_txs\",\"type\":\"bytes[]\"},{\"internalType\":\"bytes32\",\"name\":\"updatedRoot\",\"type\":\"bytes32\"}],\"name\":\"submitBatch\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"tx_sig\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"tx_from\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tx_to\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tx_amount\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"proof_from\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"proof_to\",\"type\":\"bytes\"}],\"name\":\"updateTx\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"_tx\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"latest_batch_index\",\"type\":\"uint256\"},{\"internalType\":\"bytes[]\",\"name\":\"to_merkel_proof\",\"type\":\"bytes[]\"},{\"internalType\":\"bytes[]\",\"name\":\"from_merkel_proof\",\"type\":\"bytes[]\"}],\"name\":\"verifyTx\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]"
 
 // Rollup is an auto generated Go binding around an Ethereum contract.
 type Rollup struct {
@@ -172,58 +172,6 @@ func (_Rollup *RollupTransactorRaw) Transact(opts *bind.TransactOpts, method str
 	return _Rollup.Contract.contract.Transact(opts, method, params...)
 }
 
-// ACCOUNTTREESTATE is a free data retrieval call binding the contract method 0xecf24838.
-//
-// Solidity: function ACCOUNT_TREE_STATE() constant returns(bytes32)
-func (_Rollup *RollupCaller) ACCOUNTTREESTATE(opts *bind.CallOpts) ([32]byte, error) {
-	var (
-		ret0 = new([32]byte)
-	)
-	out := ret0
-	err := _Rollup.contract.Call(opts, out, "ACCOUNT_TREE_STATE")
-	return *ret0, err
-}
-
-// ACCOUNTTREESTATE is a free data retrieval call binding the contract method 0xecf24838.
-//
-// Solidity: function ACCOUNT_TREE_STATE() constant returns(bytes32)
-func (_Rollup *RollupSession) ACCOUNTTREESTATE() ([32]byte, error) {
-	return _Rollup.Contract.ACCOUNTTREESTATE(&_Rollup.CallOpts)
-}
-
-// ACCOUNTTREESTATE is a free data retrieval call binding the contract method 0xecf24838.
-//
-// Solidity: function ACCOUNT_TREE_STATE() constant returns(bytes32)
-func (_Rollup *RollupCallerSession) ACCOUNTTREESTATE() ([32]byte, error) {
-	return _Rollup.Contract.ACCOUNTTREESTATE(&_Rollup.CallOpts)
-}
-
-// GENESISBALANCETREE is a free data retrieval call binding the contract method 0xc6a6996a.
-//
-// Solidity: function GENESIS_BALANCE_TREE() constant returns(bytes32)
-func (_Rollup *RollupCaller) GENESISBALANCETREE(opts *bind.CallOpts) ([32]byte, error) {
-	var (
-		ret0 = new([32]byte)
-	)
-	out := ret0
-	err := _Rollup.contract.Call(opts, out, "GENESIS_BALANCE_TREE")
-	return *ret0, err
-}
-
-// GENESISBALANCETREE is a free data retrieval call binding the contract method 0xc6a6996a.
-//
-// Solidity: function GENESIS_BALANCE_TREE() constant returns(bytes32)
-func (_Rollup *RollupSession) GENESISBALANCETREE() ([32]byte, error) {
-	return _Rollup.Contract.GENESISBALANCETREE(&_Rollup.CallOpts)
-}
-
-// GENESISBALANCETREE is a free data retrieval call binding the contract method 0xc6a6996a.
-//
-// Solidity: function GENESIS_BALANCE_TREE() constant returns(bytes32)
-func (_Rollup *RollupCallerSession) GENESISBALANCETREE() ([32]byte, error) {
-	return _Rollup.Contract.GENESISBALANCETREE(&_Rollup.CallOpts)
-}
-
 // ZEROBYTES32 is a free data retrieval call binding the contract method 0x069321b0.
 //
 // Solidity: function ZERO_BYTES32() constant returns(bytes32)
@@ -248,6 +196,32 @@ func (_Rollup *RollupSession) ZEROBYTES32() ([32]byte, error) {
 // Solidity: function ZERO_BYTES32() constant returns(bytes32)
 func (_Rollup *RollupCallerSession) ZEROBYTES32() ([32]byte, error) {
 	return _Rollup.Contract.ZEROBYTES32(&_Rollup.CallOpts)
+}
+
+// BalanceTreeRoot is a free data retrieval call binding the contract method 0xb4e7dddd.
+//
+// Solidity: function balanceTreeRoot() constant returns(bytes32)
+func (_Rollup *RollupCaller) BalanceTreeRoot(opts *bind.CallOpts) ([32]byte, error) {
+	var (
+		ret0 = new([32]byte)
+	)
+	out := ret0
+	err := _Rollup.contract.Call(opts, out, "balanceTreeRoot")
+	return *ret0, err
+}
+
+// BalanceTreeRoot is a free data retrieval call binding the contract method 0xb4e7dddd.
+//
+// Solidity: function balanceTreeRoot() constant returns(bytes32)
+func (_Rollup *RollupSession) BalanceTreeRoot() ([32]byte, error) {
+	return _Rollup.Contract.BalanceTreeRoot(&_Rollup.CallOpts)
+}
+
+// BalanceTreeRoot is a free data retrieval call binding the contract method 0xb4e7dddd.
+//
+// Solidity: function balanceTreeRoot() constant returns(bytes32)
+func (_Rollup *RollupCallerSession) BalanceTreeRoot() ([32]byte, error) {
+	return _Rollup.Contract.BalanceTreeRoot(&_Rollup.CallOpts)
 }
 
 // Batches is a free data retrieval call binding the contract method 0xb32c4d8d.
@@ -302,6 +276,101 @@ func (_Rollup *RollupCallerSession) Batches(arg0 *big.Int) (struct {
 	return _Rollup.Contract.Batches(&_Rollup.CallOpts, arg0)
 }
 
+// DecodeTx is a free data retrieval call binding the contract method 0xdae029d3.
+//
+// Solidity: function decodeTx(bytes tx_bytes) constant returns()
+func (_Rollup *RollupCaller) DecodeTx(opts *bind.CallOpts, tx_bytes []byte) error {
+	var ()
+	out := &[]interface{}{}
+	err := _Rollup.contract.Call(opts, out, "decodeTx", tx_bytes)
+	return err
+}
+
+// DecodeTx is a free data retrieval call binding the contract method 0xdae029d3.
+//
+// Solidity: function decodeTx(bytes tx_bytes) constant returns()
+func (_Rollup *RollupSession) DecodeTx(tx_bytes []byte) error {
+	return _Rollup.Contract.DecodeTx(&_Rollup.CallOpts, tx_bytes)
+}
+
+// DecodeTx is a free data retrieval call binding the contract method 0xdae029d3.
+//
+// Solidity: function decodeTx(bytes tx_bytes) constant returns()
+func (_Rollup *RollupCallerSession) DecodeTx(tx_bytes []byte) error {
+	return _Rollup.Contract.DecodeTx(&_Rollup.CallOpts, tx_bytes)
+}
+
+// NumberOfBatches is a free data retrieval call binding the contract method 0x88c46fb8.
+//
+// Solidity: function numberOfBatches() constant returns(uint256)
+func (_Rollup *RollupCaller) NumberOfBatches(opts *bind.CallOpts) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _Rollup.contract.Call(opts, out, "numberOfBatches")
+	return *ret0, err
+}
+
+// NumberOfBatches is a free data retrieval call binding the contract method 0x88c46fb8.
+//
+// Solidity: function numberOfBatches() constant returns(uint256)
+func (_Rollup *RollupSession) NumberOfBatches() (*big.Int, error) {
+	return _Rollup.Contract.NumberOfBatches(&_Rollup.CallOpts)
+}
+
+// NumberOfBatches is a free data retrieval call binding the contract method 0x88c46fb8.
+//
+// Solidity: function numberOfBatches() constant returns(uint256)
+func (_Rollup *RollupCallerSession) NumberOfBatches() (*big.Int, error) {
+	return _Rollup.Contract.NumberOfBatches(&_Rollup.CallOpts)
+}
+
+// VerifyTx is a free data retrieval call binding the contract method 0x7fd7f802.
+//
+// Solidity: function verifyTx(bytes _tx, uint256 latest_batch_index, bytes[] to_merkel_proof, bytes[] from_merkel_proof) constant returns()
+func (_Rollup *RollupCaller) VerifyTx(opts *bind.CallOpts, _tx []byte, latest_batch_index *big.Int, to_merkel_proof [][]byte, from_merkel_proof [][]byte) error {
+	var ()
+	out := &[]interface{}{}
+	err := _Rollup.contract.Call(opts, out, "verifyTx", _tx, latest_batch_index, to_merkel_proof, from_merkel_proof)
+	return err
+}
+
+// VerifyTx is a free data retrieval call binding the contract method 0x7fd7f802.
+//
+// Solidity: function verifyTx(bytes _tx, uint256 latest_batch_index, bytes[] to_merkel_proof, bytes[] from_merkel_proof) constant returns()
+func (_Rollup *RollupSession) VerifyTx(_tx []byte, latest_batch_index *big.Int, to_merkel_proof [][]byte, from_merkel_proof [][]byte) error {
+	return _Rollup.Contract.VerifyTx(&_Rollup.CallOpts, _tx, latest_batch_index, to_merkel_proof, from_merkel_proof)
+}
+
+// VerifyTx is a free data retrieval call binding the contract method 0x7fd7f802.
+//
+// Solidity: function verifyTx(bytes _tx, uint256 latest_batch_index, bytes[] to_merkel_proof, bytes[] from_merkel_proof) constant returns()
+func (_Rollup *RollupCallerSession) VerifyTx(_tx []byte, latest_batch_index *big.Int, to_merkel_proof [][]byte, from_merkel_proof [][]byte) error {
+	return _Rollup.Contract.VerifyTx(&_Rollup.CallOpts, _tx, latest_batch_index, to_merkel_proof, from_merkel_proof)
+}
+
+// InitAccounts is a paid mutator transaction binding the contract method 0x49f2545b.
+//
+// Solidity: function initAccounts() returns()
+func (_Rollup *RollupTransactor) InitAccounts(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _Rollup.contract.Transact(opts, "initAccounts")
+}
+
+// InitAccounts is a paid mutator transaction binding the contract method 0x49f2545b.
+//
+// Solidity: function initAccounts() returns()
+func (_Rollup *RollupSession) InitAccounts() (*types.Transaction, error) {
+	return _Rollup.Contract.InitAccounts(&_Rollup.TransactOpts)
+}
+
+// InitAccounts is a paid mutator transaction binding the contract method 0x49f2545b.
+//
+// Solidity: function initAccounts() returns()
+func (_Rollup *RollupTransactorSession) InitAccounts() (*types.Transaction, error) {
+	return _Rollup.Contract.InitAccounts(&_Rollup.TransactOpts)
+}
+
 // SubmitBatch is a paid mutator transaction binding the contract method 0x0e981757.
 //
 // Solidity: function submitBatch(bytes[] _txs, bytes32 updatedRoot) returns(bytes32)
@@ -323,25 +392,148 @@ func (_Rollup *RollupTransactorSession) SubmitBatch(_txs [][]byte, updatedRoot [
 	return _Rollup.Contract.SubmitBatch(&_Rollup.TransactOpts, _txs, updatedRoot)
 }
 
-// UpdateTx is a paid mutator transaction binding the contract method 0x0736a825.
+// UpdateTx is a paid mutator transaction binding the contract method 0x2cb79e21.
 //
-// Solidity: function updateTx(bytes tx_sig, address tx_from, address tx_to, uint256 tx_amount, bytes proof_from, bytes proof_to) returns()
-func (_Rollup *RollupTransactor) UpdateTx(opts *bind.TransactOpts, tx_sig []byte, tx_from common.Address, tx_to common.Address, tx_amount *big.Int, proof_from []byte, proof_to []byte) (*types.Transaction, error) {
+// Solidity: function updateTx(bytes tx_sig, uint256 tx_from, uint256 tx_to, uint256 tx_amount, bytes proof_from, bytes proof_to) returns()
+func (_Rollup *RollupTransactor) UpdateTx(opts *bind.TransactOpts, tx_sig []byte, tx_from *big.Int, tx_to *big.Int, tx_amount *big.Int, proof_from []byte, proof_to []byte) (*types.Transaction, error) {
 	return _Rollup.contract.Transact(opts, "updateTx", tx_sig, tx_from, tx_to, tx_amount, proof_from, proof_to)
 }
 
-// UpdateTx is a paid mutator transaction binding the contract method 0x0736a825.
+// UpdateTx is a paid mutator transaction binding the contract method 0x2cb79e21.
 //
-// Solidity: function updateTx(bytes tx_sig, address tx_from, address tx_to, uint256 tx_amount, bytes proof_from, bytes proof_to) returns()
-func (_Rollup *RollupSession) UpdateTx(tx_sig []byte, tx_from common.Address, tx_to common.Address, tx_amount *big.Int, proof_from []byte, proof_to []byte) (*types.Transaction, error) {
+// Solidity: function updateTx(bytes tx_sig, uint256 tx_from, uint256 tx_to, uint256 tx_amount, bytes proof_from, bytes proof_to) returns()
+func (_Rollup *RollupSession) UpdateTx(tx_sig []byte, tx_from *big.Int, tx_to *big.Int, tx_amount *big.Int, proof_from []byte, proof_to []byte) (*types.Transaction, error) {
 	return _Rollup.Contract.UpdateTx(&_Rollup.TransactOpts, tx_sig, tx_from, tx_to, tx_amount, proof_from, proof_to)
 }
 
-// UpdateTx is a paid mutator transaction binding the contract method 0x0736a825.
+// UpdateTx is a paid mutator transaction binding the contract method 0x2cb79e21.
 //
-// Solidity: function updateTx(bytes tx_sig, address tx_from, address tx_to, uint256 tx_amount, bytes proof_from, bytes proof_to) returns()
-func (_Rollup *RollupTransactorSession) UpdateTx(tx_sig []byte, tx_from common.Address, tx_to common.Address, tx_amount *big.Int, proof_from []byte, proof_to []byte) (*types.Transaction, error) {
+// Solidity: function updateTx(bytes tx_sig, uint256 tx_from, uint256 tx_to, uint256 tx_amount, bytes proof_from, bytes proof_to) returns()
+func (_Rollup *RollupTransactorSession) UpdateTx(tx_sig []byte, tx_from *big.Int, tx_to *big.Int, tx_amount *big.Int, proof_from []byte, proof_to []byte) (*types.Transaction, error) {
 	return _Rollup.Contract.UpdateTx(&_Rollup.TransactOpts, tx_sig, tx_from, tx_to, tx_amount, proof_from, proof_to)
+}
+
+// RollupNewAccountIterator is returned from FilterNewAccount and is used to iterate over the raw logs and unpacked data for NewAccount events raised by the Rollup contract.
+type RollupNewAccountIterator struct {
+	Event *RollupNewAccount // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *RollupNewAccountIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(RollupNewAccount)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(RollupNewAccount)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *RollupNewAccountIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *RollupNewAccountIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// RollupNewAccount represents a NewAccount event raised by the Rollup contract.
+type RollupNewAccount struct {
+	Root  [32]byte
+	Index *big.Int
+	Raw   types.Log // Blockchain specific contextual infos
+}
+
+// FilterNewAccount is a free log retrieval operation binding the contract event 0x8b7959e43d6da6de7ea88053c29ed23dc7c9f55e140402407c430152562c14b3.
+//
+// Solidity: event NewAccount(bytes32 root, uint256 index)
+func (_Rollup *RollupFilterer) FilterNewAccount(opts *bind.FilterOpts) (*RollupNewAccountIterator, error) {
+
+	logs, sub, err := _Rollup.contract.FilterLogs(opts, "NewAccount")
+	if err != nil {
+		return nil, err
+	}
+	return &RollupNewAccountIterator{contract: _Rollup.contract, event: "NewAccount", logs: logs, sub: sub}, nil
+}
+
+// WatchNewAccount is a free log subscription operation binding the contract event 0x8b7959e43d6da6de7ea88053c29ed23dc7c9f55e140402407c430152562c14b3.
+//
+// Solidity: event NewAccount(bytes32 root, uint256 index)
+func (_Rollup *RollupFilterer) WatchNewAccount(opts *bind.WatchOpts, sink chan<- *RollupNewAccount) (event.Subscription, error) {
+
+	logs, sub, err := _Rollup.contract.WatchLogs(opts, "NewAccount")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(RollupNewAccount)
+				if err := _Rollup.contract.UnpackLog(event, "NewAccount", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
 }
 
 // RollupNewBatchIterator is returned from FilterNewBatch and is used to iterate over the raw logs and unpacked data for NewBatch events raised by the Rollup contract.

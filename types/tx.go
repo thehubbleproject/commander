@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/BOPR/common"
-	db "github.com/BOPR/db"
 )
 
 // Tx represets the transaction on BOPRU
@@ -50,17 +49,6 @@ func (t *Tx) ValidateTx() error {
 	}
 
 	// signature to from account verification
-	return nil
-}
-
-// Insert tx into the DB
-func (t *Tx) Insert() error {
-	session := db.MgoSession.Copy()
-	defer session.Close()
-	if err := session.GetCollection(common.DATABASE, common.TRANSACTION_COLLECTION).Insert(t); err != nil {
-		fmt.Println("Unable to insert", "error", err)
-		return err
-	}
 	return nil
 }
 

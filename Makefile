@@ -16,4 +16,8 @@ build: clean
 
 init:
 	./build/bopr init
-.PHONY: contracts dep build clean
+
+start:
+	./build/bopr start
+	 
+.PHONY: contracts dep build clean start

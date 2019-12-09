@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/BOPR/types"
+	db "github.com/BOPR/db"
+
 )
 
 type (
@@ -28,6 +30,6 @@ func TxReceiverHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Printf("transaction", tx)
 	userTx := types.NewTx(tx.To, tx.From, tx.Amount, tx.Nonce, tx.Signature)
-	userTx.Insert()
+	db.InsertTx(&userTx)
 	return
 }

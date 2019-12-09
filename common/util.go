@@ -24,3 +24,9 @@ func AppendSlices(dataSlices [][]byte) (result []byte) {
 	}
 	return
 }
+
+func PanicIfError(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
