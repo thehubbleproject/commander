@@ -2,12 +2,11 @@ package poller
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/BOPR/common"
 	db "github.com/BOPR/db"
-	"github.com/BOPR/types"
-	"gopkg.in/mgo.v2/bson"
 
 	tmCmn "github.com/tendermint/tendermint/libs/common"
 )
@@ -56,7 +55,6 @@ func (a *Aggregator) OnStop() {
 
 func (a *Aggregator) startAggregating(ctx context.Context, interval time.Duration) {
 	ticker := time.NewTicker(interval)
-
 	// stop ticker when everything done
 	defer ticker.Stop()
 	for {
@@ -72,24 +70,10 @@ func (a *Aggregator) startAggregating(ctx context.Context, interval time.Duratio
 }
 
 func (a *Aggregator) pickBatch() {
-	session := db.MgoSession.Copy()
-	defer session.Close()
-
-	query := bson.M{"status": "pending"}
-	var txs []types.Tx
-
-	// selector := bson.M{"status": "pending"}
-	// update := bson.M{"$set": bson.M{"status": "processed"}}
-
-	// STEP-1 Get transactions from the DB
-	//Select Limit
-	iter := session.GetCollection(common.DATABASE, common.TRANSACTION_COLLECTION).Find(query).Limit(2).Iter()
-	err := iter.All(&txs)
+	txs, err := db.PopTxs()
 	if err != nil {
-		a.Logger.Error("Error iterating over transactions", "Error", err)
-		return
+		fmt.Println("Error while popping txs from mempool", "Error", err)
 	}
-	// iter := session.GetCollection(common.DATABASE, common.TRANSACTION_COLLECTION).UpdateAll(selector, update).Limit(2)
 
 	// Step-2
 	// 1. Loop  all transactions

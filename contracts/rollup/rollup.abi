@@ -1,5 +1,14 @@
 [
 	{
+		"constant": false,
+		"inputs": [],
+		"name": "initAccounts",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -50,9 +59,20 @@
 		"type": "event"
 	},
 	{
-		"constant": true,
-		"inputs": [],
-		"name": "ZERO_BYTES32",
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "bytes[]",
+				"name": "_txs",
+				"type": "bytes[]"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "updatedRoot",
+				"type": "bytes32"
+			}
+		],
+		"name": "submitBatch",
 		"outputs": [
 			{
 				"internalType": "bytes32",
@@ -61,7 +81,47 @@
 			}
 		],
 		"payable": false,
-		"stateMutability": "view",
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "bytes",
+				"name": "tx",
+				"type": "bytes"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tx_from",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tx_to",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tx_amount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bytes",
+				"name": "proof_from",
+				"type": "bytes"
+			},
+			{
+				"internalType": "bytes",
+				"name": "proof_to",
+				"type": "bytes"
+			}
+		],
+		"name": "updateTx",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -141,15 +201,6 @@
 		"type": "function"
 	},
 	{
-		"constant": false,
-		"inputs": [],
-		"name": "initAccounts",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"constant": true,
 		"inputs": [],
 		"name": "numberOfBatches",
@@ -162,72 +213,6 @@
 		],
 		"payable": false,
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "bytes[]",
-				"name": "_txs",
-				"type": "bytes[]"
-			},
-			{
-				"internalType": "bytes32",
-				"name": "updatedRoot",
-				"type": "bytes32"
-			}
-		],
-		"name": "submitBatch",
-		"outputs": [
-			{
-				"internalType": "bytes32",
-				"name": "",
-				"type": "bytes32"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "bytes",
-				"name": "tx_sig",
-				"type": "bytes"
-			},
-			{
-				"internalType": "uint256",
-				"name": "tx_from",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "tx_to",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "tx_amount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bytes",
-				"name": "proof_from",
-				"type": "bytes"
-			},
-			{
-				"internalType": "bytes",
-				"name": "proof_to",
-				"type": "bytes"
-			}
-		],
-		"name": "updateTx",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -256,6 +241,21 @@
 		],
 		"name": "verifyTx",
 		"outputs": [],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "ZERO_BYTES32",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
 		"payable": false,
 		"stateMutability": "view",
 		"type": "function"

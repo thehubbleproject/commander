@@ -53,7 +53,7 @@ func (t *Tx) ValidateTx() error {
 }
 
 func (t *Tx) String() string {
-	return fmt.Sprintf("To: %v From: %v Amount: %v Nonce: %v Type:%v Status:%v", t.To, t.From, t.Amount, t.Nonce, t.Status)
+	return fmt.Sprintf("To: %v From: %v Amount: %v Nonce: %v Type:%v Status:%v", t.To, t.From, t.Amount, t.Nonce, t.TxType, t.Status)
 }
 
 // MinimalTx constructs minimal tx from normal tx

@@ -50,6 +50,7 @@ func main() {
 	)
 	rootCmd.AddCommand(InitCmd())
 	rootCmd.AddCommand(StartCmd())
+	rootCmd.AddCommand(ResetCmd())
 
 	executor := Executor{rootCmd, os.Exit}
 	if err := executor.Command.Execute(); err != nil {
@@ -66,6 +67,37 @@ func InitCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			defaultConfig := config.GetDefaultConfig()
 			config.WriteConfigFile("./config.toml", &defaultConfig)
+		},
+	}
+}
+
+// ResetCmd resets all the collections
+func ResetCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "reset",
+		Short: "reset database",
+		Run: func(cmd *cobra.Command, args []string) {
+			viperObj := viper.New()
+			dir, err := os.Getwd()
+			common.PanicIfError(err)
+
+			viperObj.SetConfigName(ConfigFileName) // name of config file (without extension)
+			viperObj.AddConfigPath(dir)
+			err = viperObj.ReadInConfig()
+			common.PanicIfError(err)
+
+			var cfg config.Configuration
+			if err = viperObj.UnmarshalExact(&cfg); err != nil {
+				common.PanicIfError(err)
+			}
+			config.GlobalCfg = cfg
+
+			// create mgo session
+			session, err := db.NewSession(cfg.MongoDB)
+			common.PanicIfError(err)
+			fmt.Println("Resetting database", "db", common.DATABASE)
+			err = session.DropDatabase(common.DATABASE)
+			common.PanicIfError(err)
 		},
 	}
 }
@@ -110,9 +142,8 @@ func StartCmd() *cobra.Command {
 				root, err := types.ContractCallerObj.FetchBalanceTreeRoot()
 				common.PanicIfError(err)
 
-				fmt.Println(root)
-				// persist root to DB
-				err = db.InsertBatchRoot(root, batchCount)
+				// persist batch info to DB
+				err = db.InsertBatchInfo(root, batchCount)
 				common.PanicIfError(err)
 			}
 

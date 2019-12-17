@@ -17,6 +17,9 @@ build: clean
 init:
 	./build/bopr init
 
+reset:
+	
+
 start:
 	./build/bopr start
 	 

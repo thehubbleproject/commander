@@ -40,7 +40,7 @@ func NewContractCaller() (contractCaller ContractCaller, err error) {
 		contractCaller.ethClient = ethclient.NewClient(RPCClient)
 	}
 
-	if contractCaller.RollupContract, err = rollup.NewRollup(ethCmn.HexToAddress("0x51579Fe655a6F14475Cf233503c9FD9a24F3d40c"), contractCaller.ethClient); err != nil {
+	if contractCaller.RollupContract, err = rollup.NewRollup(ethCmn.HexToAddress(config.GlobalCfg.RollupAddress), contractCaller.ethClient); err != nil {
 		return contractCaller, err
 	}
 	if contractCaller.RollupContractABI, err = abi.JSON(strings.NewReader(rollup.RollupABI)); err != nil {
