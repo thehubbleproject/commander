@@ -68,9 +68,16 @@ func (c *ContractCaller) FetchBatchWithIndex(index uint64) (Batch, error) {
 }
 
 func (c *ContractCaller) FetchBalanceTreeRoot() (ByteArray, error) {
-	root, err := c.RollupContract.BalanceTreeRoot(nil)
+	root, err := c.RollupContract.GetBalanceTreeRoot(nil)
 	if err != nil {
 		return ByteArray{}, err
 	}
 	return root, nil
+}
+
+// ProcessTx calls the ProcessTx function on the contract to verify the tx
+// returns the updated accounts and the new balance root
+func (c *ContractCaller) ProcessTx(balanaceTreeRoot ByteArray) (newBalanceRoot ByteArray, from, to AccountLeaf, err error) {
+	// c.RollupContract.ProcessTxUpdate(nil)
+	return
 }

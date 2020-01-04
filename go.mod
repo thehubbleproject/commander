@@ -6,6 +6,7 @@ require (
 	github.com/VictoriaMetrics/fastcache v1.5.2
 	github.com/aristanetworks/goarista v0.0.0-20191106175434-873d404c7f40
 	github.com/btcsuite/btcd v0.20.1-beta
+	github.com/cbergoon/merkletree v0.2.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/deckarep/golang-set v1.7.1
 	github.com/edsrzf/mmap-go v1.0.0
@@ -54,6 +55,7 @@ require (
 	github.com/tendermint/tendermint v0.32.7
 	github.com/tyler-smith/go-bip39 v1.0.2
 	github.com/wsddn/go-ecdh v0.0.0-20161211032359-48726bab9208
+	github.com/xsleonard/go-merkle v1.1.0
 	golang.org/x/crypto v0.0.0-20191128160524-b544559bb6d1
 	golang.org/x/net v0.0.0-20191126235420-ef20fe5d7933
 	golang.org/x/sys v0.0.0-20191128015809-6d18c012aee9

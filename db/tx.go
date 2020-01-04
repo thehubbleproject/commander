@@ -35,3 +35,11 @@ func PopTxs() (txs []types.Tx, err error) {
 	}
 	return
 }
+
+// ApplyTx fetches all the data required to validate tx from smart contact
+// and calls the proccess tx function to return the updated balance root and accounts
+func ApplyTx() {
+	// fetch the merkle proof
+	// fromAccount := types.NewAccountLeaf()
+
+}

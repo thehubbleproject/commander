@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/BOPR/common"
+	"github.com/BOPR/contracts/rollup"
 )
 
 // Tx represets the transaction on BOPRU
@@ -72,6 +73,17 @@ func (t *Tx) MinimalTx() (tx MinimalTx, err error) {
 		common.UintTo2Byte(uint32(t.TxType)),
 		trimmedSig,
 	), nil
+}
+
+// ToABIVersion converts a standard tx to the the DataTypesTransaction struct on the contract
+func (t *Tx) ToABIVersion(from, to rollup.DataTypesAccount) rollup.DataTypesTransaction {
+	return rollup.DataTypesTransaction{
+		To:        to,
+		From:      from,
+		Amount:    uint32(t.Amount),
+		TokenType: from.TokenType,
+		Signature: []byte(t.Signature),
+	}
 }
 
 // MinimalTx is the transaction that needs to be pushed on-chain

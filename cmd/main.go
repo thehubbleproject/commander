@@ -67,6 +67,10 @@ func InitCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			defaultConfig := config.GetDefaultConfig()
 			config.WriteConfigFile("./config.toml", &defaultConfig)
+			gen := config.DefaultGenesisAccounts()
+			if err := config.WriteGenesisFile(gen); err != nil {
+				panic(err)
+			}
 		},
 	}
 }

@@ -81,6 +81,7 @@ func (a *Aggregator) pickBatch() {
 	for i, tx := range txs {
 		a.Logger.Debug("Verifing transaction", "index", i, "tx", tx.String())
 		// TODO Run verify tx from contract
+		db.ApplyTx()
 
 	}
 
