@@ -40,21 +40,23 @@ func DefaultGenesisAccounts() GenesisAccounts {
 	return NewGenesisAccounts(accounts)
 }
 
-func ReadGenesisFile() error {
+func ReadGenesisFile() (GenesisAccounts, error) {
+	var genAccounts GenesisAccounts
+
 	genesisFile, err := os.Open("genesis.json")
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return genAccounts, err
 	}
 	defer genesisFile.Close()
 
 	genBytes, err := ioutil.ReadAll(genesisFile)
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return genAccounts, err
 	}
-	var genAccounts GenesisAccounts
-	return json.Unmarshal(genBytes, &genAccounts)
+	err = json.Unmarshal(genBytes, &genAccounts)
+	return genAccounts, err
 }
 
 func WriteGenesisFile(genesis GenesisAccounts) error {
