@@ -1,41 +1,43 @@
 package main
 
 import (
-	"encoding/hex"
-	"fmt"
-
-	"github.com/BOPR/types"
-	"github.com/cbergoon/merkletree"
+	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"golang.org/x/crypto/sha3"
+	"log"
+	"math/big"
 )
 
 func main() {
-	// create 2 leaves
+	uint256Ty, _ := abi.NewType("uint256")
+	bytes32Ty, _ := abi.NewType("bytes32")
+	addressTy, _ := abi.NewType("address")
 
-	// create merkel root
-
-	// match with the one in solidity
-
-	// add the testcase to test-suite
-
-	// leaf1 := types.NewAccountLeaf(0, 10)
-	// leaf2 := types.NewAccountLeaf(1, 10)
-
-	var list []merkletree.Content
-	src := []byte("0x2aa012a32db4297b6c1ec06b81e498154b4e8d46")
-	encodedStr := hex.EncodeToString(src)
-
-	dataBytes, err := hex.DecodeString(encodedStr)
-	if err != nil {
-		fmt.Println("data bytes", dataBytes, "error", err)
+	arguments := abi.Arguments{
+		{
+			Type: addressTy,
+		},
+		{
+			Type: bytes32Ty,
+		},
+		{
+			Type: uint256Ty,
+		},
 	}
 
-	data := types.LeafData(dataBytes)
-	list = append(list, data)
-	// list = append(list, data)
-	fmt.Println("Input dataBytes", list, " Expected ", dataBytes)
-	tree, err := types.CreateTree(list)
-	if err != nil {
-		fmt.Printf("error", err)
-	}
-	fmt.Println("root", hex.EncodeToString(tree.MerkleRoot()))
+	bytes, _ := arguments.Pack(
+		common.HexToAddress("0x0000000000000000000000000000000000000000"),
+		[32]byte{'I', 'D', '1'},
+		big.NewInt(42),
+	)
+	var buf []byte
+
+	hash := sha3.NewLegacyKeccak256()
+	hash.Write(bytes)
+	buf = hash.Sum(buf)
+
+	log.Println(hexutil.Encode(buf))
+	// output:
+	// 0x1f214438d7c061ad56f98540db9a082d372df1ba9a3c96367f0103aa16c2fe9a
 }

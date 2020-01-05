@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/BOPR/common"
+	"github.com/BOPR/types"
 	merkle "github.com/cbergoon/merkletree"
 )
 
@@ -22,4 +23,6 @@ func StoreMT(mt merkle.MerkleTree) error {
 	return nil
 }
 
-func CreateAndStoreMT()
+func CreateAndStoreMT(accounts []types.AccountLeaf) {
+	types.CreateTree()
+}
