@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/hex"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -10,16 +11,16 @@ import (
 )
 
 func main() {
-	uint256Ty, _ := abi.NewType("uint256")
-	bytes32Ty, _ := abi.NewType("bytes32")
-	addressTy, _ := abi.NewType("address")
+	uint256Ty, _ := abi.NewType("uint256", "uint256", nil)
+	// bytes32Ty, _ := abi.NewType("bytes32", "bytes32", nil)
+	addressTy, _ := abi.NewType("address", "address", nil)
 
 	arguments := abi.Arguments{
 		{
 			Type: addressTy,
 		},
 		{
-			Type: bytes32Ty,
+			Type: addressTy,
 		},
 		{
 			Type: uint256Ty,
@@ -27,12 +28,12 @@ func main() {
 	}
 
 	bytes, _ := arguments.Pack(
-		common.HexToAddress("0x0000000000000000000000000000000000000000"),
-		[32]byte{'I', 'D', '1'},
+		common.HexToAddress("0x0000000000000000000000000000000000000001"),
+		common.HexToAddress("0x0000000000000000000000000000000000000001"),
 		big.NewInt(42),
 	)
 	var buf []byte
-
+	log.Println("dataBytes", hex.EncodeToString(bytes))
 	hash := sha3.NewLegacyKeccak256()
 	hash.Write(bytes)
 	buf = hash.Sum(buf)

@@ -7,6 +7,7 @@ import (
 
 	"github.com/BOPR/common"
 	db "github.com/BOPR/db"
+	"github.com/BOPR/types"
 
 	tmCmn "github.com/tendermint/tendermint/libs/common"
 )
@@ -81,11 +82,22 @@ func (a *Aggregator) pickBatch() {
 	for i, tx := range txs {
 		a.Logger.Debug("Verifing transaction", "index", i, "tx", tx.String())
 		// TODO Run verify tx from contract
-		db.ApplyTx()
+		ApplyTx(tx)
 
 	}
 
 	// Step-3
 	// Finally create a merkel root of all updated leafs and push batch on-chain
 
+}
+
+// ApplyTx fetches all the data required to validate tx from smart contact
+// and calls the proccess tx function to return the updated balance root and accounts
+func ApplyTx(tx types.Tx) {
+	// fetch to account from DB
+	fromAccount, _ := db.GetAccount(tx.From)
+	fmt.Println("fetched account", fromAccount)
+	// fetch from account from DB
+	toAccount, _ := db.GetAccount(tx.To)
+	fmt.Println("fetched account", toAccount)
 }

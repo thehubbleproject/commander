@@ -32,6 +32,7 @@ require (
 	github.com/karalabe/usb v0.0.0-20191104083709-911d15fe12a9
 	github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515
 	github.com/magiconair/properties v1.8.1
+	github.com/maticnetwork/bor v0.0.0-20200101114234-36ff50845e90 // indirect
 	github.com/mattn/go-runewidth v0.0.6
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/olekukonko/tablewriter v0.0.3
