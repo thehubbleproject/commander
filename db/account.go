@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/BOPR/common"
+	"github.com/BOPR/config"
 	"github.com/BOPR/types"
 	merkle "github.com/cbergoon/merkletree"
 	"gopkg.in/mgo.v2/bson"
@@ -43,4 +44,17 @@ func GetAccount(accID uint64) (types.AccountLeaf, error) {
 	}
 
 	return account, nil
+}
+
+func InsertBulkAccounts(accounts []types.AccountLeaf) error {
+
+}
+
+func InsertGenAccounts(genAccs []config.GenAccountLeaf) error {
+	var accLeafs []types.AccountLeaf
+	for _, acc := range genAccs {
+		newAccLeaf := types.NewAccountLeaf(acc.Path, acc.Balance, acc.TokenType, acc.Nonce)
+		accLeafs = append(accLeafs, newAccLeaf)
+	}
+	return InsertBulkAccounts(accLeafs)
 }
