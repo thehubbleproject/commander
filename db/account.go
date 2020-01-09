@@ -47,6 +47,12 @@ func GetAccount(accID uint64) (types.AccountLeaf, error) {
 }
 
 func InsertBulkAccounts(accounts []types.AccountLeaf) error {
+	session := MgoSession.Copy()
+	defer session.Close()
+	if err := session.GetCollection(common.DATABASE, common.ACCOUNT_COLLECTION).Insert(accounts); err != nil {
+		fmt.Println("Unable to insert", "error", err)
+		return err
+	}
 	return nil
 }
 
