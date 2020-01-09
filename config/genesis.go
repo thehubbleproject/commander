@@ -7,6 +7,14 @@ import (
 	"os"
 )
 
+const (
+	DEAFULT_PATH       = 100
+	DEFAULT_HEIGHT     = 2
+	DEFAULT_BALANCE    = 100
+	DEFAULT_NONCE      = 0
+	DEFAULT_TOKEN_TYPE = 0
+)
+
 //  GenAccountLeaf Exists to allow remove circular dependency with types
 // and to allow storing more data than account leaf
 type GenAccountLeaf struct {
@@ -35,7 +43,7 @@ func NewGenesisAccounts(accounts []GenAccountLeaf) GenesisAccounts {
 
 func DefaultGenesisAccounts() GenesisAccounts {
 	var accounts []GenAccountLeaf
-	acc := NewGenAccountLeaf(1223123, 10, 1, 0)
+	acc := NewGenAccountLeaf(DEAFULT_PATH, DEFAULT_BALANCE, DEFAULT_TOKEN_TYPE, DEFAULT_TOKEN_TYPE)
 	accounts = append(accounts, acc)
 	return NewGenesisAccounts(accounts)
 }

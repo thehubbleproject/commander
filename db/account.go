@@ -47,7 +47,7 @@ func GetAccount(accID uint64) (types.AccountLeaf, error) {
 }
 
 func InsertBulkAccounts(accounts []types.AccountLeaf) error {
-
+	return nil
 }
 
 func InsertGenAccounts(genAccs []config.GenAccountLeaf) error {
