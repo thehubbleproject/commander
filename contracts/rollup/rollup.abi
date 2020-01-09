@@ -112,19 +112,9 @@
           "type": "bytes32"
         },
         {
-          "internalType": "bytes32",
-          "name": "withdraw_root",
-          "type": "bytes32"
-        },
-        {
           "internalType": "address",
           "name": "committer",
           "type": "address"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "account_tree_state",
-          "type": "bytes32"
         },
         {
           "internalType": "bytes32",
