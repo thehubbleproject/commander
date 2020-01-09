@@ -64,7 +64,7 @@ func (c *ContractCaller) FetchBatchWithIndex(index uint64) (Batch, error) {
 	if err != nil {
 		return Batch{}, err
 	}
-	return NewBatch(crudeBatch.StateRoot, crudeBatch.WithdrawRoot, Address(crudeBatch.Committer), crudeBatch.AccountTreeState, crudeBatch.TxRoot), nil
+	return NewBatch(crudeBatch.StateRoot, Address(crudeBatch.Committer), crudeBatch.TxRoot), nil
 }
 
 func (c *ContractCaller) FetchBalanceTreeRoot() (ByteArray, error) {

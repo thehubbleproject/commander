@@ -1,20 +1,16 @@
 package types
 
 type Batch struct {
-	StateRoot        ByteArray
-	WithdrawRoot     ByteArray
-	Committer        Address
-	AccountTreeState ByteArray
-	TxRoot           ByteArray
+	StateRoot ByteArray
+	Committer Address
+	TxRoot    ByteArray
 }
 
-func NewBatch(stateRoot ByteArray, withdrawRoot ByteArray, committer Address, accountRoot ByteArray, txRoot ByteArray) Batch {
+func NewBatch(stateRoot ByteArray, committer Address, txRoot ByteArray) Batch {
 	return Batch{
-		StateRoot:        stateRoot,
-		WithdrawRoot:     withdrawRoot,
-		Committer:        committer,
-		AccountTreeState: accountRoot,
-		TxRoot:           txRoot,
+		StateRoot: stateRoot,
+		Committer: committer,
+		TxRoot:    txRoot,
 	}
 }
 
