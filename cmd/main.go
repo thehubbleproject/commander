@@ -148,15 +148,29 @@ func StartCmd() *cobra.Command {
 			} else {
 				root, err := types.ContractCallerObj.FetchBalanceTreeRoot()
 				common.PanicIfError(err)
+				storedBatchCount, err := db.GetBatchCount()
+				if err != nil {
+					panic(err)
+				}
 
-				// persist batch info to DB
-				err = db.InsertBatchInfo(root, batchCount)
-				common.PanicIfError(err)
+				// if there are no batches add genesis accounts else skip
+				if storedBatchCount == 0 {
+					// persist batch info to DB
+					err = db.InsertBatchInfo(root, uint64(batchCount))
+					common.PanicIfError(err)
+				}
 
-				// read genesis file and populate all accounts
-				genAcc, err := config.ReadGenesisFile()
-				common.PanicIfError(err)
-				db.InsertGenAccounts(genAcc.Accounts)
+				storedAccCount, err := db.GetAccountCount()
+				if err != nil {
+					panic(err)
+				}
+				// if there are no accounts add genesis accounts else skip
+				if storedAccCount == 0 {
+					// read genesis file and populate all accounts
+					genAcc, err := config.ReadGenesisFile()
+					common.PanicIfError(err)
+					db.InsertGenAccounts(genAcc.Accounts)
+				}
 			}
 
 			// go routine to catch signal

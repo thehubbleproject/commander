@@ -18,3 +18,23 @@ func InsertBatchInfo(root types.ByteArray, index uint64) error {
 	}
 	return nil
 }
+
+func GetAllBatches() (batches []types.Batch, err error) {
+	// session := MgoSession.Copy()
+	// defer session.Close()
+	// coll := session.GetCollection(common.DATABASE, common.BATCH_COLLECTION)
+	// coll.Count()
+	// iter := session.GetCollection(common.DATABASE, common.BATCH_COLLECTION).Iter()
+	// err := iter.All(&batches)
+	// if err != nil {
+	// 	return batches, err
+	// }
+	return
+}
+
+func GetBatchCount() (int, error) {
+	session := MgoSession.Copy()
+	defer session.Close()
+	coll := session.GetCollection(common.DATABASE, common.BATCH_COLLECTION)
+	return coll.Count()
+}

@@ -56,9 +56,9 @@ func InsertBulkAccounts(accounts []types.AccountLeaf) error {
 	}
 	bulk := collection.Bulk()
 	bulk.Insert(AccI...)
-	_, bulkErr := bulk.Run()
-	if bulkErr != nil {
-		panic(bulkErr)
+	_, err := bulk.Run()
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -70,4 +70,11 @@ func InsertGenAccounts(genAccs []config.GenAccountLeaf) error {
 		accLeafs = append(accLeafs, newAccLeaf)
 	}
 	return InsertBulkAccounts(accLeafs)
+}
+
+func GetAccountCount() (int, error) {
+	session := MgoSession.Copy()
+	defer session.Close()
+	coll := session.GetCollection(common.DATABASE, common.ACCOUNT_COLLECTION)
+	return coll.Count()
 }
