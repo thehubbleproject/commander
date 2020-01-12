@@ -5,14 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-)
 
-const (
-	DEAFULT_PATH       = 100
-	DEFAULT_HEIGHT     = 2
-	DEFAULT_BALANCE    = 100
-	DEFAULT_NONCE      = 0
-	DEFAULT_TOKEN_TYPE = 0
+	"github.com/BOPR/common"
 )
 
 //  GenAccountLeaf Exists to allow remove circular dependency with types
@@ -43,7 +37,7 @@ func NewGenesisAccounts(accounts []GenAccountLeaf) GenesisAccounts {
 
 func DefaultGenesisAccounts() GenesisAccounts {
 	var accounts []GenAccountLeaf
-	acc := NewGenAccountLeaf(DEAFULT_PATH, DEFAULT_BALANCE, DEFAULT_TOKEN_TYPE, DEFAULT_TOKEN_TYPE)
+	acc := NewGenAccountLeaf(common.DEAFULT_PATH, common.DEFAULT_BALANCE, common.DEFAULT_TOKEN_TYPE, common.DEFAULT_TOKEN_TYPE)
 	accounts = append(accounts, acc)
 	return NewGenesisAccounts(accounts)
 }

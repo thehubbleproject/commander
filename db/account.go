@@ -12,8 +12,16 @@ import (
 
 // FetchSiblings retuns the siblings of an account leaf till root
 func FetchSiblings(accID uint64) {
-
+	// for i := common.DEFAULT_HEIGHT; i >= 0; i-- {
+	// 	position, err := common.ExtractBit(int(accID), i)
+	// 	if err != nil {
+	// 		fmt.println("error whle extractBit", err)
+	// 	}
+	// }
 }
+
+// func GetLeftSiblingKey(_parent types.ByteArray) (types.ByteArray, error) {
+// }
 
 func StoreMT(mt merkle.MerkleTree) error {
 	session := MgoSession.Copy()

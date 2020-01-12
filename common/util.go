@@ -1,6 +1,9 @@
 package common
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"math"
+)
 
 func UintTo2Byte(a uint32) [2]byte {
 	b := make([]byte, 4)
@@ -29,4 +32,9 @@ func PanicIfError(err error) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func ExtractBit(num, place int) int {
+	r := num % int(math.Pow(10, float64(place)))
+	return r / int(math.Pow(10, float64(place-1)))
 }
