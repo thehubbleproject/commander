@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/BOPR/common"
+	"github.com/BOPR/config"
 	db "github.com/BOPR/db"
 	"github.com/BOPR/types"
 
@@ -41,7 +42,7 @@ func (a *Aggregator) OnStart() error {
 	a.cancelAggregating = cancelAggregating
 
 	// start polling for checkpoint in buffer
-	go a.startAggregating(ctx, 5*time.Second)
+	go a.startAggregating(ctx, config.GlobalCfg.PollingInterval)
 	a.Logger.Info("Starting aggregator")
 	return nil
 }
