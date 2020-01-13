@@ -81,7 +81,7 @@ func (a *Aggregator) pickBatch() {
 	// 2. Run verify_tx on them and update the leafs in DB according to result
 	for i, tx := range txs {
 		a.Logger.Debug("Verifing transaction", "index", i, "tx", tx.String())
-		// TODO Run verify tx from contract
+		// Apply tx and get the updated accounts
 		ApplyTx(tx)
 
 	}
@@ -97,7 +97,27 @@ func ApplyTx(tx types.Tx) {
 	// fetch to account from DB
 	fromAccount, _ := db.GetAccount(tx.From)
 	fmt.Println("fetched account", fromAccount)
+
+	fromSiblings, err := db.FetchSiblings(fromAccount.Path)
+	if err != nil {
+		fmt.Println("not able to fetch from siblings", "error", err)
+	}
+
 	// fetch from account from DB
 	toAccount, _ := db.GetAccount(tx.To)
 	fmt.Println("fetched account", toAccount)
+
+	toSiblings, err := db.FetchSiblings(toAccount.Path)
+	if err != nil {
+		fmt.Println("not able to fetch to siblings", "error", err)
+	}
+
+	// fetch latest batch from DB
+	latestBatch, err := db.GetLatestBatch()
+
+	newBalRoot, updatedFrom, updatedTo, err := types.ContractCallerObj.ProcessTx(latestBatch.StateRoot, 
+		tx, types.NewMerkleProof(fromAccount, fromSiblings), 
+		types.NewMerkleProof(toAccount, toSiblings)
+	)
+	fmt.Println("all the updated data",newBalRoot, updatedFrom, updatedTo)
 }

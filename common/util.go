@@ -1,6 +1,7 @@
 package common
 
 import (
+	"crypto/sha256"
 	"encoding/binary"
 	"math"
 )
@@ -37,4 +38,9 @@ func PanicIfError(err error) {
 func ExtractBit(num, place int) int {
 	r := num % int(math.Pow(10, float64(place)))
 	return r / int(math.Pow(10, float64(place-1)))
+}
+
+func Hash(data []byte) []byte {
+	h := sha256.New()
+	return h.Sum(data)
 }

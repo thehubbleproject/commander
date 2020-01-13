@@ -11,13 +11,15 @@ import (
 )
 
 // FetchSiblings retuns the siblings of an account leaf till root
-func FetchSiblings(accID uint64) {
-	// for i := common.DEFAULT_HEIGHT; i >= 0; i-- {
-	// 	position, err := common.ExtractBit(int(accID), i)
-	// 	if err != nil {
-	// 		fmt.println("error whle extractBit", err)
-	// 	}
-	// }
+func FetchSiblings(accID uint64) (accs []types.AccountLeaf, err error) {
+	// TODO fetch siblings using the key
+
+	// For now lets return all accounts
+	accs, err = GetAllAccounts()
+	if err != nil {
+		return accs, err
+	}
+	return accs, nil
 }
 
 // func GetLeftSiblingKey(_parent types.ByteArray) (types.ByteArray, error) {
@@ -35,6 +37,18 @@ func StoreMT(mt merkle.MerkleTree) error {
 
 func CreateAndStoreMT(accounts []types.AccountLeaf) {
 	// types.CreateTree()
+}
+
+func GetAllAccounts() (accs []types.AccountLeaf, err error) {
+	session := MgoSession.Copy()
+	defer session.Close()
+	collection := session.GetCollection(common.DATABASE, common.ACCOUNT_COLLECTION)
+
+	err = collection.Find(nil).All(accs)
+	if err != nil {
+		return accs, err
+	}
+	return accs, nil
 }
 
 // GetAccount gets the account of the given path from the DB

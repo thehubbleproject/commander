@@ -1,6 +1,7 @@
 package types
 
 import (
+	"github.com/BOPR/common"
 	"github.com/BOPR/contracts/rollup"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"math/big"
@@ -54,4 +55,11 @@ func (acc *AccountLeaf) ABIEncode() []byte {
 		big.NewInt(int64(acc.Nonce)),
 	)
 	return bytes
+}
+
+func AccsToLeafHashes(accs []AccountLeaf) (result [][32]byte) {
+	for i, acc := range accs {
+		result[i] = BytesToByteArray(common.Hash(acc.ABIEncode()))
+	}
+	return
 }

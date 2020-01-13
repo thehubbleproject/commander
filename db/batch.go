@@ -20,16 +20,24 @@ func InsertBatchInfo(root types.ByteArray, index uint64) error {
 }
 
 func GetAllBatches() (batches []types.Batch, err error) {
-	// session := MgoSession.Copy()
-	// defer session.Close()
-	// coll := session.GetCollection(common.DATABASE, common.BATCH_COLLECTION)
-	// coll.Count()
-	// iter := session.GetCollection(common.DATABASE, common.BATCH_COLLECTION).Iter()
-	// err := iter.All(&batches)
-	// if err != nil {
-	// 	return batches, err
-	// }
+	session := MgoSession.Copy()
+	defer session.Close()
+	c := session.GetCollection(common.DATABASE, common.BATCH_COLLECTION)
+	if err := c.Find(nil).All(batches); err != nil {
+		return batches, err
+	}
 	return
+}
+
+func GetLatestBatch() (types.Batch, error) {
+	session := MgoSession.Copy()
+	defer session.Close()
+	c := session.GetCollection(common.DATABASE, common.BATCH_COLLECTION)
+	var batches []types.Batch
+	if err := c.Find(nil).All(batches); err != nil {
+		return batches[0], err
+	}
+	return batches[0], nil
 }
 
 func GetBatchCount() (int, error) {
