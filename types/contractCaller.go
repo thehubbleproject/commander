@@ -1,6 +1,7 @@
 package types
 
 import (
+	"fmt"
 	big "math/big"
 	"strings"
 
@@ -78,9 +79,13 @@ func (c *ContractCaller) FetchBalanceTreeRoot() (ByteArray, error) {
 // ProcessTx calls the ProcessTx function on the contract to verify the tx
 // returns the updated accounts and the new balance root
 func (c *ContractCaller) ProcessTx(balanceTreeRoot ByteArray, tx Tx, fromMerkleProof, toMerkleProof MerkleProof) (newBalanceRoot ByteArray, from, to AccountLeaf, err error) {
-	txReceipt, err := c.RollupContract.ProcessTxUpdate(nil, balanceTreeRoot, tx.ToABIVersion(), fromMerkleProof.ToABIVersion(), toMerkleProof.ToABIVersion()).CallOpts()
+	txReceipt, err := c.RollupContract.ProcessTxUpdate(nil, balanceTreeRoot,
+		tx.ToABIVersion(fromMerkleProof.Account.ToABIAccount(), toMerkleProof.Account.ToABIAccount()),
+		fromMerkleProof.ToABIVersion(),
+		toMerkleProof.ToABIVersion())
 	if err != nil {
 		return
 	}
+	fmt.Println("txReceipt", txReceipt)
 	return
 }
