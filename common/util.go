@@ -40,6 +40,13 @@ func ExtractBit(num, place int) int {
 	return r / int(math.Pow(10, float64(place-1)))
 }
 
+func FlipBit(bit int) int {
+	if bit == 1 {
+		return 0
+	}
+	return 1
+}
+
 func Hash(data []byte) []byte {
 	h := sha256.New()
 	return h.Sum(data)

@@ -26,7 +26,7 @@ func PopTxs() (txs []types.Tx, err error) {
 
 	query := bson.M{"status": "pending"}
 
-	//Select Limit
+	// Select Limit
 	iter := session.GetCollection(common.DATABASE, common.TRANSACTION_COLLECTION).Find(query).Limit(2).Iter()
 	err = iter.All(&txs)
 	if err != nil {

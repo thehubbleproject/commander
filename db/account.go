@@ -11,15 +11,19 @@ import (
 )
 
 // FetchSiblings retuns the siblings of an account leaf till root
+// TODO make this more performannt by using bulk account fetch or using groutines to fetch in parerell
 func FetchSiblings(accID uint64) (accs []types.AccountLeaf, err error) {
-	// TODO fetch siblings using the key
-
-	// For now lets return all accounts
-	accs, err = GetAllAccounts()
-	if err != nil {
-		return accs, err
+	// For eg: for account ID 1111 => 1110, 110X, 10XX
+	var siblings []types.AccountLeaf
+	for i := common.DEFAULT_HEIGHT - 1; i < 0; i++ {
+		accID := uint64(common.FlipBit(common.ExtractBit(int(accID), i)))
+		acc, err := GetAccount(accID)
+		if err != nil {
+			return nil, err
+		}
+		siblings = append(siblings, acc)
 	}
-	return accs, nil
+	return siblings, nil
 }
 
 // func GetLeftSiblingKey(_parent types.ByteArray) (types.ByteArray, error) {
