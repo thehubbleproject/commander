@@ -2,21 +2,21 @@ package types
 
 import (
 	"bytes"
-	"crypto/sha256"
 
 	"github.com/cbergoon/merkletree"
 	merkle "github.com/cbergoon/merkletree"
+	"golang.org/x/crypto/sha3"
 )
 
 type LeafData []byte
 
 //CalculateHash hashes the values of a TestContent
 func (data LeafData) CalculateHash() ([]byte, error) {
-	h := sha256.New()
+	h := sha3.NewLegacyKeccak256()
+	// h := sha256.New()
 	// if _, err := h.Write([]byte(data)); err != nil {
 	// 	return nil, err
 	// }
-
 	return h.Sum(data), nil
 }
 
@@ -27,7 +27,7 @@ func (data LeafData) Equals(other merkletree.Content) (bool, error) {
 
 // CreateTree creates a tree from a given list of contents
 func CreateTree(list []merkle.Content) (tree *merkle.MerkleTree, err error) {
-	t, err := merkle.NewTree(list)
+	t, err := merkle.NewTreeWithHashStrategy(list, sha3.NewLegacyKeccak256)
 	if err != nil {
 		return tree, err
 	}

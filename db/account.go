@@ -26,9 +26,6 @@ func FetchSiblings(accID uint64) (accs []types.AccountLeaf, err error) {
 	return siblings, nil
 }
 
-// func GetLeftSiblingKey(_parent types.ByteArray) (types.ByteArray, error) {
-// }
-
 func StoreMT(mt merkle.MerkleTree) error {
 	session := MgoSession.Copy()
 	defer session.Close()

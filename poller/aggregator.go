@@ -115,7 +115,6 @@ func ApplyTx(tx types.Tx) {
 
 	// fetch latest batch from DB
 	latestBatch, err := db.GetLatestBatch()
-
 	newBalRoot, updatedFrom, updatedTo, err := types.ContractCallerObj.ProcessTx(latestBatch.StateRoot,
 		tx, types.NewMerkleProof(fromAccount, fromSiblings),
 		types.NewMerkleProof(toAccount, toSiblings),

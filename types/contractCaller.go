@@ -1,10 +1,12 @@
 package types
 
 import (
+	"context"
 	"fmt"
 	big "math/big"
 	"strings"
 
+	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/rpc"
 
 	"github.com/BOPR/config"
@@ -31,6 +33,8 @@ type ContractCaller struct {
 	RollupContract *rollup.Rollup
 
 	RollupContractABI abi.ABI
+
+	RollupContractAddress ethCmn.Address
 }
 
 // NewContractCaller contract caller
@@ -40,13 +44,15 @@ func NewContractCaller() (contractCaller ContractCaller, err error) {
 	} else {
 		contractCaller.ethClient = ethclient.NewClient(RPCClient)
 	}
+	contractAddress := ethCmn.HexToAddress(config.GlobalCfg.RollupAddress)
 
-	if contractCaller.RollupContract, err = rollup.NewRollup(ethCmn.HexToAddress(config.GlobalCfg.RollupAddress), contractCaller.ethClient); err != nil {
+	if contractCaller.RollupContract, err = rollup.NewRollup(contractAddress, contractCaller.ethClient); err != nil {
 		return contractCaller, err
 	}
 	if contractCaller.RollupContractABI, err = abi.JSON(strings.NewReader(rollup.RollupABI)); err != nil {
 		return contractCaller, err
 	}
+	contractCaller.RollupContractAddress = contractAddress
 	return contractCaller, nil
 }
 
@@ -79,13 +85,32 @@ func (c *ContractCaller) FetchBalanceTreeRoot() (ByteArray, error) {
 // ProcessTx calls the ProcessTx function on the contract to verify the tx
 // returns the updated accounts and the new balance root
 func (c *ContractCaller) ProcessTx(balanceTreeRoot ByteArray, tx Tx, fromMerkleProof, toMerkleProof MerkleProof) (newBalanceRoot ByteArray, from, to AccountLeaf, err error) {
-	txReceipt, err := c.RollupContract.ProcessTxUpdate(nil, balanceTreeRoot,
+	// txReceipt, err := c.RollupContract.ProcessTxUpdate(nil, balanceTreeRoot,
+	// 	tx.ToABIVersion(fromMerkleProof.Account.ToABIAccount(), toMerkleProof.Account.ToABIAccount()),
+	// 	fromMerkleProof.ToABIVersion(),
+	// 	toMerkleProof.ToABIVersion())
+	// if err != nil {
+	// 	return
+	// }
+
+	data, err := c.RollupContractABI.Pack("processTxUpdate", balanceTreeRoot,
 		tx.ToABIVersion(fromMerkleProof.Account.ToABIAccount(), toMerkleProof.Account.ToABIAccount()),
 		fromMerkleProof.ToABIVersion(),
 		toMerkleProof.ToABIVersion())
 	if err != nil {
+		fmt.Println("Unable to pack tx for submitHeaderBlock", "error", err)
 		return
 	}
-	fmt.Println("txReceipt", txReceipt)
+	callMsg := ethereum.CallMsg{
+		To:   &c.RollupContractAddress,
+		Data: data,
+	}
+	data, err = c.ethClient.CallContract(context.Background(), callMsg, nil)
+	if err != nil {
+		fmt.Println("Unable to pack tx for submitHeaderBlock", "error", err)
+		return
+	}
+	fmt.Println("data", data)
+
 	return
 }
