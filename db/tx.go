@@ -21,17 +21,22 @@ func InsertTx(t *types.Tx) error {
 func PopTxs() (txs []types.Tx, err error) {
 	session := MgoSession.Copy()
 	defer session.Close()
-	// selector := bson.M{"status": "pending"}
-	// update := bson.M{"$set": bson.M{"status": "processed"}}
+
+	// TODO fetch a limited set of transactions
+	//
+	// ids = db.collection.find(<condition>).limit(<limit>).map(
+	// 	function(doc) {
+	// 		return doc._id;
+	// 	}
+	// );
+	// db.collection.updateMany({_id: {$in: ids}}, <update>})
 
 	query := bson.M{"status": "pending"}
-
-	// Select Limit
-	iter := session.GetCollection(common.DATABASE, common.TRANSACTION_COLLECTION).Find(query).Limit(2).Iter()
-	err = iter.All(&txs)
-	if err != nil {
-		fmt.Println("Error iterating over transactions", "Error", err)
-		return
-	}
+	updateTo := bson.M{"$set": bson.M{"status": "processed"}}
+	collection := session.GetCollection(common.DATABASE, common.TRANSACTION_COLLECTION)
+	bulk := collection.Bulk()
+	bulk.UpdateAll(query, updateTo)
+	data, err := bulk.Run()
+	fmt.Println("data", data, err)
 	return
 }

@@ -1,12 +1,10 @@
 package rest
 
 import (
-	"fmt"
 	"net/http"
 
-	"github.com/BOPR/types"
 	db "github.com/BOPR/db"
-
+	"github.com/BOPR/types"
 )
 
 type (
@@ -28,7 +26,6 @@ func TxReceiverHandler(w http.ResponseWriter, r *http.Request) {
 	if !ReadRESTReq(w, r, &tx) {
 		WriteErrorResponse(w, http.StatusBadRequest, "Cannot read request")
 	}
-	fmt.Printf("transaction", tx)
 	userTx := types.NewTx(tx.To, tx.From, tx.Amount, tx.Nonce, tx.Signature)
 	db.InsertTx(&userTx)
 	return

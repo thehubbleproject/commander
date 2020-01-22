@@ -164,6 +164,7 @@ func StartCmd() *cobra.Command {
 				if err != nil {
 					panic(err)
 				}
+
 				// if there are no accounts add genesis accounts else skip
 				if storedAccCount == 0 {
 					// read genesis file and populate all accounts
