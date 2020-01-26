@@ -2,25 +2,31 @@ package db
 
 import (
 	"fmt"
+
 	"github.com/BOPR/common"
 	"github.com/BOPR/types"
+	"github.com/globalsign/mgo"
 	"gopkg.in/mgo.v2/bson"
 )
 
-// Insert tx into the DB
-func InsertTx(t *types.Tx) error {
-	session := MgoSession.Copy()
+func (db *DB) GetTxCollection() *mgo.Collection {
+	session := db.MgoSession.Copy()
 	defer session.Close()
-	if err := session.GetCollection(common.DATABASE, common.TRANSACTION_COLLECTION).Insert(t); err != nil {
+	return session.GetCollection(common.DATABASE, common.TRANSACTION_COLLECTION)
+}
+
+// Insert tx into the DB
+func (db *DB) InsertTx(t *types.Tx) error {
+	coll := db.GetTxCollection()
+	if err := coll.Insert(t); err != nil {
 		fmt.Println("Unable to insert", "error", err)
 		return err
 	}
 	return nil
 }
 
-func PopTxs() (txs []types.Tx, err error) {
-	session := MgoSession.Copy()
-	defer session.Close()
+func (db *DB) PopTxs() (txs []types.Tx, err error) {
+	coll := db.GetTxCollection()
 
 	// TODO fetch a limited set of transactions
 	//
@@ -33,8 +39,8 @@ func PopTxs() (txs []types.Tx, err error) {
 
 	query := bson.M{"status": "pending"}
 	updateTo := bson.M{"$set": bson.M{"status": "processed"}}
-	collection := session.GetCollection(common.DATABASE, common.TRANSACTION_COLLECTION)
-	bulk := collection.Bulk()
+
+	bulk := coll.Bulk()
 	bulk.UpdateAll(query, updateTo)
 	data, err := bulk.Run()
 	fmt.Println("data", data, err)

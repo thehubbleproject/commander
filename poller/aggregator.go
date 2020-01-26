@@ -21,16 +21,20 @@ type Aggregator struct {
 	// Base service
 	tmCmn.BaseService
 
+	// DB instance
+	DB db.DB
+
 	// header listener subscription
 	cancelAggregating context.CancelFunc
 }
 
 // NewAggregator returns new service object
-func NewAggregator() *Aggregator {
+func NewAggregator(db db.DB) *Aggregator {
 	// create logger
 	logger := common.Logger.With("module", AggregatingService)
 	aggregator := &Aggregator{}
 	aggregator.BaseService = *tmCmn.NewBaseService(logger, AggregatingService, aggregator)
+	aggregator.DB = db
 	return aggregator
 }
 
@@ -72,7 +76,7 @@ func (a *Aggregator) startAggregating(ctx context.Context, interval time.Duratio
 }
 
 func (a *Aggregator) pickBatch() {
-	txs, err := db.PopTxs()
+	txs, err := a.DB.PopTxs()
 	if err != nil {
 		fmt.Println("Error while popping txs from mempool", "Error", err)
 	}
@@ -83,7 +87,7 @@ func (a *Aggregator) pickBatch() {
 	for i, tx := range txs {
 		a.Logger.Debug("Verifing transaction", "index", i, "tx", tx.String())
 		// Apply tx and get the updated accounts
-		ApplyTx(tx)
+		a.ApplyTx(tx)
 
 	}
 
@@ -94,27 +98,27 @@ func (a *Aggregator) pickBatch() {
 
 // ApplyTx fetches all the data required to validate tx from smart contact
 // and calls the proccess tx function to return the updated balance root and accounts
-func ApplyTx(tx types.Tx) {
+func (a *Aggregator) ApplyTx(tx types.Tx) {
 	// fetch to account from DB
-	fromAccount, _ := db.GetAccount(tx.From)
+	fromAccount, _ := a.DB.GetAccount(tx.From)
 	fmt.Println("fetched account", fromAccount)
 
-	fromSiblings, err := db.FetchSiblings(fromAccount.Path)
+	fromSiblings, err := a.DB.FetchSiblings(fromAccount.Path)
 	if err != nil {
 		fmt.Println("not able to fetch from siblings", "error", err)
 	}
 
 	// fetch from account from DB
-	toAccount, _ := db.GetAccount(tx.To)
+	toAccount, _ := a.DB.GetAccount(tx.To)
 	fmt.Println("fetched account", toAccount)
 
-	toSiblings, err := db.FetchSiblings(toAccount.Path)
+	toSiblings, err := a.DB.FetchSiblings(toAccount.Path)
 	if err != nil {
 		fmt.Println("not able to fetch to siblings", "error", err)
 	}
 
 	// fetch latest batch from DB
-	latestBatch, err := db.GetLatestBatch()
+	latestBatch, err := a.DB.GetLatestBatch()
 	newBalRoot, updatedFrom, updatedTo, err := types.ContractCallerObj.ProcessTx(latestBatch.StateRoot,
 		tx, types.NewMerkleProof(fromAccount, fromSiblings),
 		types.NewMerkleProof(toAccount, toSiblings),

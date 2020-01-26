@@ -96,11 +96,11 @@ func ResetCmd() *cobra.Command {
 			}
 			config.GlobalCfg = cfg
 
-			// create mgo session
-			session, err := db.NewSession(cfg.MongoDB)
+			// create new DB instance
+			dbInstance, err := db.NewDB(cfg.MongoDB)
 			common.PanicIfError(err)
 			fmt.Println("Resetting database", "db", common.DATABASE)
-			err = session.DropDatabase(common.DATABASE)
+			err = dbInstance.MgoSession.DropDatabase(common.DATABASE)
 			common.PanicIfError(err)
 		},
 	}
@@ -128,12 +128,14 @@ func StartCmd() *cobra.Command {
 
 			config.GlobalCfg = cfg
 
-			// create mgo session
-			session, err := db.NewSession(cfg.MongoDB)
-			common.PanicIfError(err)
+			// create db Instance
+			dbInstance, err := db.NewDB(cfg.MongoDB)
 
-			db.MgoSession = *session
-			aggregator := poller.NewAggregator()
+			// init global DB instance
+			db.DBInstance = dbInstance
+
+			common.PanicIfError(err)
+			aggregator := poller.NewAggregator(dbInstance)
 			types.ContractCallerObj, err = types.NewContractCaller()
 			common.PanicIfError(err)
 
