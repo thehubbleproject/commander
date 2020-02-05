@@ -6,6 +6,8 @@ dep:
 	
 contracts:
 	abigen --abi=contracts/rollup/rollup.abi --pkg=rollup --out=contracts/rollup/rollup.go
+	abigen --abi=contracts/merkleTree/merkleTree.abi --pkg=merkleTree --out=contracts/merkleTree/merkleTree.go
+
 
 clean:
 	rm -rf build

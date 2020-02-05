@@ -27,6 +27,6 @@ func TxReceiverHandler(w http.ResponseWriter, r *http.Request) {
 		WriteErrorResponse(w, http.StatusBadRequest, "Cannot read request")
 	}
 	userTx := types.NewTx(tx.To, tx.From, tx.Amount, tx.Nonce, tx.Signature)
-	db.InsertTx(&userTx)
+	db.DBInstance.InsertTx(&userTx)
 	return
 }

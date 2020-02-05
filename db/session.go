@@ -4,8 +4,6 @@ import (
 	"github.com/globalsign/mgo"
 )
 
-var MgoSession Session
-
 type Session struct {
 	session *mgo.Session
 }

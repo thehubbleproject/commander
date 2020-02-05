@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/VictoriaMetrics/fastcache v1.5.3
+	github.com/Workiva/go-datastructures v1.0.50
 	github.com/aristanetworks/goarista v0.0.0-20191106175434-873d404c7f40
 	github.com/btcsuite/btcd v0.20.1-beta
 	github.com/cbergoon/merkletree v0.2.0
@@ -39,6 +40,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.3
 	github.com/pborman/uuid v0.0.0-20180906182336-adf5a7427709
 	github.com/pelletier/go-toml v1.6.0
+	github.com/philhofer/fwd v1.0.0 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/prometheus/tsdb v0.10.0
 	github.com/rjeczalik/notify v0.9.2
@@ -52,9 +54,11 @@ require (
 	github.com/status-im/keycard-go v0.0.0-20191119114148-6dd40a46baa0
 	github.com/steakknife/bloomfilter v0.0.0-20180922174646-6819c0d2a570
 	github.com/steakknife/hamming v0.0.0-20180906055917-c99c65617cd3
+	github.com/stretchr/testify v1.4.0
 	github.com/subosito/gotenv v1.2.0
 	github.com/syndtr/goleveldb v1.0.1-0.20190923125748-758128399b1d
 	github.com/tendermint/tendermint v0.32.7
+	github.com/tinylib/msgp v1.1.1 // indirect
 	github.com/tyler-smith/go-bip39 v1.0.2
 	github.com/wsddn/go-ecdh v0.0.0-20161211032359-48726bab9208
 	github.com/xsleonard/go-merkle v1.1.0

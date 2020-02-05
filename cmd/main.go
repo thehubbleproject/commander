@@ -150,7 +150,7 @@ func StartCmd() *cobra.Command {
 			} else {
 				root, err := types.ContractCallerObj.FetchBalanceTreeRoot()
 				common.PanicIfError(err)
-				storedBatchCount, err := db.GetBatchCount()
+				storedBatchCount, err := db.DBInstance.GetBatchCount()
 				if err != nil {
 					panic(err)
 				}
@@ -158,11 +158,11 @@ func StartCmd() *cobra.Command {
 				// if there are no batches add genesis accounts else skip
 				if storedBatchCount == 0 {
 					// persist batch info to DB
-					err = db.InsertBatchInfo(root, uint64(batchCount))
+					err = db.DBInstance.InsertBatchInfo(root, uint64(batchCount))
 					common.PanicIfError(err)
 				}
 
-				storedAccCount, err := db.GetAccountCount()
+				storedAccCount, err := db.DBInstance.GetAccountCount()
 				if err != nil {
 					panic(err)
 				}
@@ -172,7 +172,7 @@ func StartCmd() *cobra.Command {
 					// read genesis file and populate all accounts
 					genAcc, err := config.ReadGenesisFile()
 					common.PanicIfError(err)
-					db.InsertGenAccounts(genAcc.Accounts)
+					db.DBInstance.InsertGenAccounts(genAcc.Accounts)
 				}
 			}
 
