@@ -4,7 +4,6 @@ import (
 	"time"
 
 	ethCmn "github.com/ethereum/go-ethereum/common"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 const (
@@ -16,7 +15,7 @@ const (
 )
 
 var GlobalCfg Configuration
-var OperatorKey secp256k1.PrivKeySecp256k1
+var FilePVInstance FilePV
 
 // Configuration represents heimdall config
 type Configuration struct {
@@ -27,7 +26,6 @@ type Configuration struct {
 	ConfirmationBlocks   uint64        `mapstructure:"confirmation_blocks"` // Number of blocks for confirmation
 	RollupAddress        string        `mapstructure:"rollup_address"`
 	MerkleTreeLibAddress string        `mapstructure:"merkle_lib_address"`
-	OperatorPrivKey      string        `mapstructure:"operator_priv_key"`
 }
 
 // GetDefaultConfig returns the default configration options

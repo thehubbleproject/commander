@@ -53,8 +53,7 @@ type FilePV struct {
 
 // GenFilePV generates a new validator with randomly generated private key
 // and sets the filePaths, but does not call Save().
-func GenFilePV(keyFilePath, stateFilePath string) *FilePV {
-	// privKey := ed25519.GenPrivKey()
+func GenFilePV(keyFilePath string) *FilePV {
 	privKey := secp256k1.GenPrivKey()
 	return &FilePV{
 		Key: FilePVKey{
@@ -69,18 +68,18 @@ func GenFilePV(keyFilePath, stateFilePath string) *FilePV {
 // LoadFilePV loads a FilePV from the filePaths.  The FilePV handles double
 // signing prevention by persisting data to the stateFilePath.  If either file path
 // does not exist, the program will exit.
-func LoadFilePV(keyFilePath, stateFilePath string) *FilePV {
-	return loadFilePV(keyFilePath, stateFilePath, true)
+func LoadFilePV(keyFilePath string) *FilePV {
+	return loadFilePV(keyFilePath)
 }
 
 // LoadFilePVEmptyState loads a FilePV from the given keyFilePath, with an empty LastSignState.
 // If the keyFilePath does not exist, the program will exit.
-func LoadFilePVEmptyState(keyFilePath, stateFilePath string) *FilePV {
-	return loadFilePV(keyFilePath, stateFilePath, false)
+func LoadFilePVEmptyState(keyFilePath string) *FilePV {
+	return loadFilePV(keyFilePath)
 }
 
 // If loadState is true, we load from the stateFilePath. Otherwise, we use an empty LastSignState.
-func loadFilePV(keyFilePath, stateFilePath string, loadState bool) *FilePV {
+func loadFilePV(keyFilePath string) *FilePV {
 	keyJSONBytes, err := ioutil.ReadFile(keyFilePath)
 	if err != nil {
 		cmn.Exit(err.Error())
@@ -103,12 +102,12 @@ func loadFilePV(keyFilePath, stateFilePath string, loadState bool) *FilePV {
 
 // LoadOrGenFilePV loads a FilePV from the given filePaths
 // or else generates a new one and saves it to the filePaths.
-func LoadOrGenFilePV(keyFilePath, stateFilePath string) *FilePV {
+func LoadOrGenFilePV(keyFilePath string) *FilePV {
 	var pv *FilePV
 	if cmn.FileExists(keyFilePath) {
-		pv = LoadFilePV(keyFilePath, stateFilePath)
+		pv = LoadFilePV(keyFilePath)
 	} else {
-		pv = GenFilePV(keyFilePath, stateFilePath)
+		pv = GenFilePV(keyFilePath)
 		pv.Save()
 	}
 	return pv
