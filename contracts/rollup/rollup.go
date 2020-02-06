@@ -29,6 +29,7 @@ var (
 
 // DataTypesAccount is an auto generated low-level Go binding around an user-defined struct.
 type DataTypesAccount struct {
+	Key       [32]byte
 	Path      *big.Int
 	Balance   *big.Int
 	TokenType *big.Int
@@ -51,7 +52,7 @@ type DataTypesTransaction struct {
 }
 
 // RollupABI is the input ABI used to generate the binding from.
-const RollupABI = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"merkleTreeLib\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"root\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"NewAccount\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txroot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"updatedRoot\",\"type\":\"bytes32\"}],\"name\":\"NewBatch\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32[]\",\"name\":\"to_siblings\",\"type\":\"bytes32[]\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"to_path\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32[]\",\"name\":\"from_siblings\",\"type\":\"bytes32[]\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"from_path\",\"type\":\"uint256\"}],\"name\":\"SiblingsGenerated\",\"type\":\"event\"},{\"constant\":true,\"inputs\":[],\"name\":\"ZERO_BYTES32\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"batches\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"stateRoot\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"committer\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"txRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"numberOfBatches\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"initAccounts\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes[]\",\"name\":\"_txs\",\"type\":\"bytes[]\"},{\"internalType\":\"bytes32\",\"name\":\"_updatedRoot\",\"type\":\"bytes32\"}],\"name\":\"submitBatch\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_balanceRoot\",\"type\":\"bytes32\"},{\"components\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"from\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"to\",\"type\":\"tuple\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint32\",\"name\":\"amount\",\"type\":\"uint32\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"internalType\":\"structDataTypes.Transaction\",\"name\":\"_tx\",\"type\":\"tuple\"},{\"components\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"account\",\"type\":\"tuple\"},{\"internalType\":\"bytes32[]\",\"name\":\"siblings\",\"type\":\"bytes32[]\"}],\"internalType\":\"structDataTypes.MerkleProof\",\"name\":\"_from_merkle_proof\",\"type\":\"tuple\"},{\"components\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"account\",\"type\":\"tuple\"},{\"internalType\":\"bytes32[]\",\"name\":\"siblings\",\"type\":\"bytes32[]\"}],\"internalType\":\"structDataTypes.MerkleProof\",\"name\":\"_to_merkle_proof\",\"type\":\"tuple\"}],\"name\":\"processTxUpdate\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"account\",\"type\":\"tuple\"}],\"name\":\"getBalanceFromAccount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"original_account\",\"type\":\"tuple\"},{\"internalType\":\"uint256\",\"name\":\"new_balance\",\"type\":\"uint256\"}],\"name\":\"updateBalanceInLeaf\",\"outputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"new_account\",\"type\":\"tuple\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"account\",\"type\":\"tuple\"}],\"name\":\"getAccountBytes\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getBalanceTreeRoot\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]"
+const RollupABI = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"merkleTreeLib\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"root\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"NewAccount\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txroot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"updatedRoot\",\"type\":\"bytes32\"}],\"name\":\"NewBatch\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32[]\",\"name\":\"to_siblings\",\"type\":\"bytes32[]\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"to_path\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32[]\",\"name\":\"from_siblings\",\"type\":\"bytes32[]\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"from_path\",\"type\":\"uint256\"}],\"name\":\"SiblingsGenerated\",\"type\":\"event\"},{\"constant\":true,\"inputs\":[],\"name\":\"ZERO_BYTES32\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"batches\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"stateRoot\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"committer\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"txRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"initMT\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"_account\",\"type\":\"tuple\"}],\"name\":\"addAccount\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes[]\",\"name\":\"_txs\",\"type\":\"bytes[]\"},{\"internalType\":\"bytes32\",\"name\":\"_updatedRoot\",\"type\":\"bytes32\"}],\"name\":\"submitBatch\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"batch_id\",\"type\":\"uint256\"},{\"components\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"from\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"to\",\"type\":\"tuple\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint32\",\"name\":\"amount\",\"type\":\"uint32\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"internalType\":\"structDataTypes.Transaction[]\",\"name\":\"_txs\",\"type\":\"tuple[]\"},{\"components\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"account\",\"type\":\"tuple\"},{\"internalType\":\"bytes32[]\",\"name\":\"siblings\",\"type\":\"bytes32[]\"}],\"internalType\":\"structDataTypes.MerkleProof[]\",\"name\":\"_from_proofs\",\"type\":\"tuple[]\"},{\"components\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"account\",\"type\":\"tuple\"},{\"internalType\":\"bytes32[]\",\"name\":\"siblings\",\"type\":\"bytes32[]\"}],\"internalType\":\"structDataTypes.MerkleProof[]\",\"name\":\"_to_proofs\",\"type\":\"tuple[]\"}],\"name\":\"disputeBatch\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_balanceRoot\",\"type\":\"bytes32\"},{\"components\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"from\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"to\",\"type\":\"tuple\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint32\",\"name\":\"amount\",\"type\":\"uint32\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"internalType\":\"structDataTypes.Transaction\",\"name\":\"_tx\",\"type\":\"tuple\"},{\"components\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"account\",\"type\":\"tuple\"},{\"internalType\":\"bytes32[]\",\"name\":\"siblings\",\"type\":\"bytes32[]\"}],\"internalType\":\"structDataTypes.MerkleProof\",\"name\":\"_from_merkle_proof\",\"type\":\"tuple\"},{\"components\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"account\",\"type\":\"tuple\"},{\"internalType\":\"bytes32[]\",\"name\":\"siblings\",\"type\":\"bytes32[]\"}],\"internalType\":\"structDataTypes.MerkleProof\",\"name\":\"_to_merkle_proof\",\"type\":\"tuple\"}],\"name\":\"processTxUpdate\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"original_account\",\"type\":\"tuple\"},{\"internalType\":\"uint256\",\"name\":\"new_balance\",\"type\":\"uint256\"}],\"name\":\"updateBalanceInLeaf\",\"outputs\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"new_account\",\"type\":\"tuple\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"account\",\"type\":\"tuple\"}],\"name\":\"getBalanceFromAccount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"account\",\"type\":\"tuple\"}],\"name\":\"getAccountBytes\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"components\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"from\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"to\",\"type\":\"tuple\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint32\",\"name\":\"amount\",\"type\":\"uint32\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"internalType\":\"structDataTypes.Transaction\",\"name\":\"tx\",\"type\":\"tuple\"}],\"name\":\"getTxBytes\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"components\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"from\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"key\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"path\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structDataTypes.Account\",\"name\":\"to\",\"type\":\"tuple\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint32\",\"name\":\"amount\",\"type\":\"uint32\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"internalType\":\"structDataTypes.Transaction\",\"name\":\"tx\",\"type\":\"tuple\"}],\"name\":\"getTxBytesHash\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getBalanceTreeRoot\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"numberOfBatches\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]"
 
 // Rollup is an auto generated Go binding around an Ethereum contract.
 type Rollup struct {
@@ -265,6 +266,58 @@ func (_Rollup *RollupCallerSession) Batches(arg0 *big.Int) (struct {
 	return _Rollup.Contract.Batches(&_Rollup.CallOpts, arg0)
 }
 
+// GetAccountBytes is a free data retrieval call binding the contract method 0xe77c3657.
+//
+// Solidity: function getAccountBytes(DataTypesAccount account) constant returns(bytes)
+func (_Rollup *RollupCaller) GetAccountBytes(opts *bind.CallOpts, account DataTypesAccount) ([]byte, error) {
+	var (
+		ret0 = new([]byte)
+	)
+	out := ret0
+	err := _Rollup.contract.Call(opts, out, "getAccountBytes", account)
+	return *ret0, err
+}
+
+// GetAccountBytes is a free data retrieval call binding the contract method 0xe77c3657.
+//
+// Solidity: function getAccountBytes(DataTypesAccount account) constant returns(bytes)
+func (_Rollup *RollupSession) GetAccountBytes(account DataTypesAccount) ([]byte, error) {
+	return _Rollup.Contract.GetAccountBytes(&_Rollup.CallOpts, account)
+}
+
+// GetAccountBytes is a free data retrieval call binding the contract method 0xe77c3657.
+//
+// Solidity: function getAccountBytes(DataTypesAccount account) constant returns(bytes)
+func (_Rollup *RollupCallerSession) GetAccountBytes(account DataTypesAccount) ([]byte, error) {
+	return _Rollup.Contract.GetAccountBytes(&_Rollup.CallOpts, account)
+}
+
+// GetBalanceFromAccount is a free data retrieval call binding the contract method 0xf948a94d.
+//
+// Solidity: function getBalanceFromAccount(DataTypesAccount account) constant returns(uint256)
+func (_Rollup *RollupCaller) GetBalanceFromAccount(opts *bind.CallOpts, account DataTypesAccount) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _Rollup.contract.Call(opts, out, "getBalanceFromAccount", account)
+	return *ret0, err
+}
+
+// GetBalanceFromAccount is a free data retrieval call binding the contract method 0xf948a94d.
+//
+// Solidity: function getBalanceFromAccount(DataTypesAccount account) constant returns(uint256)
+func (_Rollup *RollupSession) GetBalanceFromAccount(account DataTypesAccount) (*big.Int, error) {
+	return _Rollup.Contract.GetBalanceFromAccount(&_Rollup.CallOpts, account)
+}
+
+// GetBalanceFromAccount is a free data retrieval call binding the contract method 0xf948a94d.
+//
+// Solidity: function getBalanceFromAccount(DataTypesAccount account) constant returns(uint256)
+func (_Rollup *RollupCallerSession) GetBalanceFromAccount(account DataTypesAccount) (*big.Int, error) {
+	return _Rollup.Contract.GetBalanceFromAccount(&_Rollup.CallOpts, account)
+}
+
 // GetBalanceTreeRoot is a free data retrieval call binding the contract method 0x652eb691.
 //
 // Solidity: function getBalanceTreeRoot() constant returns(bytes32)
@@ -289,6 +342,58 @@ func (_Rollup *RollupSession) GetBalanceTreeRoot() ([32]byte, error) {
 // Solidity: function getBalanceTreeRoot() constant returns(bytes32)
 func (_Rollup *RollupCallerSession) GetBalanceTreeRoot() ([32]byte, error) {
 	return _Rollup.Contract.GetBalanceTreeRoot(&_Rollup.CallOpts)
+}
+
+// GetTxBytes is a free data retrieval call binding the contract method 0x763ae5a7.
+//
+// Solidity: function getTxBytes(DataTypesTransaction tx) constant returns(bytes)
+func (_Rollup *RollupCaller) GetTxBytes(opts *bind.CallOpts, tx DataTypesTransaction) ([]byte, error) {
+	var (
+		ret0 = new([]byte)
+	)
+	out := ret0
+	err := _Rollup.contract.Call(opts, out, "getTxBytes", tx)
+	return *ret0, err
+}
+
+// GetTxBytes is a free data retrieval call binding the contract method 0x763ae5a7.
+//
+// Solidity: function getTxBytes(DataTypesTransaction tx) constant returns(bytes)
+func (_Rollup *RollupSession) GetTxBytes(tx DataTypesTransaction) ([]byte, error) {
+	return _Rollup.Contract.GetTxBytes(&_Rollup.CallOpts, tx)
+}
+
+// GetTxBytes is a free data retrieval call binding the contract method 0x763ae5a7.
+//
+// Solidity: function getTxBytes(DataTypesTransaction tx) constant returns(bytes)
+func (_Rollup *RollupCallerSession) GetTxBytes(tx DataTypesTransaction) ([]byte, error) {
+	return _Rollup.Contract.GetTxBytes(&_Rollup.CallOpts, tx)
+}
+
+// GetTxBytesHash is a free data retrieval call binding the contract method 0xc08f18ed.
+//
+// Solidity: function getTxBytesHash(DataTypesTransaction tx) constant returns(bytes32)
+func (_Rollup *RollupCaller) GetTxBytesHash(opts *bind.CallOpts, tx DataTypesTransaction) ([32]byte, error) {
+	var (
+		ret0 = new([32]byte)
+	)
+	out := ret0
+	err := _Rollup.contract.Call(opts, out, "getTxBytesHash", tx)
+	return *ret0, err
+}
+
+// GetTxBytesHash is a free data retrieval call binding the contract method 0xc08f18ed.
+//
+// Solidity: function getTxBytesHash(DataTypesTransaction tx) constant returns(bytes32)
+func (_Rollup *RollupSession) GetTxBytesHash(tx DataTypesTransaction) ([32]byte, error) {
+	return _Rollup.Contract.GetTxBytesHash(&_Rollup.CallOpts, tx)
+}
+
+// GetTxBytesHash is a free data retrieval call binding the contract method 0xc08f18ed.
+//
+// Solidity: function getTxBytesHash(DataTypesTransaction tx) constant returns(bytes32)
+func (_Rollup *RollupCallerSession) GetTxBytesHash(tx DataTypesTransaction) ([32]byte, error) {
+	return _Rollup.Contract.GetTxBytesHash(&_Rollup.CallOpts, tx)
 }
 
 // NumberOfBatches is a free data retrieval call binding the contract method 0x88c46fb8.
@@ -317,84 +422,84 @@ func (_Rollup *RollupCallerSession) NumberOfBatches() (*big.Int, error) {
 	return _Rollup.Contract.NumberOfBatches(&_Rollup.CallOpts)
 }
 
-// GetAccountBytes is a paid mutator transaction binding the contract method 0x7d3b5c3a.
+// AddAccount is a paid mutator transaction binding the contract method 0xd07b1b39.
 //
-// Solidity: function getAccountBytes(DataTypesAccount account) returns(bytes)
-func (_Rollup *RollupTransactor) GetAccountBytes(opts *bind.TransactOpts, account DataTypesAccount) (*types.Transaction, error) {
-	return _Rollup.contract.Transact(opts, "getAccountBytes", account)
+// Solidity: function addAccount(DataTypesAccount _account) returns(bytes32)
+func (_Rollup *RollupTransactor) AddAccount(opts *bind.TransactOpts, _account DataTypesAccount) (*types.Transaction, error) {
+	return _Rollup.contract.Transact(opts, "addAccount", _account)
 }
 
-// GetAccountBytes is a paid mutator transaction binding the contract method 0x7d3b5c3a.
+// AddAccount is a paid mutator transaction binding the contract method 0xd07b1b39.
 //
-// Solidity: function getAccountBytes(DataTypesAccount account) returns(bytes)
-func (_Rollup *RollupSession) GetAccountBytes(account DataTypesAccount) (*types.Transaction, error) {
-	return _Rollup.Contract.GetAccountBytes(&_Rollup.TransactOpts, account)
+// Solidity: function addAccount(DataTypesAccount _account) returns(bytes32)
+func (_Rollup *RollupSession) AddAccount(_account DataTypesAccount) (*types.Transaction, error) {
+	return _Rollup.Contract.AddAccount(&_Rollup.TransactOpts, _account)
 }
 
-// GetAccountBytes is a paid mutator transaction binding the contract method 0x7d3b5c3a.
+// AddAccount is a paid mutator transaction binding the contract method 0xd07b1b39.
 //
-// Solidity: function getAccountBytes(DataTypesAccount account) returns(bytes)
-func (_Rollup *RollupTransactorSession) GetAccountBytes(account DataTypesAccount) (*types.Transaction, error) {
-	return _Rollup.Contract.GetAccountBytes(&_Rollup.TransactOpts, account)
+// Solidity: function addAccount(DataTypesAccount _account) returns(bytes32)
+func (_Rollup *RollupTransactorSession) AddAccount(_account DataTypesAccount) (*types.Transaction, error) {
+	return _Rollup.Contract.AddAccount(&_Rollup.TransactOpts, _account)
 }
 
-// GetBalanceFromAccount is a paid mutator transaction binding the contract method 0xbe599579.
+// DisputeBatch is a paid mutator transaction binding the contract method 0xd7672ee2.
 //
-// Solidity: function getBalanceFromAccount(DataTypesAccount account) returns(uint256)
-func (_Rollup *RollupTransactor) GetBalanceFromAccount(opts *bind.TransactOpts, account DataTypesAccount) (*types.Transaction, error) {
-	return _Rollup.contract.Transact(opts, "getBalanceFromAccount", account)
+// Solidity: function disputeBatch(uint256 batch_id, []DataTypesTransaction _txs, []DataTypesMerkleProof _from_proofs, []DataTypesMerkleProof _to_proofs) returns(bool)
+func (_Rollup *RollupTransactor) DisputeBatch(opts *bind.TransactOpts, batch_id *big.Int, _txs []DataTypesTransaction, _from_proofs []DataTypesMerkleProof, _to_proofs []DataTypesMerkleProof) (*types.Transaction, error) {
+	return _Rollup.contract.Transact(opts, "disputeBatch", batch_id, _txs, _from_proofs, _to_proofs)
 }
 
-// GetBalanceFromAccount is a paid mutator transaction binding the contract method 0xbe599579.
+// DisputeBatch is a paid mutator transaction binding the contract method 0xd7672ee2.
 //
-// Solidity: function getBalanceFromAccount(DataTypesAccount account) returns(uint256)
-func (_Rollup *RollupSession) GetBalanceFromAccount(account DataTypesAccount) (*types.Transaction, error) {
-	return _Rollup.Contract.GetBalanceFromAccount(&_Rollup.TransactOpts, account)
+// Solidity: function disputeBatch(uint256 batch_id, []DataTypesTransaction _txs, []DataTypesMerkleProof _from_proofs, []DataTypesMerkleProof _to_proofs) returns(bool)
+func (_Rollup *RollupSession) DisputeBatch(batch_id *big.Int, _txs []DataTypesTransaction, _from_proofs []DataTypesMerkleProof, _to_proofs []DataTypesMerkleProof) (*types.Transaction, error) {
+	return _Rollup.Contract.DisputeBatch(&_Rollup.TransactOpts, batch_id, _txs, _from_proofs, _to_proofs)
 }
 
-// GetBalanceFromAccount is a paid mutator transaction binding the contract method 0xbe599579.
+// DisputeBatch is a paid mutator transaction binding the contract method 0xd7672ee2.
 //
-// Solidity: function getBalanceFromAccount(DataTypesAccount account) returns(uint256)
-func (_Rollup *RollupTransactorSession) GetBalanceFromAccount(account DataTypesAccount) (*types.Transaction, error) {
-	return _Rollup.Contract.GetBalanceFromAccount(&_Rollup.TransactOpts, account)
+// Solidity: function disputeBatch(uint256 batch_id, []DataTypesTransaction _txs, []DataTypesMerkleProof _from_proofs, []DataTypesMerkleProof _to_proofs) returns(bool)
+func (_Rollup *RollupTransactorSession) DisputeBatch(batch_id *big.Int, _txs []DataTypesTransaction, _from_proofs []DataTypesMerkleProof, _to_proofs []DataTypesMerkleProof) (*types.Transaction, error) {
+	return _Rollup.Contract.DisputeBatch(&_Rollup.TransactOpts, batch_id, _txs, _from_proofs, _to_proofs)
 }
 
-// InitAccounts is a paid mutator transaction binding the contract method 0x49f2545b.
+// InitMT is a paid mutator transaction binding the contract method 0x22a4dbf8.
 //
-// Solidity: function initAccounts() returns()
-func (_Rollup *RollupTransactor) InitAccounts(opts *bind.TransactOpts) (*types.Transaction, error) {
-	return _Rollup.contract.Transact(opts, "initAccounts")
+// Solidity: function initMT() returns()
+func (_Rollup *RollupTransactor) InitMT(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _Rollup.contract.Transact(opts, "initMT")
 }
 
-// InitAccounts is a paid mutator transaction binding the contract method 0x49f2545b.
+// InitMT is a paid mutator transaction binding the contract method 0x22a4dbf8.
 //
-// Solidity: function initAccounts() returns()
-func (_Rollup *RollupSession) InitAccounts() (*types.Transaction, error) {
-	return _Rollup.Contract.InitAccounts(&_Rollup.TransactOpts)
+// Solidity: function initMT() returns()
+func (_Rollup *RollupSession) InitMT() (*types.Transaction, error) {
+	return _Rollup.Contract.InitMT(&_Rollup.TransactOpts)
 }
 
-// InitAccounts is a paid mutator transaction binding the contract method 0x49f2545b.
+// InitMT is a paid mutator transaction binding the contract method 0x22a4dbf8.
 //
-// Solidity: function initAccounts() returns()
-func (_Rollup *RollupTransactorSession) InitAccounts() (*types.Transaction, error) {
-	return _Rollup.Contract.InitAccounts(&_Rollup.TransactOpts)
+// Solidity: function initMT() returns()
+func (_Rollup *RollupTransactorSession) InitMT() (*types.Transaction, error) {
+	return _Rollup.Contract.InitMT(&_Rollup.TransactOpts)
 }
 
-// ProcessTxUpdate is a paid mutator transaction binding the contract method 0x592dcef0.
+// ProcessTxUpdate is a paid mutator transaction binding the contract method 0x889e1f80.
 //
 // Solidity: function processTxUpdate(bytes32 _balanceRoot, DataTypesTransaction _tx, DataTypesMerkleProof _from_merkle_proof, DataTypesMerkleProof _to_merkle_proof) returns(bytes32, uint256, uint256)
 func (_Rollup *RollupTransactor) ProcessTxUpdate(opts *bind.TransactOpts, _balanceRoot [32]byte, _tx DataTypesTransaction, _from_merkle_proof DataTypesMerkleProof, _to_merkle_proof DataTypesMerkleProof) (*types.Transaction, error) {
 	return _Rollup.contract.Transact(opts, "processTxUpdate", _balanceRoot, _tx, _from_merkle_proof, _to_merkle_proof)
 }
 
-// ProcessTxUpdate is a paid mutator transaction binding the contract method 0x592dcef0.
+// ProcessTxUpdate is a paid mutator transaction binding the contract method 0x889e1f80.
 //
 // Solidity: function processTxUpdate(bytes32 _balanceRoot, DataTypesTransaction _tx, DataTypesMerkleProof _from_merkle_proof, DataTypesMerkleProof _to_merkle_proof) returns(bytes32, uint256, uint256)
 func (_Rollup *RollupSession) ProcessTxUpdate(_balanceRoot [32]byte, _tx DataTypesTransaction, _from_merkle_proof DataTypesMerkleProof, _to_merkle_proof DataTypesMerkleProof) (*types.Transaction, error) {
 	return _Rollup.Contract.ProcessTxUpdate(&_Rollup.TransactOpts, _balanceRoot, _tx, _from_merkle_proof, _to_merkle_proof)
 }
 
-// ProcessTxUpdate is a paid mutator transaction binding the contract method 0x592dcef0.
+// ProcessTxUpdate is a paid mutator transaction binding the contract method 0x889e1f80.
 //
 // Solidity: function processTxUpdate(bytes32 _balanceRoot, DataTypesTransaction _tx, DataTypesMerkleProof _from_merkle_proof, DataTypesMerkleProof _to_merkle_proof) returns(bytes32, uint256, uint256)
 func (_Rollup *RollupTransactorSession) ProcessTxUpdate(_balanceRoot [32]byte, _tx DataTypesTransaction, _from_merkle_proof DataTypesMerkleProof, _to_merkle_proof DataTypesMerkleProof) (*types.Transaction, error) {
@@ -422,21 +527,21 @@ func (_Rollup *RollupTransactorSession) SubmitBatch(_txs [][]byte, _updatedRoot 
 	return _Rollup.Contract.SubmitBatch(&_Rollup.TransactOpts, _txs, _updatedRoot)
 }
 
-// UpdateBalanceInLeaf is a paid mutator transaction binding the contract method 0xe255f0c2.
+// UpdateBalanceInLeaf is a paid mutator transaction binding the contract method 0x7bc6e417.
 //
 // Solidity: function updateBalanceInLeaf(DataTypesAccount original_account, uint256 new_balance) returns(DataTypesAccount new_account)
 func (_Rollup *RollupTransactor) UpdateBalanceInLeaf(opts *bind.TransactOpts, original_account DataTypesAccount, new_balance *big.Int) (*types.Transaction, error) {
 	return _Rollup.contract.Transact(opts, "updateBalanceInLeaf", original_account, new_balance)
 }
 
-// UpdateBalanceInLeaf is a paid mutator transaction binding the contract method 0xe255f0c2.
+// UpdateBalanceInLeaf is a paid mutator transaction binding the contract method 0x7bc6e417.
 //
 // Solidity: function updateBalanceInLeaf(DataTypesAccount original_account, uint256 new_balance) returns(DataTypesAccount new_account)
 func (_Rollup *RollupSession) UpdateBalanceInLeaf(original_account DataTypesAccount, new_balance *big.Int) (*types.Transaction, error) {
 	return _Rollup.Contract.UpdateBalanceInLeaf(&_Rollup.TransactOpts, original_account, new_balance)
 }
 
-// UpdateBalanceInLeaf is a paid mutator transaction binding the contract method 0xe255f0c2.
+// UpdateBalanceInLeaf is a paid mutator transaction binding the contract method 0x7bc6e417.
 //
 // Solidity: function updateBalanceInLeaf(DataTypesAccount original_account, uint256 new_balance) returns(DataTypesAccount new_account)
 func (_Rollup *RollupTransactorSession) UpdateBalanceInLeaf(original_account DataTypesAccount, new_balance *big.Int) (*types.Transaction, error) {

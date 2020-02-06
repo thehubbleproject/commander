@@ -109,6 +109,38 @@ func ResetCmd() *cobra.Command {
 	}
 }
 
+func AddGenesisAcccountsCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "add-gen-accounts",
+		Short: "Adds the accounts present in genesis account to the contract",
+		Run: func(cmd *cobra.Command, args []string) {
+			viperObj := viper.New()
+			dir, err := os.Getwd()
+			common.PanicIfError(err)
+
+			viperObj.SetConfigName(ConfigFileName) // name of config file (without extension)
+			viperObj.AddConfigPath(dir)
+			err = viperObj.ReadInConfig()
+			common.PanicIfError(err)
+
+			var cfg config.Configuration
+			if err = viperObj.UnmarshalExact(&cfg); err != nil {
+				common.PanicIfError(err)
+			}
+			// init global config
+			config.GlobalCfg = cfg
+			genAccs, err := config.ReadGenesisFile()
+			common.PanicIfError(err)
+			contractCaller, err := types.NewContractCaller()
+			for _, genAcc := range genAccs.Accounts {
+				err := contractCaller.AddAccount(types.NewAccountLeaf(genAcc.Path, genAcc.Balance, genAcc.TokenType, genAcc.Nonce))
+				common.PanicIfError(err)
+			}
+			common.PanicIfError(err)
+		},
+	}
+}
+
 // StartCmd starts the daemon
 func StartCmd() *cobra.Command {
 	return &cobra.Command{

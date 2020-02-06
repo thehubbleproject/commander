@@ -7,6 +7,9 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/rpc"
 
 	"github.com/BOPR/config"
@@ -24,6 +27,7 @@ type IContractCaller interface {
 	SubmitBatch(txs []Tx)
 	TotalBatches() uint64
 	FetchBatchWithIndex(uint64) (Batch, error)
+	AddAccount(acc AccountLeaf) error
 }
 
 // ContractCaller contract caller
@@ -56,6 +60,41 @@ func NewContractCaller() (contractCaller ContractCaller, err error) {
 	return contractCaller, nil
 }
 
+func GenerateAuthObj(client *ethclient.Client, callMsg ethereum.CallMsg) (auth *bind.TransactOpts, err error) {
+	pv := config.FilePVInstance
+	// create ecdsa private key
+	ecdsaPrivateKey, err := crypto.ToECDSA(pv.Key.PrivKey.Bytes())
+	if err != nil {
+		return
+	}
+
+	// from address
+	fromAddress := common.BytesToAddress(pv.GetAddress().Bytes())
+
+	// fetch gas price
+	gasprice, err := client.SuggestGasPrice(context.Background())
+	if err != nil {
+		return
+	}
+	// fetch nonce
+	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+	if err != nil {
+		return
+	}
+
+	// fetch gas limit
+	callMsg.From = fromAddress
+	gasLimit, err := client.EstimateGas(context.Background(), callMsg)
+
+	// create auth
+	auth = bind.NewKeyedTransactor(ecdsaPrivateKey)
+	auth.GasPrice = gasprice
+	auth.Nonce = big.NewInt(int64(nonce))
+	auth.GasLimit = uint64(gasLimit) // uint64(gasLimit)
+
+	return
+}
+
 // TotalBatches returns the total number of batches that have been submitted on chain
 func (c *ContractCaller) TotalBatches() (uint64, error) {
 	totalBatches, err := c.RollupContract.NumberOfBatches(nil)
@@ -80,6 +119,31 @@ func (c *ContractCaller) FetchBalanceTreeRoot() (ByteArray, error) {
 		return ByteArray{}, err
 	}
 	return root, nil
+}
+
+// AddAccount adds an account to the merkle tree in the contract
+func (c *ContractCaller) AddAccount(acc AccountLeaf) error {
+	data, err := c.RollupContractABI.Pack("addAccount", acc.ToABIAccount())
+	if err != nil {
+		fmt.Println("Unable to pack tx for submitHeaderBlock", "error", err)
+		return err
+	}
+	callMsg := ethereum.CallMsg{
+		To:   &c.RollupContractAddress,
+		Data: data,
+	}
+	auth, err := GenerateAuthObj(c.ethClient, callMsg)
+	if err != nil {
+		return err
+	}
+
+	tx, err := c.RollupContract.AddAccount(auth, acc.ToABIAccount())
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Added account to the treee", "txHash", tx.Hash().String())
+	return nil
 }
 
 // ProcessTx calls the ProcessTx function on the contract to verify the tx
