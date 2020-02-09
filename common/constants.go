@@ -12,4 +12,6 @@ const (
 	DEFAULT_BALANCE    = 100
 	DEFAULT_NONCE      = 0
 	DEFAULT_TOKEN_TYPE = 0
+
+	PrivKeyPath = "./privKey.json"
 )

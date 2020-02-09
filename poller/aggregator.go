@@ -100,28 +100,28 @@ func (a *Aggregator) pickBatch() {
 // and calls the proccess tx function to return the updated balance root and accounts
 func (a *Aggregator) ApplyTx(tx types.Tx) {
 	// fetch to account from DB
-	// fromAccount, _ := a.DB.GetAccount(tx.From)
-	// fmt.Println("fetched account", fromAccount)
+	fromAccount, _ := a.DB.GetAccount(tx.From)
+	fmt.Println("fetched account", fromAccount)
 
-	// fromSiblings, err := a.DB.FetchSiblings(fromAccount.Path)
-	// if err != nil {
-	// 	fmt.Println("not able to fetch from siblings", "error", err)
-	// }
+	fromSiblings, err := db.FetchSiblings(fromAccount.Path, a.DB)
+	if err != nil {
+		fmt.Println("not able to fetch from siblings", "error", err)
+	}
 
-	// // fetch from account from DB
-	// toAccount, _ := a.DB.GetAccount(tx.To)
-	// fmt.Println("fetched account", toAccount)
+	// fetch from account from DB
+	toAccount, _ := a.DB.GetAccount(tx.To)
+	fmt.Println("fetched account", toAccount)
 
-	// toSiblings, err := a.DB.FetchSiblings(toAccount.Path)
-	// if err != nil {
-	// 	fmt.Println("not able to fetch to siblings", "error", err)
-	// }
+	toSiblings, err := db.FetchSiblings(toAccount.Path, a.DB)
+	if err != nil {
+		fmt.Println("not able to fetch to siblings", "error", err)
+	}
 
-	// // fetch latest batch from DB
-	// latestBatch, err := a.DB.GetLatestBatch()
-	// newBalRoot, updatedFrom, updatedTo, err := types.ContractCallerObj.ProcessTx(latestBatch.StateRoot,
-	// 	tx, types.NewMerkleProof(fromAccount, fromSiblings),
-	// 	types.NewMerkleProof(toAccount, toSiblings),
-	// )
-	// fmt.Println("all the updated data", newBalRoot, updatedFrom, updatedTo)
+	// fetch latest batch from DB
+	latestBatch, err := a.DB.GetLatestBatch()
+	newBalRoot, updatedFrom, updatedTo, err := types.ContractCallerObj.ProcessTx(latestBatch.StateRoot,
+		tx, types.NewMerkleProof(fromAccount, fromSiblings),
+		types.NewMerkleProof(toAccount, toSiblings),
+	)
+	fmt.Println("all the updated data", newBalRoot, updatedFrom, updatedTo)
 }

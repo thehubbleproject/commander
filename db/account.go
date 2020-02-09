@@ -87,7 +87,7 @@ func (db *DB) GetAccountCount() (int, error) {
 
 // FetchSiblings retuns the siblings of an account leaf till root
 // TODO make this more performannt by using bulk account fetch or using groutines to fetch in parerell
-func FetchSiblings(accID uint64, db IDB) (accs []types.AccountLeaf, err error) {
+func FetchSiblings(accID uint64, db DB) (accs []types.AccountLeaf, err error) {
 	// For eg: for account ID 1111 => 1110, 110X, 10XX
 	var siblings []types.AccountLeaf
 

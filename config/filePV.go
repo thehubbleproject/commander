@@ -4,20 +4,24 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 
-	"github.com/tendermint/tendermint/crypto"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
+	ethCmn "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/maticnetwork/bor/common/hexutil"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/types"
+
+	"crypto/ecdsa"
 )
 
 //-------------------------------------------------------------------------------
 
 // FilePVKey stores the immutable part of PrivValidator.
 type FilePVKey struct {
-	Address types.Address  `json:"address"`
-	PubKey  crypto.PubKey  `json:"pub_key"`
-	PrivKey crypto.PrivKey `json:"priv_key"`
+	Address ethCmn.Address   `json:"address"`
+	PubKey  ecdsa.PublicKey  `json:"pub_key"`
+	PrivKey ecdsa.PrivateKey `json:"priv_key"`
 
 	filePath string
 }
@@ -29,10 +33,11 @@ func (pvKey FilePVKey) Save() {
 		panic("cannot save PrivValidator key: filePath not set")
 	}
 
-	jsonBytes, err := json.MarshalIndent(pvKey, "", "  ")
+	jsonBytes, err := json.Marshal(pvKey)
 	if err != nil {
 		panic(err)
 	}
+
 	err = cmn.WriteFileAtomic(outFile, jsonBytes, 0600)
 	if err != nil {
 		panic(err)
@@ -54,15 +59,45 @@ type FilePV struct {
 // GenFilePV generates a new validator with randomly generated private key
 // and sets the filePaths, but does not call Save().
 func GenFilePV(keyFilePath string) *FilePV {
-	privKey := secp256k1.GenPrivKey()
+	// privKey := secp256k1.GenPrivKey()
+	privKey, err := crypto.GenerateKey()
+	if err != nil {
+		return &FilePV{}
+	}
 	return &FilePV{
 		Key: FilePVKey{
-			Address:  privKey.PubKey().Address(),
-			PubKey:   privKey.PubKey(),
-			PrivKey:  privKey,
+			Address:  PrivKeyToAddress(privKey),
+			PubKey:   PrivToPubkey(privKey),
+			PrivKey:  *privKey,
 			filePath: keyFilePath,
 		},
 	}
+}
+
+// PrivToPubkey private key to public key
+func PrivToPubkey(privKey *ecdsa.PrivateKey) ecdsa.PublicKey {
+	publicKey := privKey.Public()
+	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+	if !ok {
+		log.Fatal("cannot assert type: publicKey is not of type *ecdsa.PublicKey")
+	}
+	return *publicKeyECDSA
+}
+
+func PrivKeyToAddress(privKey *ecdsa.PrivateKey) ethCmn.Address {
+	pubKey := PrivToPubkey(privKey)
+	return PubKeyToAddress(&pubKey)
+}
+
+// PubKeyToAddress public key to address
+func PubKeyToAddress(pubKey *ecdsa.PublicKey) ethCmn.Address {
+	return crypto.PubkeyToAddress(*pubKey)
+}
+
+// PubKeyToString converts public key human readable string
+func PubKeyToString(pubKey *ecdsa.PublicKey) string {
+	publicKeyBytes := crypto.FromECDSAPub(pubKey)
+	return hexutil.Encode(publicKeyBytes)[4:]
 }
 
 // LoadFilePV loads a FilePV from the filePaths.  The FilePV handles double
@@ -84,15 +119,16 @@ func loadFilePV(keyFilePath string) *FilePV {
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
-	pvKey := FilePVKey{}
+	var pvKey FilePVKey
+
 	err = json.Unmarshal(keyJSONBytes, &pvKey)
 	if err != nil {
 		cmn.Exit(fmt.Sprintf("Error reading PrivValidator key from %v: %v\n", keyFilePath, err))
 	}
 
 	// overwrite pubkey and address for convenience
-	pvKey.PubKey = pvKey.PrivKey.PubKey()
-	pvKey.Address = pvKey.PubKey.Address()
+	pvKey.PubKey = PrivToPubkey(&pvKey.PrivKey)
+	pvKey.Address = PrivKeyToAddress(&pvKey.PrivKey)
 	pvKey.filePath = keyFilePath
 
 	return &FilePV{
@@ -115,13 +151,13 @@ func LoadOrGenFilePV(keyFilePath string) *FilePV {
 
 // GetAddress returns the address of the validator.
 // Implements PrivValidator.
-func (pv *FilePV) GetAddress() types.Address {
+func (pv *FilePV) GetAddress() ethCmn.Address {
 	return pv.Key.Address
 }
 
 // GetPubKey returns the public key of the validator.
 // Implements PrivValidator.
-func (pv *FilePV) GetPubKey() crypto.PubKey {
+func (pv *FilePV) GetPubKey() ecdsa.PublicKey {
 	return pv.Key.PubKey
 }
 
@@ -131,40 +167,5 @@ func (pv *FilePV) Save() {
 }
 
 func (pv *FilePV) signBatch(chainID string, vote *types.Vote) error {
-	// height, round, step := vote.Height, vote.Round, voteToStep(vote)
-
-	// lss := pv.LastSignState
-
-	// sameHRS, err := lss.CheckHRS(height, round, step)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// signBytes := vote.SignBytes(chainID)
-
-	// // We might crash before writing to the wal,
-	// // causing us to try to re-sign for the same HRS.
-	// // If signbytes are the same, use the last signature.
-	// // If they only differ by timestamp, use last timestamp and signature
-	// // Otherwise, return error
-	// if sameHRS {
-	// 	if bytes.Equal(signBytes, lss.SignBytes) {
-	// 		vote.Signature = lss.Signature
-	// 	} else if timestamp, ok := checkVotesOnlyDifferByTimestamp(lss.SignBytes, signBytes); ok {
-	// 		vote.Timestamp = timestamp
-	// 		vote.Signature = lss.Signature
-	// 	} else {
-	// 		err = fmt.Errorf("conflicting data")
-	// 	}
-	// 	return err
-	// }
-
-	// // It passed the checks. Sign the vote
-	// sig, err := pv.Key.PrivKey.Sign(signBytes)
-	// if err != nil {
-	// 	return err
-	// }
-	// pv.saveSigned(height, round, step, signBytes, sig)
-	// vote.Signature = sig
 	return nil
 }

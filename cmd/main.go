@@ -22,7 +22,6 @@ import (
 const (
 	WithConfigPathFlag = "config-path"
 	ConfigFileName     = "config"
-	PrivKeyPath        = "./privKey.json"
 )
 
 // Executor wraps the cobra Command with a nicer Execute method
@@ -68,7 +67,7 @@ func InitCmd() *cobra.Command {
 		Short: "Initialises Configration for BOPR",
 		Run: func(cmd *cobra.Command, args []string) {
 			defaultConfig := config.GetDefaultConfig()
-			filePV := config.GenFilePV(PrivKeyPath)
+			filePV := config.GenFilePV(common.PrivKeyPath)
 			filePV.Save()
 			config.WriteConfigFile("./config.toml", &defaultConfig)
 			gen := config.DefaultGenesisAccounts()
@@ -166,7 +165,8 @@ func StartCmd() *cobra.Command {
 
 			// TODO remove this post testnet
 			// init file PV instance
-			config.FilePVInstance = *config.LoadFilePV(PrivKeyPath)
+			// config.FilePVInstance = *config.LoadFilePV(common.PrivKeyPath)
+			common.PanicIfError(config.SetOperatorKeys(config.GlobalCfg.OperatorKey))
 
 			// create db Instance
 			dbInstance, err := db.NewDB(cfg.MongoDB)

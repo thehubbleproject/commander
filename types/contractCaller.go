@@ -8,8 +8,6 @@ import (
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/rpc"
 
 	"github.com/BOPR/config"
@@ -61,15 +59,9 @@ func NewContractCaller() (contractCaller ContractCaller, err error) {
 }
 
 func GenerateAuthObj(client *ethclient.Client, callMsg ethereum.CallMsg) (auth *bind.TransactOpts, err error) {
-	pv := config.FilePVInstance
-	// create ecdsa private key
-	ecdsaPrivateKey, err := crypto.ToECDSA(pv.Key.PrivKey.Bytes())
-	if err != nil {
-		return
-	}
 
 	// from address
-	fromAddress := common.BytesToAddress(pv.GetAddress().Bytes())
+	fromAddress := config.OperatorAddress()
 
 	// fetch gas price
 	gasprice, err := client.SuggestGasPrice(context.Background())
@@ -87,7 +79,7 @@ func GenerateAuthObj(client *ethclient.Client, callMsg ethereum.CallMsg) (auth *
 	gasLimit, err := client.EstimateGas(context.Background(), callMsg)
 
 	// create auth
-	auth = bind.NewKeyedTransactor(ecdsaPrivateKey)
+	auth = bind.NewKeyedTransactor(config.OperatorKey)
 	auth.GasPrice = gasprice
 	auth.Nonce = big.NewInt(int64(nonce))
 	auth.GasLimit = uint64(gasLimit) // uint64(gasLimit)

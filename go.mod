@@ -69,4 +69,5 @@ require (
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
 	gopkg.in/yaml.v2 v2.2.7
+	honnef.co/go/tools v0.0.0-20190523083050-ea95bdfd59fc
 )

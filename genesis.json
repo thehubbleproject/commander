@@ -1,16 +1,1 @@
-{
-    "gen_accounts": [
-        {
-            "Path": 00,
-            "Balance": 100,
-            "TokenType": 0,
-            "Nonce": 0
-        },
-        {
-            "Path": 11,
-            "Balance": 100,
-            "TokenType": 0,
-            "Nonce": 0
-        }
-    ]
-}
+{"gen_accounts":[{"Path":100,"Balance":100,"TokenType":0,"Nonce":0}]}

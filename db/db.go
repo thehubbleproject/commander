@@ -8,7 +8,7 @@ import (
 
 type IDB interface {
 	// Account related DB functions
-	FetchSiblings(accID uint64) (accs []types.AccountLeaf, err error)
+	// FetchSiblings(accID uint64) (accs []types.AccountLeaf, err error)
 	GetAllAccounts() (accs []types.AccountLeaf, err error)
 	GetAccount(accID uint64) (types.AccountLeaf, error)
 	InsertBulkAccounts(accounts []types.AccountLeaf) error
