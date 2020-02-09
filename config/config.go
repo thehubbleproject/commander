@@ -32,6 +32,7 @@ type Configuration struct {
 	RollupAddress        string        `mapstructure:"rollup_address"`
 	MerkleTreeLibAddress string        `mapstructure:"merkle_lib_address"`
 	OperatorKey          string        `mapstructure:"operator_key"`
+	OperatorAddress      string        `mapstructure:"operator_address"`
 }
 
 // GetDefaultConfig returns the default configration options
@@ -45,6 +46,7 @@ func GetDefaultConfig() Configuration {
 		RollupAddress:        ethCmn.Address{}.String(),
 		MerkleTreeLibAddress: ethCmn.Address{}.String(),
 		OperatorKey:          "",
+		OperatorAddress:      "",
 	}
 }
 
@@ -67,4 +69,30 @@ func SetOperatorKeys(privKeyStr string) error {
 func OperatorAddress() ethCmn.Address {
 	address := crypto.PubkeyToAddress(*OperatorPubKey)
 	return address
+}
+
+func GenOperatorKey() ([]byte, error) {
+	privKey, err := crypto.GenerateKey()
+	if err != nil {
+		return nil, err
+	}
+
+	return crypto.FromECDSA(privKey), nil
+}
+
+// PrivKeyToPubKey convert private key to public key
+func PrivKeyStringToAddress(privKey string) (ethCmn.Address, error) {
+	privKeyBytes, err := hex.DecodeString(privKey)
+	if err != nil {
+		return ethCmn.Address{}, err
+	}
+
+	OperatorKey := crypto.ToECDSAUnsafe(privKeyBytes)
+	publicKey := OperatorKey.Public()
+	ecsdaPubKey, ok := publicKey.(*ecdsa.PublicKey)
+	if !ok {
+		return ethCmn.Address{}, errors.New("cannot assert type: publicKey is not of type *ecdsa.PublicKey")
+	}
+
+	return crypto.PubkeyToAddress(*ecsdaPubKey), nil
 }

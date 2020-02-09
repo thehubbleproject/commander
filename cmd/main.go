@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/hex"
 	"fmt"
 	"log"
 	"net/http"
@@ -67,8 +68,12 @@ func InitCmd() *cobra.Command {
 		Short: "Initialises Configration for BOPR",
 		Run: func(cmd *cobra.Command, args []string) {
 			defaultConfig := config.GetDefaultConfig()
-			filePV := config.GenFilePV(common.PrivKeyPath)
-			filePV.Save()
+			operatorKey, err := config.GenOperatorKey()
+			common.PanicIfError(err)
+			defaultConfig.OperatorKey = hex.EncodeToString(operatorKey)
+			address, err := config.PrivKeyStringToAddress(hex.EncodeToString(operatorKey))
+			common.PanicIfError(err)
+			defaultConfig.OperatorAddress = address.String()
 			config.WriteConfigFile("./config.toml", &defaultConfig)
 			gen := config.DefaultGenesisAccounts()
 			if err := config.WriteGenesisFile(gen); err != nil {
@@ -164,8 +169,6 @@ func StartCmd() *cobra.Command {
 			config.GlobalCfg = cfg
 
 			// TODO remove this post testnet
-			// init file PV instance
-			// config.FilePVInstance = *config.LoadFilePV(common.PrivKeyPath)
 			common.PanicIfError(config.SetOperatorKeys(config.GlobalCfg.OperatorKey))
 
 			// create db Instance

@@ -29,6 +29,11 @@ confirmation_blocks = "{{ .ConfirmationBlocks }}"
 
 ##### Contract Addresses #####
 rollup_address = "{{ .RollupAddress }}"
+merkle_lib_address = "{{ .MerkleTreeLibAddress }}"
+
+#### Keystore #####
+operator_key = "{{ .OperatorKey }}"
+operator_address = "{{ .OperatorAddress }}"
 `
 
 var configTemplate *template.Template
