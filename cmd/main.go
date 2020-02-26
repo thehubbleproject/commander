@@ -11,6 +11,7 @@ import (
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 	db "github.com/BOPR/db"
+	"github.com/BOPR/listener"
 
 	"github.com/BOPR/poller"
 	"github.com/BOPR/rest"
@@ -179,6 +180,7 @@ func StartCmd() *cobra.Command {
 
 			common.PanicIfError(err)
 			aggregator := poller.NewAggregator(dbInstance)
+			syncer := listener.NewSyncer()
 			types.ContractCallerObj, err = types.NewContractCaller()
 			common.PanicIfError(err)
 
@@ -226,6 +228,7 @@ func StartCmd() *cobra.Command {
 				// sig is a ^C, handle it
 				for range catchSignal {
 					aggregator.Stop()
+					syncer.Stop()
 
 					// exit
 					os.Exit(1)
@@ -240,6 +243,9 @@ func StartCmd() *cobra.Command {
 				log.Fatalln("Unable to start aggregator", "error", err)
 			}
 
+			if err := syncer.Start(); err != nil {
+				log.Fatalln("Unable to start syncer", "error")
+			}
 			// TODO replace this with port from config
 			http.ListenAndServe(":8080", r)
 			fmt.Println("Server started on port 8080 🎉")

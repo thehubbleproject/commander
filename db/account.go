@@ -11,14 +11,14 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func (db *DB) GetAccountCollection() *mgo.Collection {
+func (db *DB) GetAccountCollection() (*mgo.Collection, *Session) {
 	session := db.MgoSession.Copy()
-	defer session.Close()
-	return session.GetCollection(common.DATABASE, common.ACCOUNT_COLLECTION)
+	return session.GetCollection(common.DATABASE, common.ACCOUNT_COLLECTION), session
 }
 
 func (db *DB) StoreMT(mt merkle.MerkleTree) error {
-	coll := db.GetAccountCollection()
+	coll, session := db.GetAccountCollection()
+	defer session.Close()
 
 	if err := coll.Insert(mt); err != nil {
 		fmt.Println("Unable to insert", "error", err)
@@ -27,12 +27,9 @@ func (db *DB) StoreMT(mt merkle.MerkleTree) error {
 	return nil
 }
 
-func CreateAndStoreMT(accounts []types.AccountLeaf) {
-	// types.CreateTree()
-}
-
 func (db *DB) GetAllAccounts() (accs []types.AccountLeaf, err error) {
-	coll := db.GetAccountCollection()
+	coll, session := db.GetAccountCollection()
+	defer session.Close()
 
 	err = coll.Find(nil).All(accs)
 	if err != nil {
@@ -43,7 +40,9 @@ func (db *DB) GetAllAccounts() (accs []types.AccountLeaf, err error) {
 
 // GetAccount gets the account of the given path from the DB
 func (db *DB) GetAccount(accID uint64) (types.AccountLeaf, error) {
-	coll := db.GetAccountCollection()
+	coll, session := db.GetAccountCollection()
+	defer session.Close()
+
 	query := bson.M{"path": accID}
 
 	var account types.AccountLeaf
@@ -57,7 +56,9 @@ func (db *DB) GetAccount(accID uint64) (types.AccountLeaf, error) {
 }
 
 func (db *DB) InsertBulkAccounts(accounts []types.AccountLeaf) error {
-	coll := db.GetAccountCollection()
+	coll, session := db.GetAccountCollection()
+	defer session.Close()
+
 	var AccI []interface{}
 	for _, acc := range accounts {
 		AccI = append(AccI, acc)
@@ -81,7 +82,9 @@ func (db *DB) InsertGenAccounts(genAccs []config.GenAccountLeaf) error {
 }
 
 func (db *DB) GetAccountCount() (int, error) {
-	coll := db.GetAccountCollection()
+	coll, session := db.GetAccountCollection()
+	defer session.Close()
+
 	return coll.Count()
 }
 

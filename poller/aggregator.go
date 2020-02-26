@@ -47,7 +47,6 @@ func (a *Aggregator) OnStart() error {
 
 	// start polling for checkpoint in buffer
 	go a.startAggregating(ctx, config.GlobalCfg.PollingInterval)
-	a.Logger.Info("Starting aggregator")
 	return nil
 }
 

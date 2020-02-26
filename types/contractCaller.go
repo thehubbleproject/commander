@@ -12,7 +12,11 @@ import (
 
 	"github.com/BOPR/config"
 
+	"github.com/BOPR/contracts/merkleTree"
 	"github.com/BOPR/contracts/rollup"
+
+	ethTypes "github.com/ethereum/go-ethereum/core/types"
+
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	ethCmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -26,35 +30,54 @@ type IContractCaller interface {
 	TotalBatches() uint64
 	FetchBatchWithIndex(uint64) (Batch, error)
 	AddAccount(acc AccountLeaf) error
+	GetMainChainBlock(blockNum *big.Int) (header *ethTypes.Header, err error)
 }
 
 // ContractCaller contract caller
 type ContractCaller struct {
-	ethClient *ethclient.Client
+	EthClient *ethclient.Client
 
-	RollupContract *rollup.Rollup
-
-	RollupContractABI abi.ABI
-
+	// Rollup contract
+	RollupContract        *rollup.Rollup
+	RollupContractABI     abi.ABI
 	RollupContractAddress ethCmn.Address
+
+	// Merkle Tree libs
+	MerkleTreeContract   *merkleTree.MerkleTree
+	MerkleTreeABI        abi.ABI
+	MerkleTreeLibAddress ethCmn.Address
 }
 
 // NewContractCaller contract caller
 func NewContractCaller() (contractCaller ContractCaller, err error) {
+	fmt.Println("ethrpc", config.GlobalCfg.EthRPC)
 	if RPCClient, err := rpc.Dial(config.GlobalCfg.EthRPC); err != nil {
 		return contractCaller, err
 	} else {
-		contractCaller.ethClient = ethclient.NewClient(RPCClient)
+		contractCaller.EthClient = ethclient.NewClient(RPCClient)
 	}
-	contractAddress := ethCmn.HexToAddress(config.GlobalCfg.RollupAddress)
+	fmt.Println("rpcclient", contractCaller.EthClient)
 
-	if contractCaller.RollupContract, err = rollup.NewRollup(contractAddress, contractCaller.ethClient); err != nil {
+	// initialise all variables for rollup contract
+	rollupContractAddress := ethCmn.HexToAddress(config.GlobalCfg.RollupAddress)
+	if contractCaller.RollupContract, err = rollup.NewRollup(rollupContractAddress, contractCaller.EthClient); err != nil {
 		return contractCaller, err
 	}
 	if contractCaller.RollupContractABI, err = abi.JSON(strings.NewReader(rollup.RollupABI)); err != nil {
 		return contractCaller, err
 	}
-	contractCaller.RollupContractAddress = contractAddress
+	contractCaller.RollupContractAddress = rollupContractAddress
+
+	// initialise all variables for merkle tree contract
+	merkleTreeContractAddress := ethCmn.HexToAddress(config.GlobalCfg.MerkleTreeLibAddress)
+	if contractCaller.MerkleTreeContract, err = merkleTree.NewMerkleTree(merkleTreeContractAddress, contractCaller.EthClient); err != nil {
+		return contractCaller, err
+	}
+	if contractCaller.MerkleTreeABI, err = abi.JSON(strings.NewReader(merkleTree.MerkleTreeABI)); err != nil {
+		return contractCaller, err
+	}
+	contractCaller.MerkleTreeLibAddress = merkleTreeContractAddress
+
 	return contractCaller, nil
 }
 
@@ -124,7 +147,7 @@ func (c *ContractCaller) AddAccount(acc AccountLeaf) error {
 		To:   &c.RollupContractAddress,
 		Data: data,
 	}
-	auth, err := GenerateAuthObj(c.ethClient, callMsg)
+	auth, err := GenerateAuthObj(c.EthClient, callMsg)
 	if err != nil {
 		return err
 	}
@@ -161,7 +184,7 @@ func (c *ContractCaller) ProcessTx(balanceTreeRoot ByteArray, tx Tx, fromMerkleP
 		To:   &c.RollupContractAddress,
 		Data: data,
 	}
-	data, err = c.ethClient.CallContract(context.Background(), callMsg, nil)
+	data, err = c.EthClient.CallContract(context.Background(), callMsg, nil)
 	if err != nil {
 		fmt.Println("Unable to pack tx for submitHeaderBlock", "error", err)
 		return
@@ -169,4 +192,13 @@ func (c *ContractCaller) ProcessTx(balanceTreeRoot ByteArray, tx Tx, fromMerkleP
 	fmt.Println("data", data)
 
 	return
+}
+
+// get main chain block header
+func (c *ContractCaller) GetMainChainBlock(blockNum *big.Int) (header *ethTypes.Header, err error) {
+	latestBlock, err := c.EthClient.HeaderByNumber(context.Background(), blockNum)
+	if err != nil {
+		return
+	}
+	return latestBlock, nil
 }
