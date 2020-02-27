@@ -54,9 +54,7 @@ func main() {
 	rootCmd.AddCommand(StartCmd())
 	rootCmd.AddCommand(ResetCmd())
 	rootCmd.AddCommand(AddGenesisAcccountsCmd())
-	rootCmd.AddCommand(UpMigrateCmd)
-	rootCmd.AddCommand(DownMigrateCmd)
-	rootCmd.AddCommand(CreateMigrateCmd)
+	rootCmd.AddCommand(migrationCmd)
 
 	executor := Executor{rootCmd, os.Exit}
 	if err := executor.Command.Execute(); err != nil {

@@ -32,17 +32,15 @@ func init() {
 	}
 
 	// add flags to down migration
-	// downMigrateCmd.Flags().Bool(downAllFlag, false, "Rollback to last migration")
-	// downMigrateCmd.Flags().String(downToFlag, "", "Rollback untill specified migration")
+	downMigrateCmd.Flags().Bool(downAllFlag, false, "Rollback to last migration")
+	downMigrateCmd.Flags().String(downToFlag, "", "Rollback untill specified migration")
 
 	// // add flags to create migration
-	CreateMigrateCmd.Flags().String(createFileNameFlag, "migration", "Migration filename")
+	createMigrateCmd.Flags().String(createFileNameFlag, "migration", "Migration filename")
 
 	// // add sub-commands to migrate
-	// migrationCmd.AddCommand(UpMigrateCmd, downMigrateCmd, createMigrateCmd)
+	migrationCmd.AddCommand(upMigrateCmd, downMigrateCmd, createMigrateCmd)
 
-	// add migrate to root command
-	// rootCmd.AddCommand(migrationCmd)
 }
 
 // MigrationTemplate migration template
@@ -58,7 +56,7 @@ var migrationCmd = &cobra.Command{
 }
 
 // upMigrateCmd represents the up migrate command
-var UpMigrateCmd = &cobra.Command{
+var upMigrateCmd = &cobra.Command{
 	Use:   "up",
 	Short: "Run up migration",
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -75,7 +73,7 @@ var UpMigrateCmd = &cobra.Command{
 }
 
 // downMigrateCmd represents the up migrate command
-var DownMigrateCmd = &cobra.Command{
+var downMigrateCmd = &cobra.Command{
 	Use:   "down",
 	Short: "Run down migration",
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -109,7 +107,7 @@ var DownMigrateCmd = &cobra.Command{
 }
 
 // createMigrateCmd represents the create command for migration
-var CreateMigrateCmd = &cobra.Command{
+var createMigrateCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create migration file",
 	RunE: func(cmd *cobra.Command, args []string) error {
