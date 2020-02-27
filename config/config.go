@@ -68,8 +68,24 @@ func GetDefaultConfig() Configuration {
 // application.
 func ParseConfig() (*Configuration, error) {
 	conf := new(Configuration)
-	err := viper.Unmarshal(conf)
+
+	v := viper.New()
+	v.SetConfigName("config")
+	v.AddConfigPath(".")
+	if err := v.ReadInConfig(); err != nil {
+		return conf, err
+	}
+	err := v.Unmarshal(conf)
 	return conf, err
+}
+
+func ParseAndInitGlobalConfig() error {
+	conf, err := ParseConfig()
+	if err != nil {
+		return err
+	}
+	GlobalCfg = *conf
+	return nil
 }
 
 // FormattedDBURL returns formatted db url

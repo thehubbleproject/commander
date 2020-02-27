@@ -91,20 +91,9 @@ func ResetCmd() *cobra.Command {
 		Use:   "reset",
 		Short: "reset database",
 		Run: func(cmd *cobra.Command, args []string) {
-			viperObj := viper.New()
-			dir, err := os.Getwd()
-			common.PanicIfError(err)
 
-			viperObj.SetConfigName(ConfigFileName) // name of config file (without extension)
-			viperObj.AddConfigPath(dir)
-			err = viperObj.ReadInConfig()
+			err := config.ParseAndInitGlobalConfig()
 			common.PanicIfError(err)
-
-			var cfg config.Configuration
-			if err = viperObj.UnmarshalExact(&cfg); err != nil {
-				common.PanicIfError(err)
-			}
-			config.GlobalCfg = cfg
 
 			// create new DB instance
 			// dbInstance, err := db.NewDB(cfg.MongoDB)
