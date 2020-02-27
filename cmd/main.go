@@ -54,6 +54,9 @@ func main() {
 	rootCmd.AddCommand(StartCmd())
 	rootCmd.AddCommand(ResetCmd())
 	rootCmd.AddCommand(AddGenesisAcccountsCmd())
+	rootCmd.AddCommand(UpMigrateCmd)
+	rootCmd.AddCommand(DownMigrateCmd)
+	rootCmd.AddCommand(CreateMigrateCmd)
 
 	executor := Executor{rootCmd, os.Exit}
 	if err := executor.Command.Execute(); err != nil {
@@ -106,11 +109,11 @@ func ResetCmd() *cobra.Command {
 			config.GlobalCfg = cfg
 
 			// create new DB instance
-			dbInstance, err := db.NewDB(cfg.MongoDB)
-			common.PanicIfError(err)
-			fmt.Println("Resetting database", "db", common.DATABASE)
-			err = dbInstance.MgoSession.DropDatabase(common.DATABASE)
-			common.PanicIfError(err)
+			// dbInstance, err := db.NewDB(cfg.MongoDB)
+			// common.PanicIfError(err)
+			// fmt.Println("Resetting database", "db", common.DATABASE)
+			// err = dbInstance.MgoSession.DropDatabase(common.DATABASE)
+			// common.PanicIfError(err)
 		},
 	}
 }
@@ -173,7 +176,7 @@ func StartCmd() *cobra.Command {
 			common.PanicIfError(config.SetOperatorKeys(config.GlobalCfg.OperatorKey))
 
 			// create db Instance
-			dbInstance, err := db.NewDB(cfg.MongoDB)
+			dbInstance, err := db.NewDB()
 
 			// init global DB instance
 			db.DBInstance = dbInstance

@@ -38,8 +38,8 @@ type DB struct {
 	MgoSession Session
 }
 
-func NewDB(url string) (DB, error) {
-	session, err := NewSession(url)
+func NewDB() (DB, error) {
+	session, err := NewSession("url")
 	if err != nil {
 		return DB{}, err
 	}

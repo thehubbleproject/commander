@@ -1,17 +1,25 @@
 package config
 
 import (
+	"bytes"
 	"crypto/ecdsa"
 	"encoding/hex"
 	"errors"
+	"regexp"
+	"strings"
 	"time"
 
 	ethCmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/spf13/viper"
+	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
 const (
+	DATABASENAME              = "BOPR"
 	DefaultMongoDB            = "mongodb://localhost:27017"
+	DefaultDB                 = "mysql"
+	DefaultDbUrlPrefix        = "mysql://root:root@(localhost:3306)"
 	DefaultEthRPC             = "http://localhost:8545"
 	DefaultPollingInterval    = 5 * time.Second
 	DefaultSeverPort          = "8080"
@@ -24,7 +32,11 @@ var OperatorPubKey *ecdsa.PublicKey
 
 // Configuration represents heimdall config
 type Configuration struct {
-	MongoDB              string        `mapstructure:"mongo_DB_url"`
+	// DB related configs
+	DB    string `mapstructure:"db_type"`
+	DBURL string `mapstructure:"db_url"`
+	Trace bool   `mapstructure:"trace"`
+
 	EthRPC               string        `mapstructure:"eth_RPC_URL"`
 	PollingInterval      time.Duration `mapstructure:"polling_interval"`
 	ServerPort           string        `mapstructure:"server_port"`
@@ -38,7 +50,9 @@ type Configuration struct {
 // GetDefaultConfig returns the default configration options
 func GetDefaultConfig() Configuration {
 	return Configuration{
-		MongoDB:              DefaultMongoDB,
+		DB:                   DefaultDB,
+		DBURL:                GetDBURL(),
+		Trace:                false,
 		EthRPC:               DefaultEthRPC,
 		PollingInterval:      DefaultPollingInterval,
 		ServerPort:           DefaultSeverPort,
@@ -48,6 +62,32 @@ func GetDefaultConfig() Configuration {
 		OperatorKey:          "",
 		OperatorAddress:      "",
 	}
+}
+
+// ParseConfig retrieves the default environment configuration for the
+// application.
+func ParseConfig() (*Configuration, error) {
+	conf := new(Configuration)
+	err := viper.Unmarshal(conf)
+	return conf, err
+}
+
+// FormattedDBURL returns formatted db url
+func (c *Configuration) FormattedDBURL() string {
+	re := regexp.MustCompile(`[a-z0-9]+://`)
+	tokens := re.Split(c.DBURL, 2)
+	return strings.Join(tokens, "")
+}
+
+// WriteConfigFile renders config using the template and writes it to
+// configFilePath.
+func WriteConfigFile(configFilePath string, config *Configuration) {
+	var buffer bytes.Buffer
+
+	if err := configTemplate.Execute(&buffer, config); err != nil {
+		panic(err)
+	}
+	cmn.MustWriteFile(configFilePath, buffer.Bytes(), 0644)
 }
 
 // SetOperatorKey sets the operatorKey globally
@@ -95,4 +135,9 @@ func PrivKeyStringToAddress(privKey string) (ethCmn.Address, error) {
 	}
 
 	return crypto.PubkeyToAddress(*ecsdaPubKey), nil
+}
+
+func GetDBURL() string {
+	values := []string{DefaultDbUrlPrefix, "/", DATABASENAME}
+	return strings.Join(values, "")
 }

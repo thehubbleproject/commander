@@ -9,10 +9,13 @@ import (
 
 	"github.com/BOPR/common"
 	"github.com/BOPR/contracts/rollup"
+	"github.com/jinzhu/gorm"
 )
 
 // Tx represets the transaction on BOPRU
 type Tx struct {
+	gorm.Model
+
 	To     uint64 `bson:"to"`
 	From   uint64 `bson:"from"`
 	Amount uint64 `bson:"amount"`

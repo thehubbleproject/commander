@@ -1,15 +1,11 @@
 package config
 
 import (
-	"bytes"
 	"text/template"
-
-	"github.com/spf13/viper"
-	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
 // Note: any changes to the comments/variables/mapstructure
-// must be reflected in the appropriate struct in helper/config.go
+// must be reflected in the appropriate struct in config/config.go
 const defaultConfigTemplate = `# This is a TOML config file.
 
 ##### RPC configrations #####
@@ -18,7 +14,10 @@ const defaultConfigTemplate = `# This is a TOML config file.
 eth_RPC_URL = "{{ .EthRPC }}"
 
 ##### DB configrations #####
-mongo_DB_url = "{{ .MongoDB }}"
+db_type = "{{ .DB }}"
+db_url = "{{ .DBURL }}"
+trace :="{{ .Trace }}"
+
 
 ##### Server configrations #####
 server_port = "{{ .ServerPort }}"
@@ -44,23 +43,4 @@ func init() {
 	if configTemplate, err = tmpl.Parse(defaultConfigTemplate); err != nil {
 		panic(err)
 	}
-}
-
-// ParseConfig retrieves the default environment configuration for the
-// application.
-func ParseConfig() (*Configuration, error) {
-	conf := GetDefaultConfig()
-	err := viper.Unmarshal(conf)
-	return &conf, err
-}
-
-// WriteConfigFile renders config using the template and writes it to
-// configFilePath.
-func WriteConfigFile(configFilePath string, config *Configuration) {
-	var buffer bytes.Buffer
-
-	if err := configTemplate.Execute(&buffer, config); err != nil {
-		panic(err)
-	}
-	cmn.MustWriteFile(configFilePath, buffer.Bytes(), 0644)
 }

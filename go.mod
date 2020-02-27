@@ -30,6 +30,7 @@ require (
 	github.com/huin/goupnp v1.0.0
 	github.com/inconshreveable/mousetrap v1.0.0
 	github.com/jackpal/go-nat-pmp v1.0.2
+	github.com/jinzhu/gorm v1.9.12
 	github.com/karalabe/usb v0.0.0-20191104083709-911d15fe12a9
 	github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515
 	github.com/magiconair/properties v1.8.1
