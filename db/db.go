@@ -4,6 +4,7 @@ import (
 	"github.com/BOPR/config"
 	"github.com/BOPR/types"
 	"github.com/globalsign/mgo"
+	"github.com/jinzhu/gorm"
 )
 
 type IDB interface {
@@ -35,13 +36,19 @@ type IDB interface {
 var DBInstance DB
 
 type DB struct {
-	MgoSession Session
+	Instance *gorm.DB
 }
 
 func NewDB() (DB, error) {
-	session, err := NewSession("url")
+	config.ParseAndInitGlobalConfig()
+	db, err := gorm.Open(config.GlobalCfg.DB, config.GlobalCfg.FormattedDBURL())
 	if err != nil {
-		return DB{}, err
+		return nil, err
 	}
-	return DB{MgoSession: *session}, nil
+	db.LogMode(true)
+	return DB{Instance: *db}, nil
+}
+
+func (db *DB) Close() {
+	db.Instance.Close()
 }

@@ -94,9 +94,10 @@ func ResetCmd() *cobra.Command {
 
 			err := config.ParseAndInitGlobalConfig()
 			common.PanicIfError(err)
-
+			// TODO fix this command for mysql database
 			// create new DB instance
-			// dbInstance, err := db.NewDB(cfg.MongoDB)
+			// dbInstance, err := db.NewDB()
+			// defer dbInstance.Close()
 			// common.PanicIfError(err)
 			// fmt.Println("Resetting database", "db", common.DATABASE)
 			// err = dbInstance.MgoSession.DropDatabase(common.DATABASE)
@@ -163,13 +164,14 @@ func StartCmd() *cobra.Command {
 			common.PanicIfError(config.SetOperatorKeys(config.GlobalCfg.OperatorKey))
 
 			// create db Instance
-			dbInstance, err := db.NewDB()
+			tempDB, err := db.NewDB()
 
 			// init global DB instance
-			db.DBInstance = dbInstance
+			db.DBInstance = tempDB
+			dbInstance.Close()
 
 			common.PanicIfError(err)
-			aggregator := poller.NewAggregator(dbInstance)
+			aggregator := poller.NewAggregator(db.DBInstance)
 			syncer := listener.NewSyncer()
 			types.ContractCallerObj, err = types.NewContractCaller()
 			common.PanicIfError(err)
@@ -219,6 +221,7 @@ func StartCmd() *cobra.Command {
 				for range catchSignal {
 					aggregator.Stop()
 					syncer.Stop()
+					db.DBInstance.Close()
 
 					// exit
 					os.Exit(1)

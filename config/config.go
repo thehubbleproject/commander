@@ -68,7 +68,6 @@ func GetDefaultConfig() Configuration {
 // application.
 func ParseConfig() (*Configuration, error) {
 	conf := new(Configuration)
-
 	v := viper.New()
 	v.SetConfigName("config")
 	v.AddConfigPath(".")

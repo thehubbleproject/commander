@@ -10,9 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/BOPR/config"
+	db "github.com/BOPR/db"
 	"github.com/BOPR/migrations"
-	"github.com/jinzhu/gorm"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/libs/common"
 )
@@ -60,14 +59,14 @@ var upMigrateCmd = &cobra.Command{
 	Use:   "up",
 	Short: "Run up migration",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		db, err := getDB()
+		db, err := db.NewDB(db)
 		if err != nil {
 			return err
 		}
-		defer closeDB(db)
+		defer db.Close()
 
 		allMigrations := migrations.GetMigrations()
-		m := migrations.NewGormigrate(db, migrations.DefaultOptions, allMigrations)
+		m := migrations.NewGormigrate(db.Instance, migrations.DefaultOptions, allMigrations)
 		return m.Migrate()
 	},
 }
@@ -77,16 +76,16 @@ var downMigrateCmd = &cobra.Command{
 	Use:   "down",
 	Short: "Run down migration",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		db, err := getDB()
+		db, err := db.NewDB(db)
 		if err != nil {
 			return err
 		}
-		defer closeDB(db)
+		defer db.Close()
 
 		// fetch all migrations
 		allMigrations := migrations.GetMigrations()
 		// create migration object
-		m := migrations.NewGormigrate(db, migrations.DefaultOptions, allMigrations)
+		m := migrations.NewGormigrate(db.Instance, migrations.DefaultOptions, allMigrations)
 
 		if _, err := cmd.Flags().GetBool(downAllFlag); err == nil {
 			for _, d := range allMigrations {
@@ -132,19 +131,19 @@ var createMigrateCmd = &cobra.Command{
 	},
 }
 
-func getDB() (*gorm.DB, error) {
-	dbConf := config.GlobalCfg
-	db, err := gorm.Open(dbConf.DB, dbConf.FormattedDBURL())
-	if err != nil {
-		return nil, err
-	}
-	db.LogMode(true)
-	return db, nil
-}
+// func getDB() (*gorm.DB, error) {
+// 	dbConf := config.GlobalCfg
+// 	db, err := gorm.Open(dbConf.DB, dbConf.FormattedDBURL())
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	db.LogMode(true)
+// 	return db, nil
+// }
 
-func closeDB(db *gorm.DB) {
-	db.Close()
-}
+// func closeDB(db *gorm.DB) {
+// 	db.Close()
+// }
 
 func writeMigrationFile(filePath string, m *MigrationTemplate) error {
 	var buffer bytes.Buffer
