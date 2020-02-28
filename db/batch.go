@@ -1,45 +1,42 @@
 package db
 
 import (
+	"fmt"
+
 	"github.com/BOPR/types"
 )
 
 // InsertBatchInfo inserts batch info to db
 func (db *DB) InsertBatchInfo(root types.ByteArray, index uint64) error {
-	// coll, session := db.GetBatchCollection()
-	// defer session.Close()
+	batch := types.BatchInfo{StateRoot: root, Index: index}
 
-	// batch := types.BatchInfo{StateRoot: root, Index: index}
-	// if err := coll.Insert(batch); err != nil {
-	// 	fmt.Println("Unable to insert", "error", err)
-	// 	return err
-	// }
+	err := db.Instance.Create(&batch).Error
+	if err != nil {
+		return ErrUnableToCreateRecord(fmt.Sprintf("unable to insert new batch with index:%v and root:%v", index, root))
+	}
+
 	return nil
 }
 
 func (db *DB) GetAllBatches() (batches []types.Batch, err error) {
-	// coll, session := db.GetBatchCollection()
-	// defer session.Close()
-
-	// if err := coll.Find(nil).All(batches); err != nil {
-	// 	return batches, err
-	// }
+	errs := db.Instance.Find(&batches).GetErrors()
+	for _, err := range errs {
+		if err != nil {
+			return batches, GenericError("got error while fetch all batches")
+		}
+	}
 	return
 }
 
-func (db *DB) GetLatestBatch() (types.Batch, error) {
-	// coll, session := db.GetBatchCollection()
-	// defer session.Close()
-	var batches []types.Batch
-	// if err := coll.Find(nil).All(batches); err != nil {
-	// 	return batches[0], err
-	// }
-	return batches[0], nil
+func (db *DB) GetLatestBatch() (batch types.Batch, err error) {
+	if err := db.Instance.First(&batch).Error; err != nil {
+		return batch, ErrRecordNotFound(fmt.Sprintf("unable to find latest batch"))
+	}
+	return batch, nil
 }
 
 func (db *DB) GetBatchCount() (int, error) {
-	// coll, session := db.GetBatchCollection()
-	// defer session.Close()
-
-	return 0, nil
+	var count int
+	db.Instance.Table("batches").Count(&count)
+	return count, nil
 }

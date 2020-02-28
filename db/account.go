@@ -65,7 +65,9 @@ func (db *DB) InsertGenAccounts(genAccs []config.GenAccountLeaf) error {
 }
 
 func (db *DB) GetAccountCount() (int, error) {
-	return 0, nil
+	var count int
+	db.Instance.Table("account_leafs").Count(&count)
+	return count, nil
 }
 
 // FetchSiblings retuns the siblings of an account leaf till root
