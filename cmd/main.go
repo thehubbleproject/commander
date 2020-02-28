@@ -168,7 +168,7 @@ func StartCmd() *cobra.Command {
 
 			// init global DB instance
 			db.DBInstance = tempDB
-			dbInstance.Close()
+			tempDB.Close()
 
 			common.PanicIfError(err)
 			aggregator := poller.NewAggregator(db.DBInstance)

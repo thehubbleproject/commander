@@ -1,10 +1,13 @@
 package db
 
 import (
+	"fmt"
+
 	"github.com/BOPR/config"
 	"github.com/BOPR/types"
 	"github.com/globalsign/mgo"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 type IDB interface {
@@ -41,12 +44,14 @@ type DB struct {
 
 func NewDB() (DB, error) {
 	config.ParseAndInitGlobalConfig()
+	fmt.Println("Connecting to DB", "type", config.GlobalCfg.DB, "URL", config.GlobalCfg.FormattedDBURL())
 	db, err := gorm.Open(config.GlobalCfg.DB, config.GlobalCfg.FormattedDBURL())
 	if err != nil {
-		return nil, err
+		return DB{}, err
 	}
 	db.LogMode(true)
-	return DB{Instance: *db}, nil
+	fmt.Println("database", db)
+	return DB{Instance: db}, nil
 }
 
 func (db *DB) Close() {
