@@ -110,6 +110,15 @@ func GenerateAuthObj(client *ethclient.Client, callMsg ethereum.CallMsg) (auth *
 	return
 }
 
+// get main chain block header
+func (c *ContractCaller) GetMainChainBlock(blockNum *big.Int) (header *ethTypes.Header, err error) {
+	latestBlock, err := c.EthClient.HeaderByNumber(context.Background(), blockNum)
+	if err != nil {
+		return
+	}
+	return latestBlock, nil
+}
+
 // TotalBatches returns the total number of batches that have been submitted on chain
 func (c *ContractCaller) TotalBatches() (uint64, error) {
 	totalBatches, err := c.RollupContract.NumberOfBatches(nil)
@@ -192,13 +201,4 @@ func (c *ContractCaller) ProcessTx(balanceTreeRoot ByteArray, tx Tx, fromMerkleP
 	fmt.Println("data", data)
 
 	return
-}
-
-// get main chain block header
-func (c *ContractCaller) GetMainChainBlock(blockNum *big.Int) (header *ethTypes.Header, err error) {
-	latestBlock, err := c.EthClient.HeaderByNumber(context.Background(), blockNum)
-	if err != nil {
-		return
-	}
-	return latestBlock, nil
 }

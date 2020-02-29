@@ -1,6 +1,8 @@
 package db
 
 import (
+	"fmt"
+
 	"github.com/BOPR/types"
 )
 
@@ -11,25 +13,36 @@ func (db *DB) InsertTx(t *types.Tx) error {
 }
 
 func (db *DB) PopTxs() (txs []types.Tx, err error) {
-	// coll := db.GetTxCollection()
+	tx := db.Instance.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
 
-	// TODO fetch a limited set of transactions
-	//
-	// ids = db.collection.find(<condition>).limit(<limit>).map(
-	// 	function(doc) {
-	// 		return doc._id;
-	// 	}
-	// );
-	// db.collection.updateMany({_id: {$in: ids}}, <update>})
+	if err := tx.Error; err != nil {
+		return txs, err
+	}
+	var pendingTxs []types.Tx
 
-	// query := bson.M{"status": "pending"}
-	// updateTo := bson.M{"$set": bson.M{"status": "processed"}}
+	// select N number of transactions which are pending in mempool and
+	if err := tx.Limit(3).Where(&types.Tx{Status: "pending"}).Find(&pendingTxs).Error; err != nil {
+		fmt.Println("error while fetching pending transactions", err)
+		return txs, err
+	}
 
-	// bulk := coll.Bulk()
-	// bulk.UpdateAll(query, updateTo)
-	// data, err := bulk.Run()
-	// fmt.Println("data", data, err)
-	return
+	fmt.Println("found txs", pendingTxs)
+
+	var ids []uint
+	for _, tx := range pendingTxs {
+		ids = append(ids, tx.ID)
+	}
+
+	// update the transactions from pending to processing
+	errs := tx.Table("txes").Where("id IN (?)", ids).Updates(map[string]interface{}{"status": "processing"}).GetErrors()
+	fmt.Println("errors while processing transactions", errs)
+
+	return pendingTxs, tx.Commit().Error
 }
 
 func (db *DB) GetTx() (tx []types.Tx) {

@@ -86,7 +86,7 @@ func (a *Aggregator) pickBatch() {
 	for i, tx := range txs {
 		a.Logger.Debug("Verifing transaction", "index", i, "tx", tx.String())
 		// Apply tx and get the updated accounts
-		a.ApplyTx(tx)
+		a.CheckTx(tx)
 
 	}
 
@@ -97,7 +97,7 @@ func (a *Aggregator) pickBatch() {
 
 // ApplyTx fetches all the data required to validate tx from smart contact
 // and calls the proccess tx function to return the updated balance root and accounts
-func (a *Aggregator) ApplyTx(tx types.Tx) {
+func (a *Aggregator) CheckTx(tx types.Tx) {
 	// fetch to account from DB
 	fromAccount, _ := a.DB.GetAccount(tx.From)
 	fmt.Println("fetched account", fromAccount)
