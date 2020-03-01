@@ -1,6 +1,7 @@
 package listener
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"time"
@@ -9,6 +10,7 @@ import (
 	"github.com/BOPR/db"
 	"github.com/BOPR/types"
 	"github.com/ethereum/go-ethereum"
+	ethCmn "github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -23,8 +25,9 @@ type Syncer struct {
 	abis []*abi.ABI
 
 	// storage client
-	storageClient db.DB
+	dbInstance db.DB
 
+	// contract caller to interact with contracts
 	contractCaller types.ContractCaller
 
 	// header channel
@@ -50,18 +53,26 @@ func NewSyncer() Syncer {
 	if err != nil {
 		panic(err)
 	}
+
 	abis := []*abi.ABI{
 		&contractCaller.RollupContractABI,
 		&contractCaller.MerkleTreeABI,
 	}
 	syncerService.abis = abis
+	syncerService.contractCaller = contractCaller
+	syncerService.HeaderChannel = make(chan *ethTypes.Header)
+	syncerService.dbInstance, err = db.NewDB()
+	if err != nil {
+		panic(err)
+	}
 
 	return *syncerService
 }
 
 // OnStart starts new block subscription
 func (s *Syncer) OnStart() error {
-	s.BaseService.OnStart() // Always call the overridden method.
+	// Always call the overridden method.
+	s.BaseService.OnStart()
 
 	// create cancellable context
 	ctx, cancelSubscription := context.WithCancel(context.Background())
@@ -73,7 +84,7 @@ func (s *Syncer) OnStart() error {
 
 	// start header process
 	go s.startHeaderProcess(headerCtx)
-	fmt.Println("ethclient", s.contractCaller.EthClient)
+
 	// subscribe to new head
 	subscription, err := s.contractCaller.EthClient.SubscribeNewHead(ctx, s.HeaderChannel)
 	if err != nil {
@@ -83,7 +94,6 @@ func (s *Syncer) OnStart() error {
 		// start go routine to listen new header using subscription
 		go s.startSubscription(ctx, subscription)
 	}
-
 	return nil
 }
 
@@ -96,15 +106,17 @@ func (s *Syncer) OnStop() {
 
 	// cancel header process
 	s.cancelHeaderProcess()
+
+	s.dbInstance.Close()
 }
 
 // startHeaderProcess starts header process when they get new header
 func (s *Syncer) startHeaderProcess(ctx context.Context) {
+	fmt.Println("starting header process")
 	for {
 		select {
 		case newHeader := <-s.HeaderChannel:
-			fmt.Println("new header found", newHeader)
-			// s.processHeader(newHeader)
+			s.processHeader(*newHeader)
 		case <-ctx.Done():
 			return
 		}
@@ -119,18 +131,24 @@ func (s *Syncer) startPolling(ctx context.Context, pollInterval time.Duration) {
 	// Setup the ticket and the channel to signal
 	// the ending of the interval
 	ticker := time.NewTicker(interval)
+	fmt.Println("ticker setup", ticker)
 
 	// start listening
 	for {
 		select {
 		case <-ticker.C:
+			fmt.Println("here")
 			header, err := s.contractCaller.EthClient.HeaderByNumber(ctx, nil)
 			if err == nil && header != nil {
 				fmt.Println("found new header", header)
 				// send data to channel
 				s.HeaderChannel <- header
+				fmt.Println("there")
+			} else {
+				fmt.Println("here")
 			}
 		case <-ctx.Done():
+			fmt.Println("here")
 			ticker.Stop()
 			return
 		}
@@ -152,4 +170,50 @@ func (s *Syncer) startSubscription(ctx context.Context, subscription ethereum.Su
 			return
 		}
 	}
+}
+
+func (s *Syncer) processHeader(header ethTypes.Header) {
+	lastLLog := s.dbInstance.GetLastListenerLog()
+	query := ethereum.FilterQuery{
+		FromBlock: &lastLLog.LastRecordedBlock,
+		ToBlock:   header.Number,
+		Addresses: []ethCmn.Address{
+			s.contractCaller.RollupContractAddress,
+			s.contractCaller.MerkleTreeLibAddress,
+		},
+	}
+	s.dbInstance.StoreListenerLog(types.ListenerLog{LastRecordedBlock: *header.Number})
+
+	// get all logs
+	logs, err := s.contractCaller.EthClient.FilterLogs(context.Background(), query)
+	if err != nil {
+		s.Logger.Error("Error while filtering logs from syncer", "error", err)
+		return
+	} else if len(logs) > 0 {
+		s.Logger.Debug("New logs found", "numberOfLogs", len(logs))
+	}
+
+	// log
+	for _, vLog := range logs {
+		topic := vLog.Topics[0].Bytes()
+		for _, abiObject := range s.abis {
+			selectedEvent := EventByID(abiObject, topic)
+			if selectedEvent != nil {
+				s.Logger.Debug("selectedEvent ", " event name -", selectedEvent.Name)
+				switch selectedEvent.Name {
+
+				}
+				break
+			}
+		}
+	}
+}
+
+func EventByID(abiObject *abi.ABI, sigdata []byte) *abi.Event {
+	for _, event := range abiObject.Events {
+		if bytes.Equal(event.ID().Bytes(), sigdata) {
+			return &event
+		}
+	}
+	return nil
 }

@@ -1,6 +1,7 @@
 package db
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	"github.com/BOPR/types"
@@ -8,13 +9,12 @@ import (
 
 // InsertBatchInfo inserts batch info to db
 func (db *DB) InsertBatchInfo(root types.ByteArray, index uint64) error {
-	batch := types.BatchInfo{StateRoot: root, Index: index}
+	batch := types.BatchInfo{Index: index, StateRoot: hex.EncodeToString(root[:])}
 
 	err := db.Instance.Create(&batch).Error
 	if err != nil {
 		return ErrUnableToCreateRecord(fmt.Sprintf("unable to insert new batch with index:%v and root:%v", index, root))
 	}
-
 	return nil
 }
 

@@ -1,34 +1,34 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
 
-	"github.com/BOPR/db"
-	"github.com/BOPR/types"
+	"github.com/BOPR/config"
+	"github.com/BOPR/listener"
+	"github.com/gorilla/mux"
 )
 
 func main() {
-	db, err := db.NewDB()
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
+	config.ParseAndInitGlobalConfig()
+	syncer := listener.NewSyncer()
+	if err := syncer.Start(); err != nil {
+		log.Fatalln("Unable to start syncer", "error")
+	} // go routine to catch signal
+	catchSignal := make(chan os.Signal, 1)
+	signal.Notify(catchSignal, os.Interrupt)
+	go func() {
+		// sig is a ^C, handle it
+		for range catchSignal {
 
-	// tx1 := types.NewTx(1, 1, 1, 1, "esds")
-	// tx2 := types.NewTx(1, 1, 1, 1, "esds")
-	// tx3 := types.NewTx(1, 1, 1, 1, "esds")
-	// fmt.Println(db.InsertTx(&tx1))
-	// fmt.Println(db.InsertTx(&tx2))
-	// fmt.Println(db.InsertTx(&tx3))
-
-	tx4 := types.NewTx(1, 1, 1, 1, "esds")
-
-	fmt.Println(db.InsertTx(&tx4))
-
-	tx5 := types.NewTx(1, 1, 1, 1, "esds")
-	// tx5.Status = "processing"
-	fmt.Println(db.InsertTx(&tx5))
-
-	fmt.Println("popping error", db.PopTxs())
+			syncer.Stop()
+			// exit
+			os.Exit(1)
+		}
+	}()
+	r := mux.NewRouter()
+	http.ListenAndServe(":8080", r)
 
 }

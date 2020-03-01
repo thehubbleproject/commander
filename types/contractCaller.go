@@ -50,6 +50,7 @@ type ContractCaller struct {
 
 // NewContractCaller contract caller
 func NewContractCaller() (contractCaller ContractCaller, err error) {
+	config.ParseAndInitGlobalConfig()
 	fmt.Println("ethrpc", config.GlobalCfg.EthRPC)
 	if RPCClient, err := rpc.Dial(config.GlobalCfg.EthRPC); err != nil {
 		return contractCaller, err

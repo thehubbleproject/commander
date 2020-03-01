@@ -33,9 +33,10 @@ var OperatorPubKey *ecdsa.PublicKey
 // Configuration represents heimdall config
 type Configuration struct {
 	// DB related configs
-	DB    string `mapstructure:"db_type"`
-	DBURL string `mapstructure:"db_url"`
-	Trace bool   `mapstructure:"trace"`
+	DB        string `mapstructure:"db_type"`
+	DBURL     string `mapstructure:"db_url"`
+	Trace     bool   `mapstructure:"trace"`
+	DBLogMode bool   `mapstructure:"db_log_mode"`
 
 	EthRPC               string        `mapstructure:"eth_RPC_URL"`
 	PollingInterval      time.Duration `mapstructure:"polling_interval"`
@@ -53,6 +54,7 @@ func GetDefaultConfig() Configuration {
 		DB:                   DefaultDB,
 		DBURL:                GetDBURL(),
 		Trace:                false,
+		DBLogMode:            true,
 		EthRPC:               DefaultEthRPC,
 		PollingInterval:      DefaultPollingInterval,
 		ServerPort:           DefaultSeverPort,

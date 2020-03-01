@@ -2,6 +2,7 @@ package poller
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 	"time"
 
@@ -118,7 +119,12 @@ func (a *Aggregator) CheckTx(tx types.Tx) {
 
 	// fetch latest batch from DB
 	latestBatch, err := a.DB.GetLatestBatch()
-	newBalRoot, updatedFrom, updatedTo, err := types.ContractCallerObj.ProcessTx(latestBatch.StateRoot,
+	lbRootBytes, err := hex.DecodeString(latestBatch.StateRoot)
+	if err != nil {
+		fmt.Println("not able to fetch from siblings", "error", err)
+	}
+
+	newBalRoot, updatedFrom, updatedTo, err := types.ContractCallerObj.ProcessTx(types.BytesToByteArray(lbRootBytes),
 		tx, types.NewMerkleProof(fromAccount, fromSiblings),
 		types.NewMerkleProof(toAccount, toSiblings),
 	)

@@ -168,7 +168,6 @@ func StartCmd() *cobra.Command {
 
 			// init global DB instance
 			db.DBInstance = tempDB
-			tempDB.Close()
 
 			common.PanicIfError(err)
 			aggregator := poller.NewAggregator(db.DBInstance)
@@ -232,9 +231,9 @@ func StartCmd() *cobra.Command {
 			r.HandleFunc("/tx", rest.TxReceiverHandler).Methods("POST")
 			http.Handle("/", r)
 
-			if err := aggregator.Start(); err != nil {
-				log.Fatalln("Unable to start aggregator", "error", err)
-			}
+			// if err := aggregator.Start(); err != nil {
+			// 	log.Fatalln("Unable to start aggregator", "error", err)
+			// }
 
 			if err := syncer.Start(); err != nil {
 				log.Fatalln("Unable to start syncer", "error")

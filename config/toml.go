@@ -17,6 +17,8 @@ eth_RPC_URL = "{{ .EthRPC }}"
 db_type = "{{ .DB }}"
 db_url = "{{ .DBURL }}"
 trace = "{{ .Trace }}"
+db_log_mode = "{{ .DBLogMode }}"
+
 
 
 ##### Server configrations #####

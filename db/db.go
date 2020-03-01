@@ -49,7 +49,7 @@ func NewDB() (DB, error) {
 	if err != nil {
 		return DB{}, err
 	}
-	db.LogMode(true)
+	db.LogMode(config.GlobalCfg.DBLogMode)
 	fmt.Println("database", db)
 	return DB{Instance: db}, nil
 }
