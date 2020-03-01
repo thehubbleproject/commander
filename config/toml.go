@@ -19,8 +19,6 @@ db_url = "{{ .DBURL }}"
 trace = "{{ .Trace }}"
 db_log_mode = "{{ .DBLogMode }}"
 
-
-
 ##### Server configrations #####
 server_port = "{{ .ServerPort }}"
 polling_interval = "{{ .PollingInterval }}"
@@ -35,6 +33,9 @@ merkle_lib_address = "{{ .MerkleTreeLibAddress }}"
 #### Keystore #####
 operator_key = "{{ .OperatorKey }}"
 operator_address = "{{ .OperatorAddress }}"
+
+#### Syncer settings #####
+last_recorded_block = "{{ .LastRecordedBlock }}"
 `
 
 var configTemplate *template.Template

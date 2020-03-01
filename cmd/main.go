@@ -12,6 +12,7 @@ import (
 	"github.com/BOPR/config"
 	db "github.com/BOPR/db"
 	"github.com/BOPR/listener"
+	"github.com/jinzhu/gorm"
 
 	"github.com/BOPR/poller"
 	"github.com/BOPR/rest"
@@ -179,11 +180,12 @@ func StartCmd() *cobra.Command {
 			batchCount, err := types.ContractCallerObj.TotalBatches()
 			common.PanicIfError(err)
 
-			// If 0, dump to DB and start building on it
+			// Initialise balance tree and accounts
 			if batchCount != 0 {
 				// If !0, start syncer to sync all the blocks
 				// TODO start syncer
 			} else {
+				// If 0, dump to DB and start building on it
 				root, err := types.ContractCallerObj.FetchBalanceTreeRoot()
 				common.PanicIfError(err)
 				storedBatchCount, err := db.DBInstance.GetBatchCount()
@@ -208,9 +210,21 @@ func StartCmd() *cobra.Command {
 					// read genesis file and populate all accounts
 					genAcc, err := config.ReadGenesisFile()
 					common.PanicIfError(err)
-					db.DBInstance.InsertGenAccounts(genAcc.Accounts)
+					err = db.DBInstance.InsertGenAccounts(genAcc.Accounts)
+					common.PanicIfError(err)
 				}
 			}
+
+			// set last recorded block in DB
+			llog, err := db.DBInstance.GetLastListenerLog()
+			if err != nil && gorm.IsRecordNotFoundError(err) {
+				// no record is present so insert the record in config.toml
+				err := db.DBInstance.StoreListenerLog(types.ListenerLog{LastRecordedBlock: cfg.LastRecordedBlock})
+				common.PanicIfError(err)
+			} else if err != nil && !gorm.IsRecordNotFoundError(err) {
+				common.PanicIfError(err)
+			}
+			fmt.Println("Last recorded block for syncer present", llog.LastRecordedBlock)
 
 			// go routine to catch signal
 			catchSignal := make(chan os.Signal, 1)

@@ -21,6 +21,10 @@ func init() {
 			if !db.HasTable(&types.BatchInfo{}) {
 				db.CreateTable(&types.BatchInfo{})
 			}
+			if !db.HasTable(&types.ListenerLog{}) {
+				db.CreateTable(&types.ListenerLog{})
+			}
+
 			return nil
 		},
 		Down: func(db *gorm.DB) error {

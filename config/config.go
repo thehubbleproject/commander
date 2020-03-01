@@ -46,6 +46,7 @@ type Configuration struct {
 	MerkleTreeLibAddress string        `mapstructure:"merkle_lib_address"`
 	OperatorKey          string        `mapstructure:"operator_key"`
 	OperatorAddress      string        `mapstructure:"operator_address"`
+	LastRecordedBlock    string        `mapstructure:"last_recorded_block"`
 }
 
 // GetDefaultConfig returns the default configration options
@@ -63,6 +64,7 @@ func GetDefaultConfig() Configuration {
 		MerkleTreeLibAddress: ethCmn.Address{}.String(),
 		OperatorKey:          "",
 		OperatorAddress:      "",
+		LastRecordedBlock:    "0",
 	}
 }
 

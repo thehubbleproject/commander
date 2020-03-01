@@ -131,24 +131,17 @@ func (s *Syncer) startPolling(ctx context.Context, pollInterval time.Duration) {
 	// Setup the ticket and the channel to signal
 	// the ending of the interval
 	ticker := time.NewTicker(interval)
-	fmt.Println("ticker setup", ticker)
 
 	// start listening
 	for {
 		select {
 		case <-ticker.C:
-			fmt.Println("here")
 			header, err := s.contractCaller.EthClient.HeaderByNumber(ctx, nil)
 			if err == nil && header != nil {
-				fmt.Println("found new header", header)
 				// send data to channel
 				s.HeaderChannel <- header
-				fmt.Println("there")
-			} else {
-				fmt.Println("here")
 			}
 		case <-ctx.Done():
-			fmt.Println("here")
 			ticker.Stop()
 			return
 		}
@@ -173,16 +166,22 @@ func (s *Syncer) startSubscription(ctx context.Context, subscription ethereum.Su
 }
 
 func (s *Syncer) processHeader(header ethTypes.Header) {
-	lastLLog := s.dbInstance.GetLastListenerLog()
+	err := s.dbInstance.StoreListenerLog(types.ListenerLog{LastRecordedBlock: "100"})
+	fmt.Println("err =>", err)
+	lastLLog, err := s.dbInstance.GetLastListenerLog()
+	fmt.Println("lastlog =>", lastLLog, err)
 	query := ethereum.FilterQuery{
-		FromBlock: &lastLLog.LastRecordedBlock,
+		FromBlock: lastLLog.BigInt(),
 		ToBlock:   header.Number,
 		Addresses: []ethCmn.Address{
 			s.contractCaller.RollupContractAddress,
 			s.contractCaller.MerkleTreeLibAddress,
 		},
 	}
-	s.dbInstance.StoreListenerLog(types.ListenerLog{LastRecordedBlock: *header.Number})
+	err = s.dbInstance.StoreListenerLog(types.ListenerLog{LastRecordedBlock: header.Number.String()})
+	if err != nil {
+		fmt.Println("err", err)
+	}
 
 	// get all logs
 	logs, err := s.contractCaller.EthClient.FilterLogs(context.Background(), query)
@@ -201,7 +200,12 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 			if selectedEvent != nil {
 				s.Logger.Debug("selectedEvent ", " event name -", selectedEvent.Name)
 				switch selectedEvent.Name {
-
+				case "deposit":
+					s.processDeposit()
+				case "newBatch":
+					s.processNewBatch()
+				case "newAccount":
+					s.processNewAccount()
 				}
 				break
 			}
@@ -209,6 +213,19 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 	}
 }
 
+func (s *Syncer) processDeposit() {
+	s.Logger.Info("Got new deposit")
+}
+
+func (s *Syncer) processNewBatch() {
+
+}
+
+func (s *Syncer) processNewAccount() {
+
+}
+
+// EventByID
 func EventByID(abiObject *abi.ABI, sigdata []byte) *abi.Event {
 	for _, event := range abiObject.Events {
 		if bytes.Equal(event.ID().Bytes(), sigdata) {
