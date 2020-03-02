@@ -8,12 +8,14 @@ import (
 
 	"github.com/BOPR/config"
 	"github.com/BOPR/listener"
+	"github.com/BOPR/types"
 	"github.com/gorilla/mux"
 )
 
 func main() {
 	config.ParseAndInitGlobalConfig()
 	syncer := listener.NewSyncer()
+	syncer.DBInstance.StoreListenerLog(types.ListenerLog{LastRecordedBlock: "101"})
 	if err := syncer.Start(); err != nil {
 		log.Fatalln("Unable to start syncer", "error")
 	} // go routine to catch signal

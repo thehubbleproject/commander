@@ -25,7 +25,7 @@ type Syncer struct {
 	abis []*abi.ABI
 
 	// storage client
-	dbInstance db.DB
+	DBInstance db.DB
 
 	// contract caller to interact with contracts
 	contractCaller types.ContractCaller
@@ -61,7 +61,7 @@ func NewSyncer() Syncer {
 	syncerService.abis = abis
 	syncerService.contractCaller = contractCaller
 	syncerService.HeaderChannel = make(chan *ethTypes.Header)
-	syncerService.dbInstance, err = db.NewDB()
+	syncerService.DBInstance, err = db.NewDB()
 	if err != nil {
 		panic(err)
 	}
@@ -107,7 +107,7 @@ func (s *Syncer) OnStop() {
 	// cancel header process
 	s.cancelHeaderProcess()
 
-	s.dbInstance.Close()
+	s.DBInstance.Close()
 }
 
 // startHeaderProcess starts header process when they get new header
@@ -166,9 +166,7 @@ func (s *Syncer) startSubscription(ctx context.Context, subscription ethereum.Su
 }
 
 func (s *Syncer) processHeader(header ethTypes.Header) {
-	err := s.dbInstance.StoreListenerLog(types.ListenerLog{LastRecordedBlock: "100"})
-	fmt.Println("err =>", err)
-	lastLLog, err := s.dbInstance.GetLastListenerLog()
+	lastLLog, err := s.DBInstance.GetLastListenerLog()
 	fmt.Println("lastlog =>", lastLLog, err)
 	query := ethereum.FilterQuery{
 		FromBlock: lastLLog.BigInt(),
@@ -178,10 +176,12 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 			s.contractCaller.MerkleTreeLibAddress,
 		},
 	}
-	err = s.dbInstance.StoreListenerLog(types.ListenerLog{LastRecordedBlock: header.Number.String()})
+	fmt.Println("latest block =>", header.Number.String())
+	err = s.DBInstance.StoreListenerLog(types.ListenerLog{LastRecordedBlock: header.Number.String()})
 	if err != nil {
-		fmt.Println("err", err)
+		fmt.Println("err=>", err)
 	}
+	lastLLog, err = s.DBInstance.GetLastListenerLog()
 
 	// get all logs
 	logs, err := s.contractCaller.EthClient.FilterLogs(context.Background(), query)
