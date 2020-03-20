@@ -42,6 +42,9 @@ type DB struct {
 	Instance *gorm.DB
 }
 
+// NewDB creates a new DB instance
+// NOTE: it uses the configrations present in the config.toml file
+// returns error if not able to open the DB
 func NewDB() (DB, error) {
 	config.ParseAndInitGlobalConfig()
 	fmt.Println("Connecting to DB", "type", config.GlobalCfg.DB, "URL", config.GlobalCfg.FormattedDBURL())
@@ -50,7 +53,6 @@ func NewDB() (DB, error) {
 		return DB{}, err
 	}
 	db.LogMode(config.GlobalCfg.DBLogMode)
-	fmt.Println("database", db)
 	return DB{Instance: db}, nil
 }
 

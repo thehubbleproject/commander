@@ -109,7 +109,8 @@ func WriteConfigFile(configFilePath string, config *Configuration) {
 	cmn.MustWriteFile(configFilePath, buffer.Bytes(), 0644)
 }
 
-// SetOperatorKey sets the operatorKey globally
+// SetOperatorKey sets the operatorKeys which include
+// the private key and pubkey globally
 func SetOperatorKeys(privKeyStr string) error {
 	privKeyBytes, err := hex.DecodeString(privKeyStr)
 	if err != nil {

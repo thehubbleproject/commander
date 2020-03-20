@@ -26,55 +26,80 @@ func StartCmd() *cobra.Command {
 		Use:   "start",
 		Short: "Starts BOPR daemon",
 		Run: func(cmd *cobra.Command, args []string) {
+			// create viper object
 			viperObj := viper.New()
+
+			// get current directory
 			dir, err := os.Getwd()
 			common.PanicIfError(err)
 
+			// set config paths
 			viperObj.SetConfigName(ConfigFileName) // name of config file (without extension)
 			viperObj.AddConfigPath(dir)
+
+			// finally! read config
 			err = viperObj.ReadInConfig()
 			common.PanicIfError(err)
 
+			// unmarshall to the configration object
 			var cfg config.Configuration
 			if err = viperObj.UnmarshalExact(&cfg); err != nil {
 				common.PanicIfError(err)
 			}
+			//
+			// Init global config objects
+			//
+
 			// init global config
 			config.GlobalCfg = cfg
-
-			// TODO remove this post testnet
+			// TODO use a better way to handle priv keys post testnet
 			common.PanicIfError(config.SetOperatorKeys(config.GlobalCfg.OperatorKey))
 
 			// create db Instance
 			tempDB, err := db.NewDB()
-
+			common.PanicIfError(err)
 			// init global DB instance
 			db.DBInstance = tempDB
 
-			common.PanicIfError(err)
-			aggregator := poller.NewAggregator(db.DBInstance)
-			syncer := listener.NewSyncer()
+			// create and init global config object
 			types.ContractCallerObj, err = types.NewContractCaller()
 			common.PanicIfError(err)
 
-			// fetch number of batches
+			//
+			// Create all the required services
+			//
+
+			// create aggregator service
+			aggregator := poller.NewAggregator(db.DBInstance)
+
+			// create the syncer service
+			syncer := listener.NewSyncer()
+
+			//
+			// init genesis state
+			//
+
+			// fetch number of batches submitted on-chain
 			batchCount, err := types.ContractCallerObj.TotalBatches()
 			common.PanicIfError(err)
 
-			// Initialise balance tree and accounts
+			// if there are batches submitted already, start syncer
+			// syncer will figure out if we are synced or not and will proceed accordingly
 			if batchCount != 0 {
 				// If !0, start syncer to sync all the blocks
 				// TODO start syncer
 			} else {
-				// If 0, dump to DB and start building on it
+				// fetch 0 root from the contract
 				root, err := types.ContractCallerObj.FetchBalanceTreeRoot()
 				common.PanicIfError(err)
+
+				// get the number of batches we have stored
 				storedBatchCount, err := db.DBInstance.GetBatchCount()
 				if err != nil {
 					panic(err)
 				}
 
-				// if there are no batches add genesis accounts else skip
+				// figure out if we need to add adccounts
 				if storedBatchCount == 0 {
 					// persist batch info to DB
 					err = db.DBInstance.InsertBatchInfo(root, uint64(batchCount))
@@ -96,10 +121,10 @@ func StartCmd() *cobra.Command {
 				}
 			}
 
-			// set last recorded block in DB
+			// set last recorded block in DB for syncer
 			llog, err := db.DBInstance.GetLastListenerLog()
 			if err != nil && gorm.IsRecordNotFoundError(err) {
-				// no record is present so insert the record in config.toml
+				// if no record is present so insert the record in config.toml
 				err := db.DBInstance.StoreListenerLog(types.ListenerLog{LastRecordedBlock: cfg.LastRecordedBlock})
 				common.PanicIfError(err)
 			} else if err != nil && !gorm.IsRecordNotFoundError(err) {
@@ -126,13 +151,14 @@ func StartCmd() *cobra.Command {
 			r.HandleFunc("/tx", rest.TxReceiverHandler).Methods("POST")
 			http.Handle("/", r)
 
-			// if err := aggregator.Start(); err != nil {
-			// 	log.Fatalln("Unable to start aggregator", "error", err)
-			// }
+			if err := aggregator.Start(); err != nil {
+				log.Fatalln("Unable to start aggregator", "error", err)
+			}
 
 			if err := syncer.Start(); err != nil {
 				log.Fatalln("Unable to start syncer", "error")
 			}
+
 			// TODO replace this with port from config
 			http.ListenAndServe(":8080", r)
 			fmt.Println("Server started on port 8080 🎉")

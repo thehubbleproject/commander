@@ -18,6 +18,12 @@ const (
 	AggregatingService = "aggregator"
 )
 
+// Aggregator is the service which is supposed to create batches
+// It has the following tasks:
+// 1. Pick txs from the mempool
+// 2. Validate these trnsactions
+// 3. Update the DB post running each tx
+// 4. Finally create a batch of all the transactions and post on-chain
 type Aggregator struct {
 	// Base service
 	tmCmn.BaseService
@@ -29,7 +35,7 @@ type Aggregator struct {
 	cancelAggregating context.CancelFunc
 }
 
-// NewAggregator returns new service object
+// NewAggregator returns new aggregator object
 func NewAggregator(db db.DB) *Aggregator {
 	// create logger
 	logger := common.Logger.With("module", AggregatingService)

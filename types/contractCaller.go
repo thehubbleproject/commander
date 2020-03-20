@@ -22,9 +22,8 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-var ContractCallerObj ContractCaller
-
-// IContractCaller represents contract caller
+// IContractCaller is the common interface using which we will interact with the contracts
+// and the ethereum chain
 type IContractCaller interface {
 	SubmitBatch(txs []Tx)
 	TotalBatches() uint64
@@ -33,7 +32,12 @@ type IContractCaller interface {
 	GetMainChainBlock(blockNum *big.Int) (header *ethTypes.Header, err error)
 }
 
-// ContractCaller contract caller
+// TODO use context to remove this completely
+// Global Contract Caller Object
+var ContractCallerObj ContractCaller
+
+// ContractCaller satisfies the IContractCaller interface and contains all the variables required to interact
+// With the ethereum chain along with contract addresses and ABI's
 type ContractCaller struct {
 	EthClient *ethclient.Client
 
@@ -49,15 +53,14 @@ type ContractCaller struct {
 }
 
 // NewContractCaller contract caller
+// NOTE: Reads configration from the config.toml file
 func NewContractCaller() (contractCaller ContractCaller, err error) {
 	config.ParseAndInitGlobalConfig()
-	fmt.Println("ethrpc", config.GlobalCfg.EthRPC)
 	if RPCClient, err := rpc.Dial(config.GlobalCfg.EthRPC); err != nil {
 		return contractCaller, err
 	} else {
 		contractCaller.EthClient = ethclient.NewClient(RPCClient)
 	}
-	fmt.Println("rpcclient", contractCaller.EthClient)
 
 	// initialise all variables for rollup contract
 	rollupContractAddress := ethCmn.HexToAddress(config.GlobalCfg.RollupAddress)
