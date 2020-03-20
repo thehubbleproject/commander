@@ -2,6 +2,7 @@ package poller
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 	"time"
 
@@ -17,6 +18,12 @@ const (
 	AggregatingService = "aggregator"
 )
 
+// Aggregator is the service which is supposed to create batches
+// It has the following tasks:
+// 1. Pick txs from the mempool
+// 2. Validate these trnsactions
+// 3. Update the DB post running each tx
+// 4. Finally create a batch of all the transactions and post on-chain
 type Aggregator struct {
 	// Base service
 	tmCmn.BaseService
@@ -28,7 +35,7 @@ type Aggregator struct {
 	cancelAggregating context.CancelFunc
 }
 
-// NewAggregator returns new service object
+// NewAggregator returns new aggregator object
 func NewAggregator(db db.DB) *Aggregator {
 	// create logger
 	logger := common.Logger.With("module", AggregatingService)
@@ -86,7 +93,7 @@ func (a *Aggregator) pickBatch() {
 	for i, tx := range txs {
 		a.Logger.Debug("Verifing transaction", "index", i, "tx", tx.String())
 		// Apply tx and get the updated accounts
-		a.ApplyTx(tx)
+		a.CheckTx(tx)
 
 	}
 
@@ -97,7 +104,7 @@ func (a *Aggregator) pickBatch() {
 
 // ApplyTx fetches all the data required to validate tx from smart contact
 // and calls the proccess tx function to return the updated balance root and accounts
-func (a *Aggregator) ApplyTx(tx types.Tx) {
+func (a *Aggregator) CheckTx(tx types.Tx) {
 	// fetch to account from DB
 	fromAccount, _ := a.DB.GetAccount(tx.From)
 	fmt.Println("fetched account", fromAccount)
@@ -118,7 +125,12 @@ func (a *Aggregator) ApplyTx(tx types.Tx) {
 
 	// fetch latest batch from DB
 	latestBatch, err := a.DB.GetLatestBatch()
-	newBalRoot, updatedFrom, updatedTo, err := types.ContractCallerObj.ProcessTx(latestBatch.StateRoot,
+	lbRootBytes, err := hex.DecodeString(latestBatch.StateRoot)
+	if err != nil {
+		fmt.Println("not able to fetch from siblings", "error", err)
+	}
+
+	newBalRoot, updatedFrom, updatedTo, err := types.ContractCallerObj.ProcessTx(types.BytesToByteArray(lbRootBytes),
 		tx, types.NewMerkleProof(fromAccount, fromSiblings),
 		types.NewMerkleProof(toAccount, toSiblings),
 	)

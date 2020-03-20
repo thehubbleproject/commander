@@ -3,71 +3,54 @@ package db
 import (
 	"fmt"
 
-	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 	"github.com/BOPR/types"
 	merkle "github.com/cbergoon/merkletree"
-	"github.com/globalsign/mgo"
-	"gopkg.in/mgo.v2/bson"
 )
 
-func (db *DB) GetAccountCollection() (*mgo.Collection, *Session) {
-	session := db.MgoSession.Copy()
-	return session.GetCollection(common.DATABASE, common.ACCOUNT_COLLECTION), session
-}
-
 func (db *DB) StoreMT(mt merkle.MerkleTree) error {
-	coll, session := db.GetAccountCollection()
-	defer session.Close()
+	// coll, session := db.GetAccountCollection()
+	// defer session.Close()
 
-	if err := coll.Insert(mt); err != nil {
-		fmt.Println("Unable to insert", "error", err)
-		return err
-	}
+	// if err := coll.Insert(mt); err != nil {
+	// 	fmt.Println("Unable to insert", "error", err)
+	// 	return err
+	// }
 	return nil
 }
 
+// GetAllAccounts fetches all accounts from the database
 func (db *DB) GetAllAccounts() (accs []types.AccountLeaf, err error) {
-	coll, session := db.GetAccountCollection()
-	defer session.Close()
-
-	err = coll.Find(nil).All(accs)
-	if err != nil {
-		return accs, err
+	// TODO add limits here
+	errs := db.Instance.Find(&accs).GetErrors()
+	for _, err := range errs {
+		if err != nil {
+			return accs, GenericError("got error while fetch all accounts")
+		}
 	}
 	return accs, nil
 }
 
 // GetAccount gets the account of the given path from the DB
 func (db *DB) GetAccount(accID uint64) (types.AccountLeaf, error) {
-	coll, session := db.GetAccountCollection()
-	defer session.Close()
-
-	query := bson.M{"path": accID}
-
 	var account types.AccountLeaf
-	iter := coll.Find(query).Limit(1).Iter()
-	err := iter.All(&account)
-	if err != nil {
-		return account, err
+	if db.Instance.First(&account, accID).RecordNotFound() {
+		return account, ErrRecordNotFound(fmt.Sprintf("unable to find record for accountID: %d", accID))
 	}
-
 	return account, nil
 }
 
-func (db *DB) InsertBulkAccounts(accounts []types.AccountLeaf) error {
-	coll, session := db.GetAccountCollection()
-	defer session.Close()
+func (db *DB) InsertAccount(account types.AccountLeaf) error {
+	db.Instance.Create(account)
+	return nil
+}
 
-	var AccI []interface{}
-	for _, acc := range accounts {
-		AccI = append(AccI, acc)
-	}
-	bulk := coll.Bulk()
-	bulk.Insert(AccI...)
-	_, err := bulk.Run()
-	if err != nil {
-		return err
+func (db *DB) InsertBulkAccounts(accounts []types.AccountLeaf) error {
+	for _, account := range accounts {
+		err := db.InsertAccount(account)
+		if err != nil {
+			return ErrUnableToCreateRecord(fmt.Sprintf("Unable to add account with ID:%v to DB", account.Path))
+		}
 	}
 	return nil
 }
@@ -82,10 +65,9 @@ func (db *DB) InsertGenAccounts(genAccs []config.GenAccountLeaf) error {
 }
 
 func (db *DB) GetAccountCount() (int, error) {
-	coll, session := db.GetAccountCollection()
-	defer session.Close()
-
-	return coll.Count()
+	var count int
+	db.Instance.Table("account_leafs").Count(&count)
+	return count, nil
 }
 
 // FetchSiblings retuns the siblings of an account leaf till root

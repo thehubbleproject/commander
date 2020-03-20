@@ -22,9 +22,8 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-var ContractCallerObj ContractCaller
-
-// IContractCaller represents contract caller
+// IContractCaller is the common interface using which we will interact with the contracts
+// and the ethereum chain
 type IContractCaller interface {
 	SubmitBatch(txs []Tx)
 	TotalBatches() uint64
@@ -33,7 +32,12 @@ type IContractCaller interface {
 	GetMainChainBlock(blockNum *big.Int) (header *ethTypes.Header, err error)
 }
 
-// ContractCaller contract caller
+// TODO use context to remove this completely
+// Global Contract Caller Object
+var ContractCallerObj ContractCaller
+
+// ContractCaller satisfies the IContractCaller interface and contains all the variables required to interact
+// With the ethereum chain along with contract addresses and ABI's
 type ContractCaller struct {
 	EthClient *ethclient.Client
 
@@ -49,14 +53,14 @@ type ContractCaller struct {
 }
 
 // NewContractCaller contract caller
+// NOTE: Reads configration from the config.toml file
 func NewContractCaller() (contractCaller ContractCaller, err error) {
-	fmt.Println("ethrpc", config.GlobalCfg.EthRPC)
+	config.ParseAndInitGlobalConfig()
 	if RPCClient, err := rpc.Dial(config.GlobalCfg.EthRPC); err != nil {
 		return contractCaller, err
 	} else {
 		contractCaller.EthClient = ethclient.NewClient(RPCClient)
 	}
-	fmt.Println("rpcclient", contractCaller.EthClient)
 
 	// initialise all variables for rollup contract
 	rollupContractAddress := ethCmn.HexToAddress(config.GlobalCfg.RollupAddress)
@@ -108,6 +112,15 @@ func GenerateAuthObj(client *ethclient.Client, callMsg ethereum.CallMsg) (auth *
 	auth.GasLimit = uint64(gasLimit) // uint64(gasLimit)
 
 	return
+}
+
+// get main chain block header
+func (c *ContractCaller) GetMainChainBlock(blockNum *big.Int) (header *ethTypes.Header, err error) {
+	latestBlock, err := c.EthClient.HeaderByNumber(context.Background(), blockNum)
+	if err != nil {
+		return
+	}
+	return latestBlock, nil
 }
 
 // TotalBatches returns the total number of batches that have been submitted on chain
@@ -192,13 +205,4 @@ func (c *ContractCaller) ProcessTx(balanceTreeRoot ByteArray, tx Tx, fromMerkleP
 	fmt.Println("data", data)
 
 	return
-}
-
-// get main chain block header
-func (c *ContractCaller) GetMainChainBlock(blockNum *big.Int) (header *ethTypes.Header, err error) {
-	latestBlock, err := c.EthClient.HeaderByNumber(context.Background(), blockNum)
-	if err != nil {
-		return
-	}
-	return latestBlock, nil
 }

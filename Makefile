@@ -14,7 +14,7 @@ clean:
 
 build: clean
 	mkdir -p build
-	go build -o build/bopr cmd/main.go
+	go build -o build/bopr ./cmd
 
 init:
 	./build/bopr init

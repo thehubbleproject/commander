@@ -3,46 +3,49 @@ package db
 import (
 	"fmt"
 
-	"github.com/BOPR/common"
 	"github.com/BOPR/types"
-	"github.com/globalsign/mgo"
-	"gopkg.in/mgo.v2/bson"
 )
-
-func (db *DB) GetTxCollection() *mgo.Collection {
-	session := db.MgoSession.Copy()
-	defer session.Close()
-	return session.GetCollection(common.DATABASE, common.TRANSACTION_COLLECTION)
-}
 
 // Insert tx into the DB
 func (db *DB) InsertTx(t *types.Tx) error {
-	coll := db.GetTxCollection()
-	if err := coll.Insert(t); err != nil {
-		fmt.Println("Unable to insert", "error", err)
-		return err
-	}
+	db.Instance.Create(t)
 	return nil
 }
 
 func (db *DB) PopTxs() (txs []types.Tx, err error) {
-	coll := db.GetTxCollection()
+	tx := db.Instance.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
 
-	// TODO fetch a limited set of transactions
-	//
-	// ids = db.collection.find(<condition>).limit(<limit>).map(
-	// 	function(doc) {
-	// 		return doc._id;
-	// 	}
-	// );
-	// db.collection.updateMany({_id: {$in: ids}}, <update>})
+	if err := tx.Error; err != nil {
+		return txs, err
+	}
+	var pendingTxs []types.Tx
 
-	query := bson.M{"status": "pending"}
-	updateTo := bson.M{"$set": bson.M{"status": "processed"}}
+	// select N number of transactions which are pending in mempool and
+	if err := tx.Limit(3).Where(&types.Tx{Status: "pending"}).Find(&pendingTxs).Error; err != nil {
+		fmt.Println("error while fetching pending transactions", err)
+		return txs, err
+	}
 
-	bulk := coll.Bulk()
-	bulk.UpdateAll(query, updateTo)
-	data, err := bulk.Run()
-	fmt.Println("data", data, err)
+	fmt.Println("found txs", pendingTxs)
+
+	var ids []uint
+	for _, tx := range pendingTxs {
+		ids = append(ids, tx.ID)
+	}
+
+	// update the transactions from pending to processing
+	errs := tx.Table("txes").Where("id IN (?)", ids).Updates(map[string]interface{}{"status": "processing"}).GetErrors()
+	fmt.Println("errors while processing transactions", errs)
+
+	return pendingTxs, tx.Commit().Error
+}
+
+func (db *DB) GetTx() (tx []types.Tx) {
+	db.Instance.First(&tx)
 	return
 }

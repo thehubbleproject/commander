@@ -5,23 +5,24 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/BOPR/common"
 	"github.com/BOPR/contracts/rollup"
+	"github.com/jinzhu/gorm"
 )
 
 // Tx represets the transaction on BOPRU
 type Tx struct {
+	gorm.Model
+
 	To     uint64 `bson:"to"`
 	From   uint64 `bson:"from"`
 	Amount uint64 `bson:"amount"`
 	Nonce  uint64 `bson:"nonce"`
 	// Fee       uint64
-	TxType    uint64    `bson:"type"`
-	Signature string    `bson:"sig"`
-	Status    string    `bson:"status"`
-	Timestamp time.Time `bson:"timestamp"`
+	TxType    uint64 `bson:"type"`
+	Signature string `bson:"sig"`
+	Status    string `bson:"status"`
 }
 
 // NewTx creates a new transaction
@@ -38,7 +39,6 @@ func NewTx(to uint64, from uint64, amount uint64, nonce uint64, sig string) Tx {
 		TxType:    1,
 		Signature: sig,
 		Status:    "pending",
-		Timestamp: time.Now(),
 	}
 }
 

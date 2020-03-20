@@ -1,20 +1,22 @@
 package types
 
+import "encoding/hex"
+
 type Batch struct {
-	StateRoot ByteArray
+	StateRoot string
 	Committer Address
-	TxRoot    ByteArray
+	TxRoot    string
 }
 
 func NewBatch(stateRoot ByteArray, committer Address, txRoot ByteArray) Batch {
 	return Batch{
-		StateRoot: stateRoot,
+		StateRoot: hex.EncodeToString(stateRoot[:]),
 		Committer: committer,
-		TxRoot:    txRoot,
+		TxRoot:    hex.EncodeToString(txRoot[:]),
 	}
 }
 
 type BatchInfo struct {
-	StateRoot ByteArray
+	StateRoot string
 	Index     uint64
 }

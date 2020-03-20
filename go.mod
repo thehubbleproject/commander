@@ -12,6 +12,7 @@ require (
 	github.com/deckarep/golang-set v1.7.1
 	github.com/edsrzf/mmap-go v1.0.0
 	github.com/elastic/gosigar v0.10.5
+	github.com/enescakir/emoji v0.0.3 // indirect
 	github.com/ethereum/go-ethereum v1.9.9
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/gballet/go-libpcsclite v0.0.0-20191108122812-4678299bea08
@@ -30,6 +31,7 @@ require (
 	github.com/huin/goupnp v1.0.0
 	github.com/inconshreveable/mousetrap v1.0.0
 	github.com/jackpal/go-nat-pmp v1.0.2
+	github.com/jinzhu/gorm v1.9.12
 	github.com/karalabe/usb v0.0.0-20191104083709-911d15fe12a9
 	github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515
 	github.com/magiconair/properties v1.8.1

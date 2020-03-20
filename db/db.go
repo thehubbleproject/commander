@@ -1,9 +1,13 @@
 package db
 
 import (
+	"fmt"
+
 	"github.com/BOPR/config"
 	"github.com/BOPR/types"
 	"github.com/globalsign/mgo"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 type IDB interface {
@@ -35,13 +39,23 @@ type IDB interface {
 var DBInstance DB
 
 type DB struct {
-	MgoSession Session
+	Instance *gorm.DB
 }
 
-func NewDB(url string) (DB, error) {
-	session, err := NewSession(url)
+// NewDB creates a new DB instance
+// NOTE: it uses the configrations present in the config.toml file
+// returns error if not able to open the DB
+func NewDB() (DB, error) {
+	config.ParseAndInitGlobalConfig()
+	fmt.Println("Connecting to DB", "type", config.GlobalCfg.DB, "URL", config.GlobalCfg.FormattedDBURL())
+	db, err := gorm.Open(config.GlobalCfg.DB, config.GlobalCfg.FormattedDBURL())
 	if err != nil {
 		return DB{}, err
 	}
-	return DB{MgoSession: *session}, nil
+	db.LogMode(config.GlobalCfg.DBLogMode)
+	return DB{Instance: db}, nil
+}
+
+func (db *DB) Close() {
+	db.Instance.Close()
 }
