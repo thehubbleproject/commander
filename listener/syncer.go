@@ -214,23 +214,23 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 	}
 }
 
-func (s *Syncer) processDeposit(eventName string, abiObject *abi.ABI, vLog ethTypes.Log) {
+func (s *Syncer) processDeposit(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
 	s.Logger.Info("New deposit found")
 	// add deposit to the account DB
 
 }
 
-func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog ethTypes.Log) {
+func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
 	s.Logger.Info("New batch found")
-	event := new(rollupContract.RollupNewBatch)
-	types.NewBatch(event.UpdatedRoot, event.Comm)
+	// event := new(rollupContract.RollupNewBatch)
+	// types.NewBatch(event.UpdatedRoot, event.Comm)
 
 }
 
-func (s *Syncer) processNewAccount(eventName string, abiObject *abi.ABI, vLog ethTypes.Log) {
+func (s *Syncer) processNewAccount(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
 	s.Logger.Info("New account found")
 	event := new(rollupContract.RollupNewAccount)
-	if err := UnpackLog(abiObject, event, eventName, vLog); err != nil {
+	if err := common.UnpackLog(abiObject, event, eventName, vLog); err != nil {
 		fmt.Println("error => ", err)
 	}
 
@@ -251,20 +251,4 @@ func EventByID(abiObject *abi.ABI, sigdata []byte) *abi.Event {
 		}
 	}
 	return nil
-}
-
-// UnpackLog unpacks log
-func UnpackLog(abiObject *abi.ABI, out interface{}, event string, log *types.Log) error {
-	if len(log.Data) > 0 {
-		if err := abiObject.Unpack(out, event, log.Data); err != nil {
-			return err
-		}
-	}
-	var indexed abi.Arguments
-	for _, arg := range abiObject.Events[event].Inputs {
-		if arg.Indexed {
-			indexed = append(indexed, arg)
-		}
-	}
-	return parseTopics(out, indexed, log.Topics[1:])
 }
