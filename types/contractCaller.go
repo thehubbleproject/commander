@@ -28,7 +28,7 @@ type IContractCaller interface {
 	SubmitBatch(txs []Tx)
 	TotalBatches() uint64
 	FetchBatchWithIndex(uint64) (Batch, error)
-	AddAccount(acc AccountLeaf) error
+	AddAccount(acc UserAccount) error
 	GetMainChainBlock(blockNum *big.Int) (header *ethTypes.Header, err error)
 }
 
@@ -150,7 +150,7 @@ func (c *ContractCaller) FetchBalanceTreeRoot() (ByteArray, error) {
 }
 
 // AddAccount adds an account to the merkle tree in the contract
-func (c *ContractCaller) AddAccount(acc AccountLeaf) error {
+func (c *ContractCaller) AddAccount(acc UserAccount) error {
 	data, err := c.RollupContractABI.Pack("addAccount", acc.ToABIAccount())
 	if err != nil {
 		fmt.Println("Unable to pack tx for submitHeaderBlock", "error", err)
@@ -176,7 +176,7 @@ func (c *ContractCaller) AddAccount(acc AccountLeaf) error {
 
 // ProcessTx calls the ProcessTx function on the contract to verify the tx
 // returns the updated accounts and the new balance root
-func (c *ContractCaller) ProcessTx(balanceTreeRoot ByteArray, tx Tx, fromMerkleProof, toMerkleProof MerkleProof) (newBalanceRoot ByteArray, from, to AccountLeaf, err error) {
+func (c *ContractCaller) ProcessTx(balanceTreeRoot ByteArray, tx Tx, fromMerkleProof, toMerkleProof MerkleProof) (newBalanceRoot ByteArray, from, to UserAccount, err error) {
 	// txReceipt, err := c.RollupContract.ProcessTxUpdate(nil, balanceTreeRoot,
 	// 	tx.ToABIVersion(fromMerkleProof.Account.ToABIAccount(), toMerkleProof.Account.ToABIAccount()),
 	// 	fromMerkleProof.ToABIVersion(),

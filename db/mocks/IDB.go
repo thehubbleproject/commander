@@ -18,15 +18,15 @@ type IDB struct {
 }
 
 // FetchSiblings provides a mock function with given fields: accID
-func (_m *IDB) FetchSiblings(accID uint64) ([]types.AccountLeaf, error) {
+func (_m *IDB) FetchSiblings(accID uint64) ([]types.UserAccount, error) {
 	ret := _m.Called(accID)
 
-	var r0 []types.AccountLeaf
-	if rf, ok := ret.Get(0).(func(uint64) []types.AccountLeaf); ok {
+	var r0 []types.UserAccount
+	if rf, ok := ret.Get(0).(func(uint64) []types.UserAccount); ok {
 		r0 = rf(accID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]types.AccountLeaf)
+			r0 = ret.Get(0).([]types.UserAccount)
 		}
 	}
 
@@ -41,14 +41,14 @@ func (_m *IDB) FetchSiblings(accID uint64) ([]types.AccountLeaf, error) {
 }
 
 // GetAccount provides a mock function with given fields: accID
-func (_m *IDB) GetAccount(accID uint64) (types.AccountLeaf, error) {
+func (_m *IDB) GetAccount(accID uint64) (types.UserAccount, error) {
 	ret := _m.Called(accID)
 
-	var r0 types.AccountLeaf
-	if rf, ok := ret.Get(0).(func(uint64) types.AccountLeaf); ok {
+	var r0 types.UserAccount
+	if rf, ok := ret.Get(0).(func(uint64) types.UserAccount); ok {
 		r0 = rf(accID)
 	} else {
-		r0 = ret.Get(0).(types.AccountLeaf)
+		r0 = ret.Get(0).(types.UserAccount)
 	}
 
 	var r1 error
@@ -99,15 +99,15 @@ func (_m *IDB) GetAccountCount() (int, error) {
 }
 
 // GetAllAccounts provides a mock function with given fields:
-func (_m *IDB) GetAllAccounts() ([]types.AccountLeaf, error) {
+func (_m *IDB) GetAllAccounts() ([]types.UserAccount, error) {
 	ret := _m.Called()
 
-	var r0 []types.AccountLeaf
-	if rf, ok := ret.Get(0).(func() []types.AccountLeaf); ok {
+	var r0 []types.UserAccount
+	if rf, ok := ret.Get(0).(func() []types.UserAccount); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]types.AccountLeaf)
+			r0 = ret.Get(0).([]types.UserAccount)
 		}
 	}
 
@@ -233,11 +233,11 @@ func (_m *IDB) InsertBatchInfo(root types.ByteArray, index uint64) error {
 }
 
 // InsertBulkAccounts provides a mock function with given fields: accounts
-func (_m *IDB) InsertBulkAccounts(accounts []types.AccountLeaf) error {
+func (_m *IDB) InsertBulkAccounts(accounts []types.UserAccount) error {
 	ret := _m.Called(accounts)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func([]types.AccountLeaf) error); ok {
+	if rf, ok := ret.Get(0).(func([]types.UserAccount) error); ok {
 		r0 = rf(accounts)
 	} else {
 		r0 = ret.Error(0)
@@ -247,11 +247,11 @@ func (_m *IDB) InsertBulkAccounts(accounts []types.AccountLeaf) error {
 }
 
 // InsertGenAccounts provides a mock function with given fields: genAccs
-func (_m *IDB) InsertGenAccounts(genAccs []config.GenAccountLeaf) error {
+func (_m *IDB) InsertGenAccounts(genAccs []config.GenUserAccount) error {
 	ret := _m.Called(genAccs)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func([]config.GenAccountLeaf) error); ok {
+	if rf, ok := ret.Get(0).(func([]config.GenUserAccount) error); ok {
 		r0 = rf(genAccs)
 	} else {
 		r0 = ret.Error(0)

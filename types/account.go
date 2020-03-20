@@ -1,21 +1,22 @@
 package types
 
 import (
+	"math/big"
+
 	"github.com/BOPR/common"
 	"github.com/BOPR/contracts/rollup"
 	"github.com/ethereum/go-ethereum/accounts/abi"
-	"math/big"
 )
 
-type AccountLeaf struct {
+type UserAccount struct {
 	Path      uint64
 	Balance   uint64
 	TokenType uint64
 	Nonce     uint64
 }
 
-func NewAccountLeaf(path, balance, tokenType, nonce uint64) AccountLeaf {
-	return AccountLeaf{
+func NewUserAccount(path, balance, tokenType, nonce uint64) UserAccount {
+	return UserAccount{
 		Path:      path,
 		Balance:   balance,
 		TokenType: tokenType,
@@ -23,7 +24,7 @@ func NewAccountLeaf(path, balance, tokenType, nonce uint64) AccountLeaf {
 	}
 }
 
-func (acc *AccountLeaf) ToABIAccount() rollup.DataTypesAccount {
+func (acc *UserAccount) ToABIAccount() rollup.DataTypesAccount {
 	return rollup.DataTypesAccount{
 		Path:      UintToBigInt(acc.Path),
 		Balance:   UintToBigInt(acc.Balance),
@@ -32,7 +33,7 @@ func (acc *AccountLeaf) ToABIAccount() rollup.DataTypesAccount {
 	}
 }
 
-func (acc *AccountLeaf) ABIEncode() []byte {
+func (acc *UserAccount) ABIEncode() []byte {
 	uint256Ty, _ := abi.NewType("uint256", "uint256", nil)
 	arguments := abi.Arguments{
 		{
@@ -57,7 +58,7 @@ func (acc *AccountLeaf) ABIEncode() []byte {
 	return bytes
 }
 
-func AccsToLeafHashes(accs []AccountLeaf) (result [][32]byte) {
+func AccsToLeafHashes(accs []UserAccount) (result [][32]byte) {
 	for i, acc := range accs {
 		result[i] = BytesToByteArray(common.Hash(acc.ABIEncode()))
 	}
