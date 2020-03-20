@@ -13,6 +13,7 @@ import (
 	ethCmn "github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 
+	rollupContract "github.com/BOPR/contracts/rollup"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 )
 
@@ -201,11 +202,11 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 				s.Logger.Debug("selectedEvent ", " event name -", selectedEvent.Name)
 				switch selectedEvent.Name {
 				case "deposit":
-					s.processDeposit()
+					s.processDeposit(selectedEvent.Name, abiObject, &vLog)
 				case "newBatch":
-					s.processNewBatch()
+					s.processNewBatch(selectedEvent.Name, abiObject, &vLog)
 				case "newAccount":
-					s.processNewAccount()
+					s.processNewAccount(selectedEvent.Name, abiObject, &vLog)
 				}
 				break
 			}
@@ -213,16 +214,33 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 	}
 }
 
-func (s *Syncer) processDeposit() {
-	s.Logger.Info("Got new deposit")
-}
-
-func (s *Syncer) processNewBatch() {
+func (s *Syncer) processDeposit(eventName string, abiObject *abi.ABI, vLog ethTypes.Log) {
+	s.Logger.Info("New deposit found")
+	// add deposit to the account DB
 
 }
 
-func (s *Syncer) processNewAccount() {
+func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog ethTypes.Log) {
+	s.Logger.Info("New batch found")
+	event := new(rollupContract.RollupNewBatch)
+	types.NewBatch(event.UpdatedRoot, event.Comm)
 
+}
+
+func (s *Syncer) processNewAccount(eventName string, abiObject *abi.ABI, vLog ethTypes.Log) {
+	s.Logger.Info("New account found")
+	event := new(rollupContract.RollupNewAccount)
+	if err := UnpackLog(abiObject, event, eventName, vLog); err != nil {
+		fmt.Println("error => ", err)
+	}
+
+	acc := types.NewAccountLeaf(event.Index.Uint64(), 0, 0, 0)
+
+	// add account to the DB
+	err := s.DBInstance.InsertAccount(acc)
+	if err != nil {
+		fmt.Println("error => ", err)
+	}
 }
 
 // EventByID
@@ -233,4 +251,20 @@ func EventByID(abiObject *abi.ABI, sigdata []byte) *abi.Event {
 		}
 	}
 	return nil
+}
+
+// UnpackLog unpacks log
+func UnpackLog(abiObject *abi.ABI, out interface{}, event string, log *types.Log) error {
+	if len(log.Data) > 0 {
+		if err := abiObject.Unpack(out, event, log.Data); err != nil {
+			return err
+		}
+	}
+	var indexed abi.Arguments
+	for _, arg := range abiObject.Events[event].Inputs {
+		if arg.Indexed {
+			indexed = append(indexed, arg)
+		}
+	}
+	return parseTopics(out, indexed, log.Topics[1:])
 }

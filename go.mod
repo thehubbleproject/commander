@@ -12,6 +12,7 @@ require (
 	github.com/deckarep/golang-set v1.7.1
 	github.com/edsrzf/mmap-go v1.0.0
 	github.com/elastic/gosigar v0.10.5
+	github.com/enescakir/emoji v0.0.3 // indirect
 	github.com/ethereum/go-ethereum v1.9.9
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/gballet/go-libpcsclite v0.0.0-20191108122812-4678299bea08
