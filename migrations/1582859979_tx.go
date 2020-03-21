@@ -12,8 +12,8 @@ func init() {
 			if !db.HasTable(&types.Tx{}) {
 				db.CreateTable(&types.Tx{})
 			}
-			if !db.HasTable(&types.AccountLeaf{}) {
-				db.CreateTable(&types.AccountLeaf{})
+			if !db.HasTable(&types.UserAccount{}) {
+				db.CreateTable(&types.UserAccount{})
 			}
 			if !db.HasTable(&types.Batch{}) {
 				db.CreateTable(&types.Batch{})
@@ -30,7 +30,7 @@ func init() {
 		Down: func(db *gorm.DB) error {
 			db.DropTableIfExists(&types.Tx{})
 			db.DropTableIfExists(&types.Batch{})
-			db.DropTableIfExists(&types.AccountLeaf{})
+			db.DropTableIfExists(&types.UserAccount{})
 			return nil
 		},
 	}

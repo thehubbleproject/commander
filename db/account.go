@@ -20,7 +20,7 @@ func (db *DB) StoreMT(mt merkle.MerkleTree) error {
 }
 
 // GetAllAccounts fetches all accounts from the database
-func (db *DB) GetAllAccounts() (accs []types.AccountLeaf, err error) {
+func (db *DB) GetAllAccounts() (accs []types.UserAccount, err error) {
 	// TODO add limits here
 	errs := db.Instance.Find(&accs).GetErrors()
 	for _, err := range errs {
@@ -32,20 +32,20 @@ func (db *DB) GetAllAccounts() (accs []types.AccountLeaf, err error) {
 }
 
 // GetAccount gets the account of the given path from the DB
-func (db *DB) GetAccount(accID uint64) (types.AccountLeaf, error) {
-	var account types.AccountLeaf
+func (db *DB) GetAccount(accID uint64) (types.UserAccount, error) {
+	var account types.UserAccount
 	if db.Instance.First(&account, accID).RecordNotFound() {
 		return account, ErrRecordNotFound(fmt.Sprintf("unable to find record for accountID: %d", accID))
 	}
 	return account, nil
 }
 
-func (db *DB) InsertAccount(account types.AccountLeaf) error {
+func (db *DB) InsertAccount(account types.UserAccount) error {
 	db.Instance.Create(account)
 	return nil
 }
 
-func (db *DB) InsertBulkAccounts(accounts []types.AccountLeaf) error {
+func (db *DB) InsertBulkAccounts(accounts []types.UserAccount) error {
 	for _, account := range accounts {
 		err := db.InsertAccount(account)
 		if err != nil {
@@ -55,10 +55,10 @@ func (db *DB) InsertBulkAccounts(accounts []types.AccountLeaf) error {
 	return nil
 }
 
-func (db *DB) InsertGenAccounts(genAccs []config.GenAccountLeaf) error {
-	var accLeafs []types.AccountLeaf
+func (db *DB) InsertGenAccounts(genAccs []config.GenUserAccount) error {
+	var accLeafs []types.UserAccount
 	for _, acc := range genAccs {
-		newAccLeaf := types.NewAccountLeaf(acc.Path, acc.Balance, acc.TokenType, acc.Nonce)
+		newAccLeaf := types.NewUserAccount(acc.Path, acc.Balance, acc.TokenType, acc.Nonce)
 		accLeafs = append(accLeafs, newAccLeaf)
 	}
 	return db.InsertBulkAccounts(accLeafs)
@@ -72,9 +72,9 @@ func (db *DB) GetAccountCount() (int, error) {
 
 // FetchSiblings retuns the siblings of an account leaf till root
 // TODO make this more performannt by using bulk account fetch or using groutines to fetch in parerell
-func FetchSiblings(accID uint64, db DB) (accs []types.AccountLeaf, err error) {
+func FetchSiblings(accID uint64, db DB) (accs []types.UserAccount, err error) {
 	// For eg: for account ID 1111 => 1110, 110X, 10XX
-	var siblings []types.AccountLeaf
+	var siblings []types.UserAccount
 
 	return siblings, nil
 }

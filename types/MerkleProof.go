@@ -5,11 +5,11 @@ import (
 )
 
 type MerkleProof struct {
-	Account  AccountLeaf   `bson:"account"`
-	Siblings []AccountLeaf `bson:"siblings"`
+	Account  UserAccount   `bson:"account"`
+	Siblings []UserAccount `bson:"siblings"`
 }
 
-func NewMerkleProof(account AccountLeaf, siblings []AccountLeaf) MerkleProof {
+func NewMerkleProof(account UserAccount, siblings []UserAccount) MerkleProof {
 	return MerkleProof{Account: account, Siblings: siblings}
 }
 

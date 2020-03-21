@@ -234,7 +234,7 @@ func (s *Syncer) processNewAccount(eventName string, abiObject *abi.ABI, vLog *e
 		fmt.Println("error => ", err)
 	}
 
-	acc := types.NewAccountLeaf(event.Index.Uint64(), 0, 0, 0)
+	acc := types.NewUserAccount(event.Index.Uint64(), 0, 0, 0)
 
 	// add account to the DB
 	err := s.DBInstance.InsertAccount(acc)

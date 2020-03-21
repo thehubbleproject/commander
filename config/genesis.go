@@ -9,17 +9,17 @@ import (
 	"github.com/BOPR/common"
 )
 
-//  GenAccountLeaf Exists to allow remove circular dependency with types
-// and to allow storing more data than account leaf
-type GenAccountLeaf struct {
+//  GenUserAccount exists to allow remove circular dependency with types
+// and to allow storing more data about the account than the data in UserAccount
+type GenUserAccount struct {
 	Path      uint64
 	Balance   uint64
 	TokenType uint64
 	Nonce     uint64
 }
 
-func NewGenAccountLeaf(path, balance, tokenType, nonce uint64) GenAccountLeaf {
-	return GenAccountLeaf{
+func NewGenUserAccount(path, balance, tokenType, nonce uint64) GenUserAccount {
+	return GenUserAccount{
 		Path:      path,
 		Balance:   balance,
 		TokenType: tokenType,
@@ -28,16 +28,16 @@ func NewGenAccountLeaf(path, balance, tokenType, nonce uint64) GenAccountLeaf {
 }
 
 type GenesisAccounts struct {
-	Accounts []GenAccountLeaf `json:"gen_accounts"`
+	Accounts []GenUserAccount `json:"gen_accounts"`
 }
 
-func NewGenesisAccounts(accounts []GenAccountLeaf) GenesisAccounts {
+func NewGenesisAccounts(accounts []GenUserAccount) GenesisAccounts {
 	return GenesisAccounts{Accounts: accounts}
 }
 
 func DefaultGenesisAccounts() GenesisAccounts {
-	var accounts []GenAccountLeaf
-	acc := NewGenAccountLeaf(common.DEAFULT_PATH, common.DEFAULT_BALANCE, common.DEFAULT_TOKEN_TYPE, common.DEFAULT_TOKEN_TYPE)
+	var accounts []GenUserAccount
+	acc := NewGenUserAccount(common.DEAFULT_PATH, common.DEFAULT_BALANCE, common.DEFAULT_TOKEN_TYPE, common.DEFAULT_TOKEN_TYPE)
 	accounts = append(accounts, acc)
 	return NewGenesisAccounts(accounts)
 }

@@ -99,7 +99,7 @@ func AddGenesisAcccountsCmd() *cobra.Command {
 			common.PanicIfError(err)
 			contractCaller, err := types.NewContractCaller()
 			for _, genAcc := range genAccs.Accounts {
-				err := contractCaller.AddAccount(types.NewAccountLeaf(genAcc.Path, genAcc.Balance, genAcc.TokenType, genAcc.Nonce))
+				err := contractCaller.AddAccount(types.NewUserAccount(genAcc.Path, genAcc.Balance, genAcc.TokenType, genAcc.Nonce))
 				common.PanicIfError(err)
 			}
 			common.PanicIfError(err)
