@@ -3,13 +3,113 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "merkleTreeLib",
+          "name": "_balancesTree",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_accountsTree",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_merkleTreeLib",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_tokenRegistryAddr",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_coordinator",
           "type": "address"
         }
       ],
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "batch_id",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "committer",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "stateRoot",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "txRoot",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "stakeSlashed",
+          "type": "uint256"
+        }
+      ],
+      "name": "BatchRollback",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [],
+      "name": "DepositLeafMerged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "DepositQueued",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [],
+      "name": "DepositsProcessed",
+      "type": "event"
     },
     {
       "anonymous": false,
@@ -35,6 +135,12 @@
       "inputs": [
         {
           "indexed": false,
+          "internalType": "address",
+          "name": "committer",
+          "type": "address"
+        },
+        {
+          "indexed": false,
           "internalType": "bytes32",
           "name": "txroot",
           "type": "bytes32"
@@ -54,30 +160,69 @@
       "inputs": [
         {
           "indexed": false,
-          "internalType": "bytes32[]",
-          "name": "to_siblings",
-          "type": "bytes32[]"
-        },
-        {
-          "indexed": false,
           "internalType": "uint256",
-          "name": "to_path",
+          "name": "tokenType",
           "type": "uint256"
         },
         {
           "indexed": false,
-          "internalType": "bytes32[]",
-          "name": "from_siblings",
-          "type": "bytes32[]"
-        },
+          "internalType": "address",
+          "name": "tokenContract",
+          "type": "address"
+        }
+      ],
+      "name": "RegisteredToken",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "tokenContract",
+          "type": "address"
+        }
+      ],
+      "name": "RegistrationRequest",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "from_path",
+          "name": "totalBatchesSlashed",
           "type": "uint256"
         }
       ],
-      "name": "SiblingsGenerated",
+      "name": "RollbackFinalisation",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "committed",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "batch_id",
+          "type": "uint256"
+        }
+      ],
+      "name": "StakeWithdraw",
       "type": "event"
     },
     {
@@ -89,6 +234,36 @@
           "internalType": "bytes32",
           "name": "",
           "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "accountsTree",
+      "outputs": [
+        {
+          "internalType": "contract MerkleTree",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "balancesTree",
+      "outputs": [
+        {
+          "internalType": "contract MerkleTree",
+          "name": "",
+          "type": "address"
         }
       ],
       "payable": false,
@@ -123,6 +298,16 @@
         },
         {
           "internalType": "uint256",
+          "name": "stakeCommitted",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "finalisesOn",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
           "name": "timestamp",
           "type": "uint256"
         }
@@ -132,51 +317,45 @@
       "type": "function"
     },
     {
-      "constant": false,
+      "constant": true,
       "inputs": [],
-      "name": "initMT",
-      "outputs": [],
+      "name": "depositSubtreeHeight",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
       "payable": false,
-      "stateMutability": "nonpayable",
+      "stateMutability": "view",
       "type": "function"
     },
     {
-      "constant": false,
-      "inputs": [
+      "constant": true,
+      "inputs": [],
+      "name": "merkleTreeLib",
+      "outputs": [
         {
-          "components": [
-            {
-              "internalType": "bytes32",
-              "name": "key",
-              "type": "bytes32"
-            },
-            {
-              "internalType": "uint256",
-              "name": "path",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "balance",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "tokenType",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "nonce",
-              "type": "uint256"
-            }
-          ],
-          "internalType": "struct DataTypes.Account",
-          "name": "_account",
-          "type": "tuple"
+          "internalType": "contract MerkleTreeLib",
+          "name": "",
+          "type": "address"
         }
       ],
-      "name": "addAccount",
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "pendingDeposits",
       "outputs": [
         {
           "internalType": "bytes32",
@@ -185,7 +364,52 @@
         }
       ],
       "payable": false,
-      "stateMutability": "nonpayable",
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "queueNumber",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "tokenContract",
+      "outputs": [
+        {
+          "internalType": "contract IERC20",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "tokenRegistry",
+      "outputs": [
+        {
+          "internalType": "contract ITokenRegistry",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -204,8 +428,8 @@
       ],
       "name": "submitBatch",
       "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
+      "payable": true,
+      "stateMutability": "payable",
       "type": "function"
     },
     {
@@ -213,7 +437,7 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "batch_id",
+          "name": "_batch_id",
           "type": "uint256"
         },
         {
@@ -221,18 +445,8 @@
             {
               "components": [
                 {
-                  "internalType": "bytes32",
-                  "name": "key",
-                  "type": "bytes32"
-                },
-                {
                   "internalType": "uint256",
-                  "name": "path",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "balance",
+                  "name": "ID",
                   "type": "uint256"
                 },
                 {
@@ -242,29 +456,24 @@
                 },
                 {
                   "internalType": "uint256",
+                  "name": "balance",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
                   "name": "nonce",
                   "type": "uint256"
                 }
               ],
-              "internalType": "struct DataTypes.Account",
+              "internalType": "struct DataTypes.UserAccount",
               "name": "from",
               "type": "tuple"
             },
             {
               "components": [
                 {
-                  "internalType": "bytes32",
-                  "name": "key",
-                  "type": "bytes32"
-                },
-                {
                   "internalType": "uint256",
-                  "name": "path",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "balance",
+                  "name": "ID",
                   "type": "uint256"
                 },
                 {
@@ -274,11 +483,16 @@
                 },
                 {
                   "internalType": "uint256",
+                  "name": "balance",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
                   "name": "nonce",
                   "type": "uint256"
                 }
               ],
-              "internalType": "struct DataTypes.Account",
+              "internalType": "struct DataTypes.UserAccount",
               "name": "to",
               "type": "tuple"
             },
@@ -307,33 +521,40 @@
             {
               "components": [
                 {
-                  "internalType": "bytes32",
-                  "name": "key",
-                  "type": "bytes32"
-                },
-                {
                   "internalType": "uint256",
-                  "name": "path",
+                  "name": "pathToAccount",
                   "type": "uint256"
                 },
                 {
-                  "internalType": "uint256",
-                  "name": "balance",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "tokenType",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "nonce",
-                  "type": "uint256"
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "ID",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "tokenType",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "balance",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "nonce",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct DataTypes.UserAccount",
+                  "name": "account",
+                  "type": "tuple"
                 }
               ],
-              "internalType": "struct DataTypes.Account",
-              "name": "account",
+              "internalType": "struct DataTypes.AccountInclusionProof",
+              "name": "accountIP",
               "type": "tuple"
             },
             {
@@ -342,7 +563,7 @@
               "type": "bytes32[]"
             }
           ],
-          "internalType": "struct DataTypes.MerkleProof[]",
+          "internalType": "struct DataTypes.AccountMerkleProof[]",
           "name": "_from_proofs",
           "type": "tuple[]"
         },
@@ -351,33 +572,40 @@
             {
               "components": [
                 {
-                  "internalType": "bytes32",
-                  "name": "key",
-                  "type": "bytes32"
-                },
-                {
                   "internalType": "uint256",
-                  "name": "path",
+                  "name": "pathToAccount",
                   "type": "uint256"
                 },
                 {
-                  "internalType": "uint256",
-                  "name": "balance",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "tokenType",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "nonce",
-                  "type": "uint256"
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "ID",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "tokenType",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "balance",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "nonce",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct DataTypes.UserAccount",
+                  "name": "account",
+                  "type": "tuple"
                 }
               ],
-              "internalType": "struct DataTypes.Account",
-              "name": "account",
+              "internalType": "struct DataTypes.AccountInclusionProof",
+              "name": "accountIP",
               "type": "tuple"
             },
             {
@@ -386,19 +614,13 @@
               "type": "bytes32[]"
             }
           ],
-          "internalType": "struct DataTypes.MerkleProof[]",
+          "internalType": "struct DataTypes.AccountMerkleProof[]",
           "name": "_to_proofs",
           "type": "tuple[]"
         }
       ],
       "name": "disputeBatch",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
+      "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
@@ -416,18 +638,8 @@
             {
               "components": [
                 {
-                  "internalType": "bytes32",
-                  "name": "key",
-                  "type": "bytes32"
-                },
-                {
                   "internalType": "uint256",
-                  "name": "path",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "balance",
+                  "name": "ID",
                   "type": "uint256"
                 },
                 {
@@ -437,29 +649,24 @@
                 },
                 {
                   "internalType": "uint256",
+                  "name": "balance",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
                   "name": "nonce",
                   "type": "uint256"
                 }
               ],
-              "internalType": "struct DataTypes.Account",
+              "internalType": "struct DataTypes.UserAccount",
               "name": "from",
               "type": "tuple"
             },
             {
               "components": [
                 {
-                  "internalType": "bytes32",
-                  "name": "key",
-                  "type": "bytes32"
-                },
-                {
                   "internalType": "uint256",
-                  "name": "path",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "balance",
+                  "name": "ID",
                   "type": "uint256"
                 },
                 {
@@ -469,11 +676,16 @@
                 },
                 {
                   "internalType": "uint256",
+                  "name": "balance",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
                   "name": "nonce",
                   "type": "uint256"
                 }
               ],
-              "internalType": "struct DataTypes.Account",
+              "internalType": "struct DataTypes.UserAccount",
               "name": "to",
               "type": "tuple"
             },
@@ -502,33 +714,40 @@
             {
               "components": [
                 {
-                  "internalType": "bytes32",
-                  "name": "key",
-                  "type": "bytes32"
-                },
-                {
                   "internalType": "uint256",
-                  "name": "path",
+                  "name": "pathToAccount",
                   "type": "uint256"
                 },
                 {
-                  "internalType": "uint256",
-                  "name": "balance",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "tokenType",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "nonce",
-                  "type": "uint256"
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "ID",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "tokenType",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "balance",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "nonce",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct DataTypes.UserAccount",
+                  "name": "account",
+                  "type": "tuple"
                 }
               ],
-              "internalType": "struct DataTypes.Account",
-              "name": "account",
+              "internalType": "struct DataTypes.AccountInclusionProof",
+              "name": "accountIP",
               "type": "tuple"
             },
             {
@@ -537,7 +756,7 @@
               "type": "bytes32[]"
             }
           ],
-          "internalType": "struct DataTypes.MerkleProof",
+          "internalType": "struct DataTypes.AccountMerkleProof",
           "name": "_from_merkle_proof",
           "type": "tuple"
         },
@@ -546,33 +765,40 @@
             {
               "components": [
                 {
-                  "internalType": "bytes32",
-                  "name": "key",
-                  "type": "bytes32"
-                },
-                {
                   "internalType": "uint256",
-                  "name": "path",
+                  "name": "pathToAccount",
                   "type": "uint256"
                 },
                 {
-                  "internalType": "uint256",
-                  "name": "balance",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "tokenType",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "nonce",
-                  "type": "uint256"
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "ID",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "tokenType",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "balance",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "nonce",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct DataTypes.UserAccount",
+                  "name": "account",
+                  "type": "tuple"
                 }
               ],
-              "internalType": "struct DataTypes.Account",
-              "name": "account",
+              "internalType": "struct DataTypes.AccountInclusionProof",
+              "name": "accountIP",
               "type": "tuple"
             },
             {
@@ -581,12 +807,12 @@
               "type": "bytes32[]"
             }
           ],
-          "internalType": "struct DataTypes.MerkleProof",
+          "internalType": "struct DataTypes.AccountMerkleProof",
           "name": "_to_merkle_proof",
           "type": "tuple"
         }
       ],
-      "name": "processTxUpdate",
+      "name": "processTx",
       "outputs": [
         {
           "internalType": "bytes32",
@@ -602,6 +828,147 @@
           "internalType": "uint256",
           "name": "",
           "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "SlashAndRollback",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_tokenType",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_pubkey",
+          "type": "bytes"
+        }
+      ],
+      "name": "deposit",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_destination",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_tokenType",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_pubkey",
+          "type": "bytes"
+        }
+      ],
+      "name": "depositFor",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_subTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "pathToAccount",
+                  "type": "uint256"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "ID",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "tokenType",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "balance",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "nonce",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct DataTypes.UserAccount",
+                  "name": "account",
+                  "type": "tuple"
+                }
+              ],
+              "internalType": "struct DataTypes.AccountInclusionProof",
+              "name": "accountIP",
+              "type": "tuple"
+            },
+            {
+              "internalType": "bytes32[]",
+              "name": "siblings",
+              "type": "bytes32[]"
+            }
+          ],
+          "internalType": "struct DataTypes.AccountMerkleProof",
+          "name": "_zero_account_mp",
+          "type": "tuple"
+        }
+      ],
+      "name": "finaliseDeposits",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
         }
       ],
       "payable": false,
@@ -612,20 +979,55 @@
       "constant": false,
       "inputs": [
         {
+          "internalType": "address",
+          "name": "_tokenContractAddress",
+          "type": "address"
+        }
+      ],
+      "name": "requestTokenRegistration",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_tokenContractAddress",
+          "type": "address"
+        }
+      ],
+      "name": "finaliseTokenRegistration",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "batch_id",
+          "type": "uint256"
+        }
+      ],
+      "name": "WithdrawStake",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
           "components": [
             {
-              "internalType": "bytes32",
-              "name": "key",
-              "type": "bytes32"
-            },
-            {
               "internalType": "uint256",
-              "name": "path",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "balance",
+              "name": "ID",
               "type": "uint256"
             },
             {
@@ -635,11 +1037,16 @@
             },
             {
               "internalType": "uint256",
+              "name": "balance",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
               "name": "nonce",
               "type": "uint256"
             }
           ],
-          "internalType": "struct DataTypes.Account",
+          "internalType": "struct DataTypes.UserAccount",
           "name": "original_account",
           "type": "tuple"
         },
@@ -649,23 +1056,13 @@
           "type": "uint256"
         }
       ],
-      "name": "updateBalanceInLeaf",
+      "name": "UpdateBalanceInAccount",
       "outputs": [
         {
           "components": [
             {
-              "internalType": "bytes32",
-              "name": "key",
-              "type": "bytes32"
-            },
-            {
               "internalType": "uint256",
-              "name": "path",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "balance",
+              "name": "ID",
               "type": "uint256"
             },
             {
@@ -675,11 +1072,16 @@
             },
             {
               "internalType": "uint256",
+              "name": "balance",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
               "name": "nonce",
               "type": "uint256"
             }
           ],
-          "internalType": "struct DataTypes.Account",
+          "internalType": "struct DataTypes.UserAccount",
           "name": "new_account",
           "type": "tuple"
         }
@@ -694,18 +1096,8 @@
         {
           "components": [
             {
-              "internalType": "bytes32",
-              "name": "key",
-              "type": "bytes32"
-            },
-            {
               "internalType": "uint256",
-              "name": "path",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "balance",
+              "name": "ID",
               "type": "uint256"
             },
             {
@@ -715,16 +1107,21 @@
             },
             {
               "internalType": "uint256",
+              "name": "balance",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
               "name": "nonce",
               "type": "uint256"
             }
           ],
-          "internalType": "struct DataTypes.Account",
+          "internalType": "struct DataTypes.UserAccount",
           "name": "account",
           "type": "tuple"
         }
       ],
-      "name": "getBalanceFromAccount",
+      "name": "BalanceFromAccount",
       "outputs": [
         {
           "internalType": "uint256",
@@ -742,13 +1139,13 @@
         {
           "components": [
             {
-              "internalType": "bytes32",
-              "name": "key",
-              "type": "bytes32"
+              "internalType": "uint256",
+              "name": "ID",
+              "type": "uint256"
             },
             {
               "internalType": "uint256",
-              "name": "path",
+              "name": "tokenType",
               "type": "uint256"
             },
             {
@@ -758,7 +1155,45 @@
             },
             {
               "internalType": "uint256",
+              "name": "nonce",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct DataTypes.UserAccount",
+          "name": "account",
+          "type": "tuple"
+        }
+      ],
+      "name": "HashFromAccount",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "ID",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
               "name": "tokenType",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "balance",
               "type": "uint256"
             },
             {
@@ -767,12 +1202,12 @@
               "type": "uint256"
             }
           ],
-          "internalType": "struct DataTypes.Account",
+          "internalType": "struct DataTypes.UserAccount",
           "name": "account",
           "type": "tuple"
         }
       ],
-      "name": "getAccountBytes",
+      "name": "BytesFromAccount",
       "outputs": [
         {
           "internalType": "bytes",
@@ -792,18 +1227,8 @@
             {
               "components": [
                 {
-                  "internalType": "bytes32",
-                  "name": "key",
-                  "type": "bytes32"
-                },
-                {
                   "internalType": "uint256",
-                  "name": "path",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "balance",
+                  "name": "ID",
                   "type": "uint256"
                 },
                 {
@@ -813,29 +1238,24 @@
                 },
                 {
                   "internalType": "uint256",
+                  "name": "balance",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
                   "name": "nonce",
                   "type": "uint256"
                 }
               ],
-              "internalType": "struct DataTypes.Account",
+              "internalType": "struct DataTypes.UserAccount",
               "name": "from",
               "type": "tuple"
             },
             {
               "components": [
                 {
-                  "internalType": "bytes32",
-                  "name": "key",
-                  "type": "bytes32"
-                },
-                {
                   "internalType": "uint256",
-                  "name": "path",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "balance",
+                  "name": "ID",
                   "type": "uint256"
                 },
                 {
@@ -845,11 +1265,16 @@
                 },
                 {
                   "internalType": "uint256",
+                  "name": "balance",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
                   "name": "nonce",
                   "type": "uint256"
                 }
               ],
-              "internalType": "struct DataTypes.Account",
+              "internalType": "struct DataTypes.UserAccount",
               "name": "to",
               "type": "tuple"
             },
@@ -870,11 +1295,11 @@
             }
           ],
           "internalType": "struct DataTypes.Transaction",
-          "name": "tx",
+          "name": "_tx",
           "type": "tuple"
         }
       ],
-      "name": "getTxBytes",
+      "name": "BytesFromTx",
       "outputs": [
         {
           "internalType": "bytes",
@@ -894,18 +1319,8 @@
             {
               "components": [
                 {
-                  "internalType": "bytes32",
-                  "name": "key",
-                  "type": "bytes32"
-                },
-                {
                   "internalType": "uint256",
-                  "name": "path",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "balance",
+                  "name": "ID",
                   "type": "uint256"
                 },
                 {
@@ -915,29 +1330,24 @@
                 },
                 {
                   "internalType": "uint256",
+                  "name": "balance",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
                   "name": "nonce",
                   "type": "uint256"
                 }
               ],
-              "internalType": "struct DataTypes.Account",
+              "internalType": "struct DataTypes.UserAccount",
               "name": "from",
               "type": "tuple"
             },
             {
               "components": [
                 {
-                  "internalType": "bytes32",
-                  "name": "key",
-                  "type": "bytes32"
-                },
-                {
                   "internalType": "uint256",
-                  "name": "path",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "balance",
+                  "name": "ID",
                   "type": "uint256"
                 },
                 {
@@ -947,11 +1357,16 @@
                 },
                 {
                   "internalType": "uint256",
+                  "name": "balance",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
                   "name": "nonce",
                   "type": "uint256"
                 }
               ],
-              "internalType": "struct DataTypes.Account",
+              "internalType": "struct DataTypes.UserAccount",
               "name": "to",
               "type": "tuple"
             },
@@ -972,11 +1387,11 @@
             }
           ],
           "internalType": "struct DataTypes.Transaction",
-          "name": "tx",
+          "name": "_tx",
           "type": "tuple"
         }
       ],
-      "name": "getTxBytesHash",
+      "name": "HashFromTx",
       "outputs": [
         {
           "internalType": "bytes32",
@@ -1004,6 +1419,32 @@
       "type": "function"
     },
     {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "a",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "b",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getDepositsHash",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "constant": true,
       "inputs": [],
       "name": "numberOfBatches",
@@ -1016,6 +1457,27 @@
       ],
       "payable": false,
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "pub",
+          "type": "bytes"
+        }
+      ],
+      "name": "calculateAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "addr",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
       "type": "function"
     }
   ]

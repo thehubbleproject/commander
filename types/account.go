@@ -14,7 +14,7 @@ type UserAccount struct {
 	// Cannot be changed once created
 	ID uint64
 	// Token type of the user account
-	// Cannot be changed after creation
+	// Cannot be changed once creation
 	TokenType uint64
 
 	// Balance of the user account

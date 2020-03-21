@@ -28,7 +28,7 @@ var (
 )
 
 // MerkleTreeABI is the input ABI used to generate the binding from.
-const MerkleTreeABI = "[{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"defaultHashes\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"tree\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"root\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"height\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"bytes[]\",\"name\":\"_dataBlocks\",\"type\":\"bytes[]\"}],\"name\":\"getMerkleRoot\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"_dataBlock\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"_path\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_siblings\",\"type\":\"bytes32[]\"}],\"name\":\"computeInclusionProofRoot\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_root\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"_dataBlock\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"_path\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_siblings\",\"type\":\"bytes32[]\"}],\"name\":\"verify\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"_dataBlock\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"_path\",\"type\":\"uint256\"}],\"name\":\"update\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_leaf\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_path\",\"type\":\"uint256\"}],\"name\":\"updateLeaf\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"_dataBlock\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"_path\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_siblings\",\"type\":\"bytes32[]\"}],\"name\":\"verifyAndStore\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"_dataBlock\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"_path\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_siblings\",\"type\":\"bytes32[]\"}],\"name\":\"store\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_leaf\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_path\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_siblings\",\"type\":\"bytes32[]\"}],\"name\":\"storeLeaf\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_leaf\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_path\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_root\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32[]\",\"name\":\"_siblings\",\"type\":\"bytes32[]\"}],\"name\":\"updateLeafWithSiblings\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_path\",\"type\":\"uint256\"}],\"name\":\"getSiblings\",\"outputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"\",\"type\":\"bytes32[]\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getRoot\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_root\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_height\",\"type\":\"uint256\"}],\"name\":\"setMerkleRootAndHeight\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_parent\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"_leftChild\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"_rightChild\",\"type\":\"bytes32\"}],\"name\":\"storeNode\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_intVal\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_index\",\"type\":\"uint256\"}],\"name\":\"getNthBitFromRight\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_parent\",\"type\":\"bytes32\"}],\"name\":\"getChildren\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_parent\",\"type\":\"bytes32\"}],\"name\":\"getLeftSiblingKey\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_parent\",\"type\":\"bytes32\"}],\"name\":\"getRightSiblingKey\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"}]"
+const MerkleTreeABI = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_mtLibAddress\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"constant\":true,\"inputs\":[],\"name\":\"tree\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"root\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"height\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"_dataBlock\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"_path\",\"type\":\"uint256\"}],\"name\":\"update\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_leaf\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_path\",\"type\":\"uint256\"}],\"name\":\"updateLeaf\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"_dataBlock\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"_path\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_siblings\",\"type\":\"bytes32[]\"}],\"name\":\"verifyAndStore\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"_dataBlock\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"_path\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_siblings\",\"type\":\"bytes32[]\"}],\"name\":\"store\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_leaf\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_path\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_siblings\",\"type\":\"bytes32[]\"}],\"name\":\"storeLeaf\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_path\",\"type\":\"uint256\"}],\"name\":\"getSiblings\",\"outputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"\",\"type\":\"bytes32[]\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"leaf\",\"type\":\"bytes32\"}],\"name\":\"appendLeaf\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getRoot\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_root\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_height\",\"type\":\"uint256\"}],\"name\":\"setMerkleRootAndHeight\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_parent\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"_leftChild\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"_rightChild\",\"type\":\"bytes32\"}],\"name\":\"storeNode\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_parent\",\"type\":\"bytes32\"}],\"name\":\"getChildren\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]"
 
 // MerkleTree is an auto generated Go binding around an Ethereum contract.
 type MerkleTree struct {
@@ -172,58 +172,6 @@ func (_MerkleTree *MerkleTreeTransactorRaw) Transact(opts *bind.TransactOpts, me
 	return _MerkleTree.Contract.contract.Transact(opts, method, params...)
 }
 
-// ComputeInclusionProofRoot is a free data retrieval call binding the contract method 0x99ae9309.
-//
-// Solidity: function computeInclusionProofRoot(bytes _dataBlock, uint256 _path, bytes32[] _siblings) constant returns(bytes32)
-func (_MerkleTree *MerkleTreeCaller) ComputeInclusionProofRoot(opts *bind.CallOpts, _dataBlock []byte, _path *big.Int, _siblings [][32]byte) ([32]byte, error) {
-	var (
-		ret0 = new([32]byte)
-	)
-	out := ret0
-	err := _MerkleTree.contract.Call(opts, out, "computeInclusionProofRoot", _dataBlock, _path, _siblings)
-	return *ret0, err
-}
-
-// ComputeInclusionProofRoot is a free data retrieval call binding the contract method 0x99ae9309.
-//
-// Solidity: function computeInclusionProofRoot(bytes _dataBlock, uint256 _path, bytes32[] _siblings) constant returns(bytes32)
-func (_MerkleTree *MerkleTreeSession) ComputeInclusionProofRoot(_dataBlock []byte, _path *big.Int, _siblings [][32]byte) ([32]byte, error) {
-	return _MerkleTree.Contract.ComputeInclusionProofRoot(&_MerkleTree.CallOpts, _dataBlock, _path, _siblings)
-}
-
-// ComputeInclusionProofRoot is a free data retrieval call binding the contract method 0x99ae9309.
-//
-// Solidity: function computeInclusionProofRoot(bytes _dataBlock, uint256 _path, bytes32[] _siblings) constant returns(bytes32)
-func (_MerkleTree *MerkleTreeCallerSession) ComputeInclusionProofRoot(_dataBlock []byte, _path *big.Int, _siblings [][32]byte) ([32]byte, error) {
-	return _MerkleTree.Contract.ComputeInclusionProofRoot(&_MerkleTree.CallOpts, _dataBlock, _path, _siblings)
-}
-
-// DefaultHashes is a free data retrieval call binding the contract method 0x48419ad8.
-//
-// Solidity: function defaultHashes(uint256 ) constant returns(bytes32)
-func (_MerkleTree *MerkleTreeCaller) DefaultHashes(opts *bind.CallOpts, arg0 *big.Int) ([32]byte, error) {
-	var (
-		ret0 = new([32]byte)
-	)
-	out := ret0
-	err := _MerkleTree.contract.Call(opts, out, "defaultHashes", arg0)
-	return *ret0, err
-}
-
-// DefaultHashes is a free data retrieval call binding the contract method 0x48419ad8.
-//
-// Solidity: function defaultHashes(uint256 ) constant returns(bytes32)
-func (_MerkleTree *MerkleTreeSession) DefaultHashes(arg0 *big.Int) ([32]byte, error) {
-	return _MerkleTree.Contract.DefaultHashes(&_MerkleTree.CallOpts, arg0)
-}
-
-// DefaultHashes is a free data retrieval call binding the contract method 0x48419ad8.
-//
-// Solidity: function defaultHashes(uint256 ) constant returns(bytes32)
-func (_MerkleTree *MerkleTreeCallerSession) DefaultHashes(arg0 *big.Int) ([32]byte, error) {
-	return _MerkleTree.Contract.DefaultHashes(&_MerkleTree.CallOpts, arg0)
-}
-
 // GetChildren is a free data retrieval call binding the contract method 0xd37684ff.
 //
 // Solidity: function getChildren(bytes32 _parent) constant returns(bytes32, bytes32)
@@ -252,110 +200,6 @@ func (_MerkleTree *MerkleTreeSession) GetChildren(_parent [32]byte) ([32]byte, [
 // Solidity: function getChildren(bytes32 _parent) constant returns(bytes32, bytes32)
 func (_MerkleTree *MerkleTreeCallerSession) GetChildren(_parent [32]byte) ([32]byte, [32]byte, error) {
 	return _MerkleTree.Contract.GetChildren(&_MerkleTree.CallOpts, _parent)
-}
-
-// GetLeftSiblingKey is a free data retrieval call binding the contract method 0xdf7c7263.
-//
-// Solidity: function getLeftSiblingKey(bytes32 _parent) constant returns(bytes32)
-func (_MerkleTree *MerkleTreeCaller) GetLeftSiblingKey(opts *bind.CallOpts, _parent [32]byte) ([32]byte, error) {
-	var (
-		ret0 = new([32]byte)
-	)
-	out := ret0
-	err := _MerkleTree.contract.Call(opts, out, "getLeftSiblingKey", _parent)
-	return *ret0, err
-}
-
-// GetLeftSiblingKey is a free data retrieval call binding the contract method 0xdf7c7263.
-//
-// Solidity: function getLeftSiblingKey(bytes32 _parent) constant returns(bytes32)
-func (_MerkleTree *MerkleTreeSession) GetLeftSiblingKey(_parent [32]byte) ([32]byte, error) {
-	return _MerkleTree.Contract.GetLeftSiblingKey(&_MerkleTree.CallOpts, _parent)
-}
-
-// GetLeftSiblingKey is a free data retrieval call binding the contract method 0xdf7c7263.
-//
-// Solidity: function getLeftSiblingKey(bytes32 _parent) constant returns(bytes32)
-func (_MerkleTree *MerkleTreeCallerSession) GetLeftSiblingKey(_parent [32]byte) ([32]byte, error) {
-	return _MerkleTree.Contract.GetLeftSiblingKey(&_MerkleTree.CallOpts, _parent)
-}
-
-// GetMerkleRoot is a free data retrieval call binding the contract method 0x40ff34ef.
-//
-// Solidity: function getMerkleRoot(bytes[] _dataBlocks) constant returns(bytes32)
-func (_MerkleTree *MerkleTreeCaller) GetMerkleRoot(opts *bind.CallOpts, _dataBlocks [][]byte) ([32]byte, error) {
-	var (
-		ret0 = new([32]byte)
-	)
-	out := ret0
-	err := _MerkleTree.contract.Call(opts, out, "getMerkleRoot", _dataBlocks)
-	return *ret0, err
-}
-
-// GetMerkleRoot is a free data retrieval call binding the contract method 0x40ff34ef.
-//
-// Solidity: function getMerkleRoot(bytes[] _dataBlocks) constant returns(bytes32)
-func (_MerkleTree *MerkleTreeSession) GetMerkleRoot(_dataBlocks [][]byte) ([32]byte, error) {
-	return _MerkleTree.Contract.GetMerkleRoot(&_MerkleTree.CallOpts, _dataBlocks)
-}
-
-// GetMerkleRoot is a free data retrieval call binding the contract method 0x40ff34ef.
-//
-// Solidity: function getMerkleRoot(bytes[] _dataBlocks) constant returns(bytes32)
-func (_MerkleTree *MerkleTreeCallerSession) GetMerkleRoot(_dataBlocks [][]byte) ([32]byte, error) {
-	return _MerkleTree.Contract.GetMerkleRoot(&_MerkleTree.CallOpts, _dataBlocks)
-}
-
-// GetNthBitFromRight is a free data retrieval call binding the contract method 0xdb0787cb.
-//
-// Solidity: function getNthBitFromRight(uint256 _intVal, uint256 _index) constant returns(uint8)
-func (_MerkleTree *MerkleTreeCaller) GetNthBitFromRight(opts *bind.CallOpts, _intVal *big.Int, _index *big.Int) (uint8, error) {
-	var (
-		ret0 = new(uint8)
-	)
-	out := ret0
-	err := _MerkleTree.contract.Call(opts, out, "getNthBitFromRight", _intVal, _index)
-	return *ret0, err
-}
-
-// GetNthBitFromRight is a free data retrieval call binding the contract method 0xdb0787cb.
-//
-// Solidity: function getNthBitFromRight(uint256 _intVal, uint256 _index) constant returns(uint8)
-func (_MerkleTree *MerkleTreeSession) GetNthBitFromRight(_intVal *big.Int, _index *big.Int) (uint8, error) {
-	return _MerkleTree.Contract.GetNthBitFromRight(&_MerkleTree.CallOpts, _intVal, _index)
-}
-
-// GetNthBitFromRight is a free data retrieval call binding the contract method 0xdb0787cb.
-//
-// Solidity: function getNthBitFromRight(uint256 _intVal, uint256 _index) constant returns(uint8)
-func (_MerkleTree *MerkleTreeCallerSession) GetNthBitFromRight(_intVal *big.Int, _index *big.Int) (uint8, error) {
-	return _MerkleTree.Contract.GetNthBitFromRight(&_MerkleTree.CallOpts, _intVal, _index)
-}
-
-// GetRightSiblingKey is a free data retrieval call binding the contract method 0xe913e47f.
-//
-// Solidity: function getRightSiblingKey(bytes32 _parent) constant returns(bytes32)
-func (_MerkleTree *MerkleTreeCaller) GetRightSiblingKey(opts *bind.CallOpts, _parent [32]byte) ([32]byte, error) {
-	var (
-		ret0 = new([32]byte)
-	)
-	out := ret0
-	err := _MerkleTree.contract.Call(opts, out, "getRightSiblingKey", _parent)
-	return *ret0, err
-}
-
-// GetRightSiblingKey is a free data retrieval call binding the contract method 0xe913e47f.
-//
-// Solidity: function getRightSiblingKey(bytes32 _parent) constant returns(bytes32)
-func (_MerkleTree *MerkleTreeSession) GetRightSiblingKey(_parent [32]byte) ([32]byte, error) {
-	return _MerkleTree.Contract.GetRightSiblingKey(&_MerkleTree.CallOpts, _parent)
-}
-
-// GetRightSiblingKey is a free data retrieval call binding the contract method 0xe913e47f.
-//
-// Solidity: function getRightSiblingKey(bytes32 _parent) constant returns(bytes32)
-func (_MerkleTree *MerkleTreeCallerSession) GetRightSiblingKey(_parent [32]byte) ([32]byte, error) {
-	return _MerkleTree.Contract.GetRightSiblingKey(&_MerkleTree.CallOpts, _parent)
 }
 
 // GetRoot is a free data retrieval call binding the contract method 0x5ca1e165.
@@ -446,30 +290,25 @@ func (_MerkleTree *MerkleTreeCallerSession) Tree() (struct {
 	return _MerkleTree.Contract.Tree(&_MerkleTree.CallOpts)
 }
 
-// Verify is a free data retrieval call binding the contract method 0x30d90a76.
+// AppendLeaf is a paid mutator transaction binding the contract method 0x9c891b08.
 //
-// Solidity: function verify(bytes32 _root, bytes _dataBlock, uint256 _path, bytes32[] _siblings) constant returns(bool)
-func (_MerkleTree *MerkleTreeCaller) Verify(opts *bind.CallOpts, _root [32]byte, _dataBlock []byte, _path *big.Int, _siblings [][32]byte) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _MerkleTree.contract.Call(opts, out, "verify", _root, _dataBlock, _path, _siblings)
-	return *ret0, err
+// Solidity: function appendLeaf(bytes32 leaf) returns(bytes32)
+func (_MerkleTree *MerkleTreeTransactor) AppendLeaf(opts *bind.TransactOpts, leaf [32]byte) (*types.Transaction, error) {
+	return _MerkleTree.contract.Transact(opts, "appendLeaf", leaf)
 }
 
-// Verify is a free data retrieval call binding the contract method 0x30d90a76.
+// AppendLeaf is a paid mutator transaction binding the contract method 0x9c891b08.
 //
-// Solidity: function verify(bytes32 _root, bytes _dataBlock, uint256 _path, bytes32[] _siblings) constant returns(bool)
-func (_MerkleTree *MerkleTreeSession) Verify(_root [32]byte, _dataBlock []byte, _path *big.Int, _siblings [][32]byte) (bool, error) {
-	return _MerkleTree.Contract.Verify(&_MerkleTree.CallOpts, _root, _dataBlock, _path, _siblings)
+// Solidity: function appendLeaf(bytes32 leaf) returns(bytes32)
+func (_MerkleTree *MerkleTreeSession) AppendLeaf(leaf [32]byte) (*types.Transaction, error) {
+	return _MerkleTree.Contract.AppendLeaf(&_MerkleTree.TransactOpts, leaf)
 }
 
-// Verify is a free data retrieval call binding the contract method 0x30d90a76.
+// AppendLeaf is a paid mutator transaction binding the contract method 0x9c891b08.
 //
-// Solidity: function verify(bytes32 _root, bytes _dataBlock, uint256 _path, bytes32[] _siblings) constant returns(bool)
-func (_MerkleTree *MerkleTreeCallerSession) Verify(_root [32]byte, _dataBlock []byte, _path *big.Int, _siblings [][32]byte) (bool, error) {
-	return _MerkleTree.Contract.Verify(&_MerkleTree.CallOpts, _root, _dataBlock, _path, _siblings)
+// Solidity: function appendLeaf(bytes32 leaf) returns(bytes32)
+func (_MerkleTree *MerkleTreeTransactorSession) AppendLeaf(leaf [32]byte) (*types.Transaction, error) {
+	return _MerkleTree.Contract.AppendLeaf(&_MerkleTree.TransactOpts, leaf)
 }
 
 // SetMerkleRootAndHeight is a paid mutator transaction binding the contract method 0x5c22b6d9.
@@ -596,27 +435,6 @@ func (_MerkleTree *MerkleTreeSession) UpdateLeaf(_leaf [32]byte, _path *big.Int)
 // Solidity: function updateLeaf(bytes32 _leaf, uint256 _path) returns()
 func (_MerkleTree *MerkleTreeTransactorSession) UpdateLeaf(_leaf [32]byte, _path *big.Int) (*types.Transaction, error) {
 	return _MerkleTree.Contract.UpdateLeaf(&_MerkleTree.TransactOpts, _leaf, _path)
-}
-
-// UpdateLeafWithSiblings is a paid mutator transaction binding the contract method 0x240d1a5a.
-//
-// Solidity: function updateLeafWithSiblings(bytes32 _leaf, uint256 _path, bytes32 _root, bytes32[] _siblings) returns(bytes32)
-func (_MerkleTree *MerkleTreeTransactor) UpdateLeafWithSiblings(opts *bind.TransactOpts, _leaf [32]byte, _path *big.Int, _root [32]byte, _siblings [][32]byte) (*types.Transaction, error) {
-	return _MerkleTree.contract.Transact(opts, "updateLeafWithSiblings", _leaf, _path, _root, _siblings)
-}
-
-// UpdateLeafWithSiblings is a paid mutator transaction binding the contract method 0x240d1a5a.
-//
-// Solidity: function updateLeafWithSiblings(bytes32 _leaf, uint256 _path, bytes32 _root, bytes32[] _siblings) returns(bytes32)
-func (_MerkleTree *MerkleTreeSession) UpdateLeafWithSiblings(_leaf [32]byte, _path *big.Int, _root [32]byte, _siblings [][32]byte) (*types.Transaction, error) {
-	return _MerkleTree.Contract.UpdateLeafWithSiblings(&_MerkleTree.TransactOpts, _leaf, _path, _root, _siblings)
-}
-
-// UpdateLeafWithSiblings is a paid mutator transaction binding the contract method 0x240d1a5a.
-//
-// Solidity: function updateLeafWithSiblings(bytes32 _leaf, uint256 _path, bytes32 _root, bytes32[] _siblings) returns(bytes32)
-func (_MerkleTree *MerkleTreeTransactorSession) UpdateLeafWithSiblings(_leaf [32]byte, _path *big.Int, _root [32]byte, _siblings [][32]byte) (*types.Transaction, error) {
-	return _MerkleTree.Contract.UpdateLeafWithSiblings(&_MerkleTree.TransactOpts, _leaf, _path, _root, _siblings)
 }
 
 // VerifyAndStore is a paid mutator transaction binding the contract method 0x4359356d.

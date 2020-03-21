@@ -1,30 +1,15 @@
 [
     {
-      "inputs": [],
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_mtLibAddress",
+          "type": "address"
+        }
+      ],
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "constructor"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "defaultHashes",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
     },
     {
       "constant": true,
@@ -44,94 +29,6 @@
       ],
       "payable": false,
       "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "internalType": "bytes[]",
-          "name": "_dataBlocks",
-          "type": "bytes[]"
-        }
-      ],
-      "name": "getMerkleRoot",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "internalType": "bytes",
-          "name": "_dataBlock",
-          "type": "bytes"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_path",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bytes32[]",
-          "name": "_siblings",
-          "type": "bytes32[]"
-        }
-      ],
-      "name": "computeInclusionProofRoot",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "pure",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "_root",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "bytes",
-          "name": "_dataBlock",
-          "type": "bytes"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_path",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bytes32[]",
-          "name": "_siblings",
-          "type": "bytes32[]"
-        }
-      ],
-      "name": "verify",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "pure",
       "type": "function"
     },
     {
@@ -250,42 +147,6 @@
       "type": "function"
     },
     {
-      "constant": false,
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "_leaf",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_path",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "_root",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "bytes32[]",
-          "name": "_siblings",
-          "type": "bytes32[]"
-        }
-      ],
-      "name": "updateLeafWithSiblings",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "constant": true,
       "inputs": [
         {
@@ -304,6 +165,27 @@
       ],
       "payable": false,
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "leaf",
+          "type": "bytes32"
+        }
+      ],
+      "name": "appendLeaf",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -370,32 +252,6 @@
       "constant": true,
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "_intVal",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_index",
-          "type": "uint256"
-        }
-      ],
-      "name": "getNthBitFromRight",
-      "outputs": [
-        {
-          "internalType": "uint8",
-          "name": "",
-          "type": "uint8"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "pure",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
           "internalType": "bytes32",
           "name": "_parent",
           "type": "bytes32"
@@ -416,48 +272,6 @@
       ],
       "payable": false,
       "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "_parent",
-          "type": "bytes32"
-        }
-      ],
-      "name": "getLeftSiblingKey",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "pure",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "_parent",
-          "type": "bytes32"
-        }
-      ],
-      "name": "getRightSiblingKey",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "pure",
       "type": "function"
     }
   ]
