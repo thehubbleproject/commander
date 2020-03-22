@@ -32,12 +32,19 @@ func NewUserAccount(id, balance, tokenType, nonce uint64) UserAccount {
 	}
 }
 
-func (acc *UserAccount) ToABIAccount() rollup.DataTypesAccount {
-	return rollup.DataTypesAccount{
-		ID:        UintToBigInt(acc.id),
+func (acc *UserAccount) ToABIAccount() rollup.DataTypesUserAccount {
+	return rollup.DataTypesUserAccount{
+		ID:        UintToBigInt(acc.ID),
 		Balance:   UintToBigInt(acc.Balance),
 		TokenType: UintToBigInt(acc.TokenType),
 		Nonce:     UintToBigInt(acc.Nonce),
+	}
+}
+
+func (acc *UserAccount) AccountInclusionProof(path int64) rollup.DataTypesAccountInclusionProof {
+	return rollup.DataTypesAccountInclusionProof{
+		PathToAccount: big.NewInt(path),
+		Account:       acc.ToABIAccount(),
 	}
 }
 
@@ -58,7 +65,7 @@ func (acc *UserAccount) ABIEncode() []byte {
 		},
 	}
 	bytes, _ := arguments.Pack(
-		big.NewInt(int64(acc.Path)),
+		big.NewInt(int64(acc.ID)),
 		big.NewInt(int64(acc.Balance)),
 		big.NewInt(int64(acc.TokenType)),
 		big.NewInt(int64(acc.Nonce)),
