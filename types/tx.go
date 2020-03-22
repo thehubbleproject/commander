@@ -15,14 +15,17 @@ import (
 type Tx struct {
 	gorm.Model
 
-	To     uint64 `bson:"to"`
-	From   uint64 `bson:"from"`
-	Amount uint64 `bson:"amount"`
-	Nonce  uint64 `bson:"nonce"`
-	// Fee       uint64
-	TxType    uint64 `bson:"type"`
-	Signature string `bson:"sig"`
-	Status    string `bson:"status"`
+	ToID      uint64 `json:"to"`
+	FromID    uint64 `json:"from"`
+	Amount    uint64 `json:"amount"`
+	Nonce     uint64 `json:"nonce"`
+	TokenID   uint64 `json:"tokenID"`
+	Signature string `json:"sig"`
+
+	// 100 Pending
+	// 200 Processing
+	// 300 Processed
+	Status uint `json:"status"`
 }
 
 // NewTx creates a new transaction

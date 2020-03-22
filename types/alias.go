@@ -9,6 +9,9 @@ import (
 
 type ByteArray [32]byte
 
+type Hash ethCmn.Hash
+type Address ethCmn.Address
+
 func HexToByteArray(a string) (b ByteArray, err error) {
 	bz, err := hex.DecodeString(a)
 	if err != nil {
@@ -22,9 +25,6 @@ func BytesToByteArray(bz []byte) ByteArray {
 	copy(temp[:], bz)
 	return temp
 }
-
-type Hash ethCmn.Hash
-type Address ethCmn.Address
 
 //
 // utils

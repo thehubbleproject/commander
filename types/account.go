@@ -6,10 +6,13 @@ import (
 	"github.com/BOPR/common"
 	"github.com/BOPR/contracts/rollup"
 	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/jinzhu/gorm"
 )
 
 // UserAccount is the user data stored on the node per user
 type UserAccount struct {
+	gorm.Model
+
 	// ID is the path of the user account in the PDA Tree
 	// Cannot be changed once created
 	ID uint64
