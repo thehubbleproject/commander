@@ -1,7 +1,6 @@
 package listener
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"time"
@@ -13,7 +12,6 @@ import (
 	ethCmn "github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 
-	rollupContract "github.com/BOPR/contracts/rollup"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 )
 
@@ -73,7 +71,10 @@ func NewSyncer() Syncer {
 // OnStart starts new block subscription
 func (s *Syncer) OnStart() error {
 	// Always call the overridden method.
-	s.BaseService.OnStart()
+	err := s.BaseService.OnStart()
+	if err != nil {
+		return err
+	}
 
 	// create cancellable context
 	ctx, cancelSubscription := context.WithCancel(context.Background())
@@ -195,13 +196,13 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 		s.Logger.Debug("New logs found", "numberOfLogs", len(logs))
 	}
 
-	// log
+	// TODO test if this works if one block has more than one log
 	for _, vLog := range logs {
 		topic := vLog.Topics[0].Bytes()
 		for _, abiObject := range s.abis {
 			selectedEvent := EventByID(abiObject, topic)
 			if selectedEvent != nil {
-				s.Logger.Debug("selectedEvent ", " event name -", selectedEvent.Name)
+				s.Logger.Debug("Found an event", "name", selectedEvent.Name)
 				switch selectedEvent.Name {
 				case "deposit":
 					s.processDeposit(selectedEvent.Name, abiObject, &vLog)
@@ -210,47 +211,9 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 				case "newAccount":
 					s.processNewAccount(selectedEvent.Name, abiObject, &vLog)
 				}
+				// break the inner loop
 				break
 			}
 		}
 	}
-}
-
-func (s *Syncer) processDeposit(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
-	s.Logger.Info("New deposit found")
-	// add deposit to the account DB
-
-}
-
-func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
-	s.Logger.Info("New batch found")
-	// event := new(rollupContract.RollupNewBatch)
-	// types.NewBatch(event.UpdatedRoot, event.Comm)
-
-}
-
-func (s *Syncer) processNewAccount(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
-	s.Logger.Info("New account found")
-	event := new(rollupContract.RollupNewAccount)
-	if err := common.UnpackLog(abiObject, event, eventName, vLog); err != nil {
-		fmt.Println("error => ", err)
-	}
-
-	acc := types.NewUserAccount(event.Index.Uint64(), 0, 0, 0)
-
-	// add account to the DB
-	err := s.DBInstance.InsertAccount(acc)
-	if err != nil {
-		fmt.Println("error => ", err)
-	}
-}
-
-// EventByID
-func EventByID(abiObject *abi.ABI, sigdata []byte) *abi.Event {
-	for _, event := range abiObject.Events {
-		if bytes.Equal(event.ID().Bytes(), sigdata) {
-			return &event
-		}
-	}
-	return nil
 }
