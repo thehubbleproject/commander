@@ -18,11 +18,14 @@ func init() {
 			if !db.HasTable(&types.Batch{}) {
 				db.CreateTable(&types.Batch{})
 			}
-			if !db.HasTable(&types.BatchInfo{}) {
-				db.CreateTable(&types.BatchInfo{})
+			if !db.HasTable(&types.Params{}) {
+				db.CreateTable(&types.Params{})
 			}
 			if !db.HasTable(&types.ListenerLog{}) {
 				db.CreateTable(&types.ListenerLog{})
+			}
+			if !db.HasTable(&types.Token{}) {
+				db.CreateTable(&types.Token{})
 			}
 
 			return nil
