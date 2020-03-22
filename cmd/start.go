@@ -90,21 +90,21 @@ func StartCmd() *cobra.Command {
 				// TODO start syncer
 			} else {
 				// fetch 0 root from the contract
-				root, err := types.ContractCallerObj.FetchBalanceTreeRoot()
-				common.PanicIfError(err)
+				// root, err := types.ContractCallerObj.FetchBalanceTreeRoot()
+				// common.PanicIfError(err)
 
-				// get the number of batches we have stored
-				storedBatchCount, err := db.DBInstance.GetBatchCount()
-				if err != nil {
-					panic(err)
-				}
+				// // get the number of batches we have stored
+				// storedBatchCount, err := db.DBInstance.GetBatchCount()
+				// if err != nil {
+				// 	panic(err)
+				// }
 
-				// figure out if we need to add adccounts
-				if storedBatchCount == 0 {
-					// persist batch info to DB
-					err = db.DBInstance.InsertBatchInfo(root, uint64(batchCount))
-					common.PanicIfError(err)
-				}
+				// // figure out if we need to add adccounts
+				// if storedBatchCount == 0 {
+				// 	// persist batch info to DB
+				// 	err = db.DBInstance.InsertBatchInfo(root, uint64(batchCount))
+				// 	common.PanicIfError(err)
+				// }
 
 				storedAccCount, err := db.DBInstance.GetAccountCount()
 				if err != nil {
@@ -149,6 +149,8 @@ func StartCmd() *cobra.Command {
 
 			r := mux.NewRouter()
 			r.HandleFunc("/tx", rest.TxReceiverHandler).Methods("POST")
+			r.HandleFunc("/account", rest.GetAccountHandler).Methods("GET")
+
 			http.Handle("/", r)
 
 			if err := aggregator.Start(); err != nil {

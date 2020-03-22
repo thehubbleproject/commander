@@ -32,10 +32,10 @@ func (db *DB) GetAllAccounts() (accs []types.UserAccount, err error) {
 }
 
 // GetAccount gets the account of the given path from the DB
-func (db *DB) GetAccount(accID uint64) (types.UserAccount, error) {
+func (db *DB) GetAccount(ID uint64) (types.UserAccount, error) {
 	var account types.UserAccount
-	if db.Instance.First(&account, accID).RecordNotFound() {
-		return account, ErrRecordNotFound(fmt.Sprintf("unable to find record for accountID: %d", accID))
+	if db.Instance.First(&account, ID).RecordNotFound() {
+		return account, ErrRecordNotFound(fmt.Sprintf("unable to find record for accountID: %d", ID))
 	}
 	return account, nil
 }
@@ -49,7 +49,7 @@ func (db *DB) InsertBulkAccounts(accounts []types.UserAccount) error {
 	for _, account := range accounts {
 		err := db.InsertAccount(account)
 		if err != nil {
-			return ErrUnableToCreateRecord(fmt.Sprintf("Unable to add account with ID:%v to DB", account.Path))
+			return ErrUnableToCreateRecord(fmt.Sprintf("Unable to add account with ID:%v to DB", account.ID))
 		}
 	}
 	return nil

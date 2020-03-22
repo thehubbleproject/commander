@@ -26,7 +26,7 @@ func (db *DB) PopTxs() (txs []types.Tx, err error) {
 	var pendingTxs []types.Tx
 
 	// select N number of transactions which are pending in mempool and
-	if err := tx.Limit(3).Where(&types.Tx{Status: "pending"}).Find(&pendingTxs).Error; err != nil {
+	if err := tx.Limit(3).Where(&types.Tx{Status: 100}).Find(&pendingTxs).Error; err != nil {
 		fmt.Println("error while fetching pending transactions", err)
 		return txs, err
 	}

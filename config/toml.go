@@ -9,7 +9,6 @@ import (
 const defaultConfigTemplate = `# This is a TOML config file.
 
 ##### RPC configrations #####
-
 # RPC endpoint for ethereum chain
 eth_RPC_URL = "{{ .EthRPC }}"
 
@@ -23,19 +22,20 @@ db_log_mode = "{{ .DBLogMode }}"
 server_port = "{{ .ServerPort }}"
 polling_interval = "{{ .PollingInterval }}"
 
-
-confirmation_blocks = "{{ .ConfirmationBlocks }}"
-
-##### Contract Addresses #####
-rollup_address = "{{ .RollupAddress }}"
-merkle_lib_address = "{{ .MerkleTreeLibAddress }}"
-
 #### Keystore #####
 operator_key = "{{ .OperatorKey }}"
 operator_address = "{{ .OperatorAddress }}"
 
 #### Syncer settings #####
 last_recorded_block = "{{ .LastRecordedBlock }}"
+confirmation_blocks = "{{ .ConfirmationBlocks }}"
+
+##### Contract Addresses #####
+rollup_address = "{{ .RollupAddress }}"
+balance_tree_address = "{{ .BalanceTreeAddress }}"
+account_tree_address = "{{ .AccountTreeAddress }}"
+merkle_lib_address = "{{ .MerkleTreeLibAddress }}"
+token_registry_address = "{{ .TokenRegistryAddress }}"
 `
 
 var configTemplate *template.Template

@@ -38,15 +38,20 @@ type Configuration struct {
 	Trace     bool   `mapstructure:"trace"`
 	DBLogMode bool   `mapstructure:"db_log_mode"`
 
-	EthRPC               string        `mapstructure:"eth_RPC_URL"`
-	PollingInterval      time.Duration `mapstructure:"polling_interval"`
-	ServerPort           string        `mapstructure:"server_port"`
-	ConfirmationBlocks   uint64        `mapstructure:"confirmation_blocks"` // Number of blocks for confirmation
-	RollupAddress        string        `mapstructure:"rollup_address"`
-	MerkleTreeLibAddress string        `mapstructure:"merkle_lib_address"`
-	OperatorKey          string        `mapstructure:"operator_key"`
-	OperatorAddress      string        `mapstructure:"operator_address"`
-	LastRecordedBlock    string        `mapstructure:"last_recorded_block"`
+	EthRPC             string        `mapstructure:"eth_RPC_URL"`
+	PollingInterval    time.Duration `mapstructure:"polling_interval"`
+	ServerPort         string        `mapstructure:"server_port"`
+	ConfirmationBlocks uint64        `mapstructure:"confirmation_blocks"` // Number of blocks for confirmation
+
+	RollupAddress        string `mapstructure:"rollup_address"`
+	BalanceTreeAddress   string `mapstructure:"balance_tree_address"`
+	AccountTreeAddress   string `mapstructure:"account_tree_address"`
+	MerkleTreeLibAddress string `mapstructure:"merkle_lib_address"`
+	TokenRegistryAddress string `mapstructure:"token_registry_address"`
+
+	OperatorKey       string `mapstructure:"operator_key"`
+	OperatorAddress   string `mapstructure:"operator_address"`
+	LastRecordedBlock string `mapstructure:"last_recorded_block"`
 }
 
 // GetDefaultConfig returns the default configration options
@@ -61,7 +66,10 @@ func GetDefaultConfig() Configuration {
 		ServerPort:           DefaultSeverPort,
 		ConfirmationBlocks:   DefaultConfirmationBlocks,
 		RollupAddress:        ethCmn.Address{}.String(),
+		BalanceTreeAddress:   ethCmn.Address{}.String(),
+		AccountTreeAddress:   ethCmn.Address{}.String(),
 		MerkleTreeLibAddress: ethCmn.Address{}.String(),
+		TokenRegistryAddress: ethCmn.Address{}.String(),
 		OperatorKey:          "",
 		OperatorAddress:      "",
 		LastRecordedBlock:    "0",

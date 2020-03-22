@@ -5,7 +5,10 @@ import (
 	"fmt"
 
 	"github.com/BOPR/contracts/rollup"
+	ethCmn "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/jinzhu/gorm"
+	"golang.org/x/crypto/sha3"
 )
 
 // Tx represets the transaction on BOPRU
@@ -18,21 +21,43 @@ type Tx struct {
 	Nonce     uint64 `json:"nonce"`
 	TokenID   uint64 `json:"tokenID"`
 	Signature string `json:"sig"`
-
+	TxHash    Hash   `json:"hash"`
 	// 100 Pending
 	// 200 Processing
 	// 300 Processed
+	// 400 reverted
 	Status uint `json:"status"`
 }
 
 // NewTx creates a new transaction
-func NewTx(to uint64, from uint64, amount uint64, nonce uint64, sig string) Tx {
+func NewTx(to uint64, from uint64, amount uint64, nonce uint64, sig string, tokenID uint64) Tx {
 	return Tx{
 		To:        to,
 		From:      from,
 		Amount:    amount,
 		Nonce:     nonce,
-		TokenID:   1,
+		TokenID:   tokenID,
+		Signature: sig,
+	}
+}
+
+// NewTx creates a new transaction
+func (t *Tx) AssignHash() Hash {
+	if ethCmn.Hash(t.TxHash).String() != "" {
+		return t.TxHash
+	}
+
+	return rlpHash(t)
+}
+
+// NewPendingTx creates a new transaction
+func NewPendingTx(to uint64, from uint64, amount uint64, nonce uint64, sig string, tokenID uint64) Tx {
+	return Tx{
+		To:        to,
+		From:      from,
+		Amount:    amount,
+		Nonce:     nonce,
+		TokenID:   tokenID,
 		Signature: sig,
 		Status:    100,
 	}
@@ -52,7 +77,7 @@ func (t *Tx) ValidateBasic() error {
 	}
 
 	// check amount is greater than 0
-	if t.Amount <= 0 {
+	if t.Amount == 0 {
 		return errors.New("Invalid amount. Cannot be less than 0")
 	}
 
@@ -75,7 +100,7 @@ func (t *Tx) ValidateBasic() error {
 }
 
 func (t *Tx) String() string {
-	return fmt.Sprintf("To: %v From: %v Amount: %v Nonce: %v Type:%v Status:%v", t.To, t.From, t.Amount, t.Nonce, t.TxType, t.Status)
+	return fmt.Sprintf("To: %v From: %v Amount: %v Nonce: %v Type:%v Status:%v", t.To, t.From, t.Amount, t.Nonce, t.TokenID, t.Status)
 }
 
 // MinimalTx constructs minimal tx from normal tx
@@ -167,3 +192,10 @@ func (t *Tx) ToABIVersion(from, to rollup.DataTypesUserAccount) rollup.DataTypes
 // func (t *MinimalTx) String() string {
 // 	return fmt.Sprintf("To: %v From: %v Amount: %v Nonce: %v Type:%v Sig:%v", t.To, t.From, t.Amount, t.Nonce, t.TxType, t.Signature)
 // }
+
+func rlpHash(x interface{}) (h Hash) {
+	hw := sha3.NewLegacyKeccak256()
+	rlp.Encode(hw, x)
+	hw.Sum(h[:0])
+	return h
+}

@@ -7,7 +7,6 @@ import (
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 
-	"github.com/BOPR/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -95,14 +94,14 @@ func AddGenesisAcccountsCmd() *cobra.Command {
 			}
 			// init global config
 			config.GlobalCfg = cfg
-			genAccs, err := config.ReadGenesisFile()
-			common.PanicIfError(err)
-			contractCaller, err := types.NewContractCaller()
-			for _, genAcc := range genAccs.Accounts {
-				err := contractCaller.AddAccount(types.NewUserAccount(genAcc.Path, genAcc.Balance, genAcc.TokenType, genAcc.Nonce))
-				common.PanicIfError(err)
-			}
-			common.PanicIfError(err)
+			// genAccs, err := config.ReadGenesisFile()
+			// common.PanicIfError(err)
+			// contractCaller, err := types.NewContractCaller()
+			// for _, genAcc := range genAccs.Accounts {
+			// 	err := contractCaller.AddAccount(types.NewUserAccount(genAcc.Path, genAcc.Balance, genAcc.TokenType, genAcc.Nonce))
+			// 	common.PanicIfError(err)
+			// }
+			// common.PanicIfError(err)
 		},
 	}
 }

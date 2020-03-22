@@ -20,7 +20,7 @@ import (
 // Syncer to sync events from ethereum chain
 type Syncer struct {
 	// Base service
-	BaseService
+	types.BaseService
 
 	// ABIs
 	abis []*abi.ABI
@@ -48,7 +48,7 @@ func NewSyncer() Syncer {
 	syncerService := &Syncer{}
 
 	// create new base service
-	syncerService.BaseService = *NewBaseService(logger, SyncerServiceName, syncerService)
+	syncerService.BaseService = *types.NewBaseService(logger, SyncerServiceName, syncerService)
 
 	contractCaller, err := types.NewContractCaller()
 	if err != nil {
@@ -100,6 +100,8 @@ func (s *Syncer) OnStart() error {
 
 // OnStop stops all necessary go routines
 func (s *Syncer) OnStop() {
+
+	fmt.Println("Stopping services")
 	s.BaseService.OnStop() // Always call the overridden method.
 
 	// cancel subscription if any

@@ -24,6 +24,10 @@ type UserAccount struct {
 	Balance uint64
 	// Nonce of the account
 	Nonce uint64
+
+	// Path from root to leaf
+	// NOTE: not a part of the leaf
+	Path uint
 }
 
 func NewUserAccount(id, balance, tokenType, nonce uint64) UserAccount {

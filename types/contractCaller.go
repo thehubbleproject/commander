@@ -2,7 +2,6 @@ package types
 
 import (
 	"context"
-	"fmt"
 	big "math/big"
 	"strings"
 
@@ -25,11 +24,6 @@ import (
 // IContractCaller is the common interface using which we will interact with the contracts
 // and the ethereum chain
 type IContractCaller interface {
-	SubmitBatch(txs []Tx)
-	TotalBatches() uint64
-	FetchBatchWithIndex(uint64) (Batch, error)
-	AddAccount(acc UserAccount) error
-	GetMainChainBlock(blockNum *big.Int) (header *ethTypes.Header, err error)
 }
 
 // TODO use context to remove this completely
@@ -85,35 +79,6 @@ func NewContractCaller() (contractCaller ContractCaller, err error) {
 	return contractCaller, nil
 }
 
-func GenerateAuthObj(client *ethclient.Client, callMsg ethereum.CallMsg) (auth *bind.TransactOpts, err error) {
-
-	// from address
-	fromAddress := config.OperatorAddress()
-
-	// fetch gas price
-	gasprice, err := client.SuggestGasPrice(context.Background())
-	if err != nil {
-		return
-	}
-	// fetch nonce
-	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
-	if err != nil {
-		return
-	}
-
-	// fetch gas limit
-	callMsg.From = fromAddress
-	gasLimit, err := client.EstimateGas(context.Background(), callMsg)
-
-	// create auth
-	auth = bind.NewKeyedTransactor(config.OperatorKey)
-	auth.GasPrice = gasprice
-	auth.Nonce = big.NewInt(int64(nonce))
-	auth.GasLimit = uint64(gasLimit) // uint64(gasLimit)
-
-	return
-}
-
 // get main chain block header
 func (c *ContractCaller) GetMainChainBlock(blockNum *big.Int) (header *ethTypes.Header, err error) {
 	latestBlock, err := c.EthClient.HeaderByNumber(context.Background(), blockNum)
@@ -149,31 +114,6 @@ func (c *ContractCaller) FetchBalanceTreeRoot() (ByteArray, error) {
 	return root, nil
 }
 
-// AddAccount adds an account to the merkle tree in the contract
-func (c *ContractCaller) AddAccount(acc UserAccount) error {
-	data, err := c.RollupContractABI.Pack("addAccount", acc.ToABIAccount())
-	if err != nil {
-		fmt.Println("Unable to pack tx for submitHeaderBlock", "error", err)
-		return err
-	}
-	callMsg := ethereum.CallMsg{
-		To:   &c.RollupContractAddress,
-		Data: data,
-	}
-	auth, err := GenerateAuthObj(c.EthClient, callMsg)
-	if err != nil {
-		return err
-	}
-
-	tx, err := c.RollupContract.AddAccount(auth, acc.ToABIAccount())
-	if err != nil {
-		return err
-	}
-
-	fmt.Println("Added account to the treee", "txHash", tx.Hash().String())
-	return nil
-}
-
 // ProcessTx calls the ProcessTx function on the contract to verify the tx
 // returns the updated accounts and the new balance root
 func (c *ContractCaller) ProcessTx(balanceTreeRoot ByteArray, tx Tx, fromMerkleProof, toMerkleProof MerkleProof) (newBalanceRoot ByteArray, from, to UserAccount, err error) {
@@ -185,24 +125,52 @@ func (c *ContractCaller) ProcessTx(balanceTreeRoot ByteArray, tx Tx, fromMerkleP
 	// 	return
 	// }
 
-	data, err := c.RollupContractABI.Pack("processTxUpdate", balanceTreeRoot,
-		tx.ToABIVersion(fromMerkleProof.Account.ToABIAccount(), toMerkleProof.Account.ToABIAccount()),
-		fromMerkleProof.ToABIVersion(),
-		toMerkleProof.ToABIVersion())
+	// data, err := c.RollupContractABI.Pack("processTxUpdate", balanceTreeRoot,
+	// 	tx.ToABIVersion(fromMerkleProof.Account.ToABIAccount(), toMerkleProof.Account.ToABIAccount()),
+	// 	fromMerkleProof.ToABIVersion(),
+	// 	toMerkleProof.ToABIVersion())
+	// if err != nil {
+	// 	fmt.Println("Unable to pack tx for submitHeaderBlock", "error", err)
+	// 	return
+	// }
+	// callMsg := ethereum.CallMsg{
+	// 	To:   &c.RollupContractAddress,
+	// 	Data: data,
+	// }
+	// data, err = c.EthClient.CallContract(context.Background(), callMsg, nil)
+	// if err != nil {
+	// 	fmt.Println("Unable to pack tx for submitHeaderBlock", "error", err)
+	// 	return
+	// }
+	// fmt.Println("data", data)
+
+	return
+}
+
+func GenerateAuthObj(client *ethclient.Client, callMsg ethereum.CallMsg) (auth *bind.TransactOpts, err error) {
+	// from address
+	fromAddress := config.OperatorAddress()
+
+	// fetch gas price
+	gasprice, err := client.SuggestGasPrice(context.Background())
 	if err != nil {
-		fmt.Println("Unable to pack tx for submitHeaderBlock", "error", err)
 		return
 	}
-	callMsg := ethereum.CallMsg{
-		To:   &c.RollupContractAddress,
-		Data: data,
-	}
-	data, err = c.EthClient.CallContract(context.Background(), callMsg, nil)
+	// fetch nonce
+	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
 	if err != nil {
-		fmt.Println("Unable to pack tx for submitHeaderBlock", "error", err)
 		return
 	}
-	fmt.Println("data", data)
+
+	// fetch gas limit
+	callMsg.From = fromAddress
+	gasLimit, err := client.EstimateGas(context.Background(), callMsg)
+
+	// create auth
+	auth = bind.NewKeyedTransactor(config.OperatorKey)
+	auth.GasPrice = gasprice
+	auth.Nonce = big.NewInt(int64(nonce))
+	auth.GasLimit = uint64(gasLimit) // uint64(gasLimit)
 
 	return
 }

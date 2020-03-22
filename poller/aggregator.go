@@ -2,7 +2,6 @@ package poller
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"time"
 
@@ -10,8 +9,6 @@ import (
 	"github.com/BOPR/config"
 	db "github.com/BOPR/db"
 	"github.com/BOPR/types"
-
-	tmCmn "github.com/tendermint/tendermint/libs/common"
 )
 
 const (
@@ -26,7 +23,7 @@ const (
 // 4. Finally create a batch of all the transactions and post on-chain
 type Aggregator struct {
 	// Base service
-	tmCmn.BaseService
+	types.BaseService
 
 	// DB instance
 	DB db.DB
@@ -40,7 +37,7 @@ func NewAggregator(db db.DB) *Aggregator {
 	// create logger
 	logger := common.Logger.With("module", AggregatingService)
 	aggregator := &Aggregator{}
-	aggregator.BaseService = *tmCmn.NewBaseService(logger, AggregatingService, aggregator)
+	aggregator.BaseService = *types.NewBaseService(logger, AggregatingService, aggregator)
 	aggregator.DB = db
 	return aggregator
 }
@@ -102,37 +99,37 @@ func (a *Aggregator) pickBatch() {
 
 }
 
-// ApplyTx fetches all the data required to validate tx from smart contact
+// CheckTx fetches all the data required to validate tx from smart contact
 // and calls the proccess tx function to return the updated balance root and accounts
 func (a *Aggregator) CheckTx(tx types.Tx) {
 	// fetch to account from DB
-	fromAccount, _ := a.DB.GetAccount(tx.From)
-	fmt.Println("fetched account", fromAccount)
+	// fromAccount, _ := a.DB.GetAccount(tx.From)
+	// fmt.Println("fetched account", fromAccount)
 
-	fromSiblings, err := db.FetchSiblings(fromAccount.Path, a.DB)
-	if err != nil {
-		fmt.Println("not able to fetch from siblings", "error", err)
-	}
+	// fromSiblings, err := db.FetchSiblings(fromAccount.Path, a.DB)
+	// if err != nil {
+	// 	fmt.Println("not able to fetch from siblings", "error", err)
+	// }
 
-	// fetch from account from DB
-	toAccount, _ := a.DB.GetAccount(tx.To)
-	fmt.Println("fetched account", toAccount)
+	// // fetch from account from DB
+	// toAccount, _ := a.DB.GetAccount(tx.To)
+	// fmt.Println("fetched account", toAccount)
 
-	toSiblings, err := db.FetchSiblings(toAccount.Path, a.DB)
-	if err != nil {
-		fmt.Println("not able to fetch to siblings", "error", err)
-	}
+	// toSiblings, err := db.FetchSiblings(toAccount.Path, a.DB)
+	// if err != nil {
+	// 	fmt.Println("not able to fetch to siblings", "error", err)
+	// }
 
-	// fetch latest batch from DB
-	latestBatch, err := a.DB.GetLatestBatch()
-	lbRootBytes, err := hex.DecodeString(latestBatch.StateRoot)
-	if err != nil {
-		fmt.Println("not able to fetch from siblings", "error", err)
-	}
+	// // fetch latest batch from DB
+	// latestBatch, err := a.DB.GetLatestBatch()
+	// lbRootBytes, err := hex.DecodeString(latestBatch.StateRoot)
+	// if err != nil {
+	// 	fmt.Println("not able to fetch from siblings", "error", err)
+	// }
 
-	newBalRoot, updatedFrom, updatedTo, err := types.ContractCallerObj.ProcessTx(types.BytesToByteArray(lbRootBytes),
-		tx, types.NewMerkleProof(fromAccount, fromSiblings),
-		types.NewMerkleProof(toAccount, toSiblings),
-	)
-	fmt.Println("all the updated data", newBalRoot, updatedFrom, updatedTo)
+	// newBalRoot, updatedFrom, updatedTo, err := types.ContractCallerObj.ProcessTx(types.BytesToByteArray(lbRootBytes),
+	// 	tx, types.NewMerkleProof(fromAccount, fromSiblings),
+	// 	types.NewMerkleProof(toAccount, toSiblings),
+	// )
+	// fmt.Println("all the updated data", newBalRoot, updatedFrom, updatedTo)
 }
