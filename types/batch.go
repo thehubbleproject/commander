@@ -11,12 +11,13 @@ import (
 type Batch struct {
 	gorm.Model
 
-	Index       uint64
-	StateRoot   string
-	Committer   Address
-	TxRoot      string
-	StakeAmount uint64
-	FinalisesOn big.Int
+	Index          uint64
+	StateRoot      string
+	Committer      Address
+	TxRoot         string
+	StakeAmount    uint64
+	FinalisesOn    big.Int
+	SubmissionHash Hash
 }
 
 // NewBatch creates new batch

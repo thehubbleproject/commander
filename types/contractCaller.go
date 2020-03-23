@@ -114,6 +114,12 @@ func (c *ContractCaller) FetchBalanceTreeRoot() (ByteArray, error) {
 	return root, nil
 }
 
+// func (c *ContractCaller) FetchTransactionCalldata(tx ethCmn.Hash) (ByteArray, error) {
+// 	_, _ := c.EthClient.TransactionByHash(context.Background(), tx)
+
+// 	return root, nil
+// }
+
 // ProcessTx calls the ProcessTx function on the contract to verify the tx
 // returns the updated accounts and the new balance root
 func (c *ContractCaller) ProcessTx(balanceTreeRoot ByteArray, tx Tx, fromMerkleProof, toMerkleProof MerkleProof) (newBalanceRoot ByteArray, from, to UserAccount, err error) {

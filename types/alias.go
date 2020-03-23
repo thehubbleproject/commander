@@ -12,6 +12,10 @@ type ByteArray [32]byte
 type Hash ethCmn.Hash
 type Address ethCmn.Address
 
+func (b ByteArray) String() string {
+	return hex.EncodeToString(b[:])
+}
+
 func HexToByteArray(a string) (b ByteArray, err error) {
 	bz, err := hex.DecodeString(a)
 	if err != nil {
