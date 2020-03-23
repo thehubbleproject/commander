@@ -28,7 +28,7 @@ func main() {
 func TestCallData() {
 	RPCClient, err := rpc.Dial("https://goerli.infura.io/v3/7e99d705c25844b59df18449632dd97c")
 	client := ethclient.NewClient(RPCClient)
-	tx, _, err := client.TransactionByHash(context.Background(), ethCmn.HexToHash("0x92571ece7656376802d5e49a67b80ab51a9bfd15a451564b9e29e13928338f7f"))
+	tx, _, err := client.TransactionByHash(context.Background(), ethCmn.HexToHash("0x16325b88c533d8e75be9efefa2e96a39c75e106ec6d0974da1f143702b181809"))
 	if err != nil {
 		panic(err)
 	}
@@ -47,7 +47,8 @@ func TestCallData() {
 	if err != nil {
 		log.Fatal("error decoding", err)
 	}
-	fmt.Println("decoded data", hex.EncodeToString(inputDataMsap["_txs"].([][]uint8)[0]))
+
+	fmt.Println("decoded data", hex.EncodeToString(inputDataMsap["_txs"].([][]byte)[2]))
 }
 
 func TestSyncer() {

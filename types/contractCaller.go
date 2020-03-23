@@ -2,6 +2,8 @@ package types
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	big "math/big"
 	"strings"
 
@@ -9,6 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/rpc"
 
+	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 
 	"github.com/BOPR/contracts/merkleTree"
@@ -19,6 +22,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	ethCmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/tendermint/tendermint/libs/log"
 )
 
 // IContractCaller is the common interface using which we will interact with the contracts
@@ -33,6 +37,8 @@ var ContractCallerObj ContractCaller
 // ContractCaller satisfies the IContractCaller interface and contains all the variables required to interact
 // With the ethereum chain along with contract addresses and ABI's
 type ContractCaller struct {
+	Logger log.Logger
+
 	EthClient *ethclient.Client
 
 	// Rollup contract
@@ -76,6 +82,7 @@ func NewContractCaller() (contractCaller ContractCaller, err error) {
 	}
 	contractCaller.MerkleTreeLibAddress = merkleTreeContractAddress
 
+	contractCaller.Logger = common.Logger.With("contractCaller")
 	return contractCaller, nil
 }
 
@@ -114,11 +121,34 @@ func (c *ContractCaller) FetchBalanceTreeRoot() (ByteArray, error) {
 	return root, nil
 }
 
-// func (c *ContractCaller) FetchTransactionCalldata(tx ethCmn.Hash) (ByteArray, error) {
-// 	_, _ := c.EthClient.TransactionByHash(context.Background(), tx)
+func (c *ContractCaller) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, err error) {
+	tx, isPending, err := c.EthClient.TransactionByHash(context.Background(), txHash)
+	if err != nil {
+		c.Logger.Error("Cannot fetch transaction from hash", "Error", err)
+		return
+	}
 
-// 	return root, nil
-// }
+	if isPending {
+		err := errors.New("Transaction is pending")
+		c.Logger.Error("Transaction is still pending, cannot process", "Error", err)
+		return txs, err
+	}
+
+	payload := tx.Data()
+	decodedPayload := payload[4:]
+
+	inputDataMap := make(map[string]interface{})
+
+	method := c.RollupContractABI.Methods["SubmitBatch"]
+
+	err = method.Inputs.UnpackIntoMap(inputDataMap, decodedPayload)
+	if err != nil {
+		fmt.Println("Error unpacking payload", "Error", err)
+		return
+	}
+
+	return GetTxsFromInput(inputDataMap), nil
+}
 
 // ProcessTx calls the ProcessTx function on the contract to verify the tx
 // returns the updated accounts and the new balance root
@@ -179,4 +209,8 @@ func GenerateAuthObj(client *ethclient.Client, callMsg ethereum.CallMsg) (auth *
 	auth.GasLimit = uint64(gasLimit) // uint64(gasLimit)
 
 	return
+}
+
+func GetTxsFromInput(input map[string]interface{}) (txs [][]byte) {
+	return input["_txs"].([][]byte)
 }

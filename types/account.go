@@ -1,6 +1,7 @@
 package types
 
 import (
+	"fmt"
 	"math/big"
 
 	"github.com/BOPR/common"
@@ -55,8 +56,12 @@ func (acc *UserAccount) AccountInclusionProof(path int64) rollup.DataTypesAccoun
 	}
 }
 
-func (acc *UserAccount) ABIEncode() []byte {
-	uint256Ty, _ := abi.NewType("uint256", "uint256", nil)
+func (acc *UserAccount) ABIEncode() ([]byte, error) {
+	uint256Ty, err := abi.NewType("uint256", "uint256", nil)
+	if err != nil {
+		return []byte(""), err
+	}
+
 	arguments := abi.Arguments{
 		{
 			Type: uint256Ty,
@@ -71,18 +76,27 @@ func (acc *UserAccount) ABIEncode() []byte {
 			Type: uint256Ty,
 		},
 	}
-	bytes, _ := arguments.Pack(
+	bytes, err := arguments.Pack(
 		big.NewInt(int64(acc.ID)),
 		big.NewInt(int64(acc.Balance)),
 		big.NewInt(int64(acc.TokenType)),
 		big.NewInt(int64(acc.Nonce)),
 	)
-	return bytes
+	if err != nil {
+		return []byte(""), err
+	}
+
+	return bytes, nil
 }
 
 func AccsToLeafHashes(accs []UserAccount) (result [][32]byte) {
 	for i, acc := range accs {
-		result[i] = BytesToByteArray(common.Hash(acc.ABIEncode()))
+		accEncoded, err := acc.ABIEncode()
+		if err != nil {
+			fmt.Println("Error while abi encoding accounts", err)
+			return
+		}
+		result[i] = BytesToByteArray(common.Hash(accEncoded))
 	}
 	return
 }
