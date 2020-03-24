@@ -7,6 +7,7 @@ dep:
 contracts:
 	abigen --abi=contracts/rollup/rollup.abi --pkg=rollup --out=contracts/rollup/rollup.go
 	abigen --abi=contracts/merkleTree/merkleTree.abi --pkg=merkleTree --out=contracts/merkleTree/merkleTree.go
+		abigen --abi=contracts/trial/trial.abi --pkg=trial --out=contracts/trial/trial.go
 
 
 clean:

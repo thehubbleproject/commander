@@ -150,6 +150,43 @@ func (c *ContractCaller) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, 
 	return GetTxsFromInput(inputDataMap), nil
 }
 
+// ABIEncodeTx encodes a transaction account to abi.encode parameter in solidity
+// func (c *ContractCaller) ABIEncodeTx(tx *types.Transaction) []byte {
+
+// }
+
+func GenerateAuthObj(client *ethclient.Client, callMsg ethereum.CallMsg) (auth *bind.TransactOpts, err error) {
+	// TODO remove
+	config.ParseAndInitGlobalConfig()
+	config.SetOperatorKeys(config.GlobalCfg.OperatorKey)
+
+	// from address
+	fromAddress := config.OperatorAddress()
+
+	// fetch gas price
+	gasprice, err := client.SuggestGasPrice(context.Background())
+	if err != nil {
+		return
+	}
+	// fetch nonce
+	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+	if err != nil {
+		return
+	}
+
+	// fetch gas limit
+	callMsg.From = fromAddress
+	gasLimit, err := client.EstimateGas(context.Background(), callMsg)
+
+	// create auth
+	auth = bind.NewKeyedTransactor(config.OperatorKey)
+	auth.GasPrice = gasprice
+	auth.Nonce = big.NewInt(int64(nonce))
+	auth.GasLimit = uint64(gasLimit) // uint64(gasLimit)
+
+	return
+}
+
 // ProcessTx calls the ProcessTx function on the contract to verify the tx
 // returns the updated accounts and the new balance root
 func (c *ContractCaller) ProcessTx(balanceTreeRoot ByteArray, tx Tx, fromMerkleProof, toMerkleProof MerkleProof) (newBalanceRoot ByteArray, from, to UserAccount, err error) {
@@ -179,34 +216,6 @@ func (c *ContractCaller) ProcessTx(balanceTreeRoot ByteArray, tx Tx, fromMerkleP
 	// 	return
 	// }
 	// fmt.Println("data", data)
-
-	return
-}
-
-func GenerateAuthObj(client *ethclient.Client, callMsg ethereum.CallMsg) (auth *bind.TransactOpts, err error) {
-	// from address
-	fromAddress := config.OperatorAddress()
-
-	// fetch gas price
-	gasprice, err := client.SuggestGasPrice(context.Background())
-	if err != nil {
-		return
-	}
-	// fetch nonce
-	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
-	if err != nil {
-		return
-	}
-
-	// fetch gas limit
-	callMsg.From = fromAddress
-	gasLimit, err := client.EstimateGas(context.Background(), callMsg)
-
-	// create auth
-	auth = bind.NewKeyedTransactor(config.OperatorKey)
-	auth.GasPrice = gasprice
-	auth.Nonce = big.NewInt(int64(nonce))
-	auth.GasLimit = uint64(gasLimit) // uint64(gasLimit)
 
 	return
 }

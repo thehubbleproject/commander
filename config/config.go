@@ -79,7 +79,6 @@ func GetDefaultConfig() Configuration {
 // ParseConfig retrieves the default environment configuration for the
 // application.
 func ParseConfig() (*Configuration, error) {
-
 	conf := new(Configuration)
 	v := viper.New()
 	v.SetConfigName("config")

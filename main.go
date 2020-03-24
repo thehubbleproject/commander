@@ -5,16 +5,19 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log"
+	"math/big"
 	"net/http"
 	"os"
 	"os/signal"
 	"strings"
 
+	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	ethCmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/rpc"
 
 	"github.com/BOPR/config"
+	"github.com/BOPR/contracts/trial"
 	"github.com/BOPR/listener"
 	"github.com/BOPR/types"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -22,11 +25,57 @@ import (
 )
 
 func main() {
-	TestCallData()
+	TestABIEncodeAndDecode()
+}
+
+func TestABIEncodeAndDecode() {
+	RPCClient, err := rpc.Dial("")
+	client := ethclient.NewClient(RPCClient)
+	rollupContractAddress := ethCmn.HexToAddress("0x61b14bAA77069494fCff00EAeeCf0212d5Ac1d10")
+	instance, err := trial.NewTrial(rollupContractAddress, client)
+	if err != nil {
+		panic(err)
+	}
+
+	rollupABI, err := abi.JSON(strings.NewReader(trial.TrialABI))
+	from := trial.TrialUserAccount{
+		ID:        big.NewInt(100),
+		Balance:   big.NewInt(100),
+		TokenType: big.NewInt(100),
+		Nonce:     big.NewInt(100),
+	}
+
+	txData := trial.TrialTransaction{
+		From:      from,
+		To:        from,
+		TokenType: big.NewInt(100),
+		Amount:    100,
+		Signature: []byte("dsds"),
+	}
+
+	data, err := rollupABI.Pack("ABIEncodeTransaction", txData)
+	if err != nil {
+		fmt.Println("Unable to pack tx for approve", "error", err)
+	}
+
+	// generate call msg
+	callMsg := ethereum.CallMsg{
+		To:   &rollupContractAddress,
+		Data: data,
+	}
+
+	auth, err := types.GenerateAuthObj(client, callMsg)
+	fmt.Println("auth generated", auth, err)
+
+	tx, err := instance.ABIEncodeTransaction(auth, txData)
+	if err != nil {
+		fmt.Println("Unable to send tx", err)
+	}
+	fmt.Println("sent transaction", tx.Hash().String())
 }
 
 func TestCallData() {
-	RPCClient, err := rpc.Dial("https://goerli.infura.io/v3/7e99d705c25844b59df18449632dd97c")
+	RPCClient, err := rpc.Dial("")
 	client := ethclient.NewClient(RPCClient)
 	tx, _, err := client.TransactionByHash(context.Background(), ethCmn.HexToHash("0x16325b88c533d8e75be9efefa2e96a39c75e106ec6d0974da1f143702b181809"))
 	if err != nil {
