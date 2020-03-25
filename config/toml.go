@@ -36,6 +36,7 @@ balance_tree_address = "{{ .BalanceTreeAddress }}"
 account_tree_address = "{{ .AccountTreeAddress }}"
 merkle_lib_address = "{{ .MerkleTreeLibAddress }}"
 token_registry_address = "{{ .TokenRegistryAddress }}"
+logger_address = "{{ .LoggerAddress }}"
 `
 
 var configTemplate *template.Template

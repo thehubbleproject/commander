@@ -48,6 +48,7 @@ type Configuration struct {
 	AccountTreeAddress   string `mapstructure:"account_tree_address"`
 	MerkleTreeLibAddress string `mapstructure:"merkle_lib_address"`
 	TokenRegistryAddress string `mapstructure:"token_registry_address"`
+	LoggerAddress        string `mapstructure:"logger_address"`
 
 	OperatorKey       string `mapstructure:"operator_key"`
 	OperatorAddress   string `mapstructure:"operator_address"`
