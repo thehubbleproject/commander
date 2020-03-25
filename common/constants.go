@@ -14,4 +14,13 @@ const (
 	DEFAULT_TOKEN_TYPE = 0
 
 	PrivKeyPath = "./privKey.json"
+	//
+	// CONTRACT_NAMES
+	ROLLUP_CONTRACT_KEY      = "rollup"
+	MERKLE_TREE_CONTRACT_KEY = "MTC"
+	BALANCE_TREE_KEY         = "btk"
+	ACCOUNT_TREE_KEY         = "atk"
+	MERKLE_TREE_LIB_KEY      = "mktlibk"
+	TOKEN_REGISTRY_KEY       = "tkk"
+	LOGGER_KEY               = "logger"
 )

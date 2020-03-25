@@ -14,6 +14,7 @@ import (
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 
+	"github.com/BOPR/contracts/logger"
 	"github.com/BOPR/contracts/merkleTree"
 	"github.com/BOPR/contracts/rollup"
 
@@ -42,15 +43,12 @@ type ContractCaller struct {
 
 	EthClient *ethclient.Client
 
-	// Rollup contract
-	RollupContract        *rollup.Rollup
-	RollupContractABI     abi.ABI
-	RollupContractAddress ethCmn.Address
+	ContractABI map[string]abi.ABI
 
-	// Merkle Tree libs
-	MerkleTreeContract   *merkleTree.MerkleTree
-	MerkleTreeABI        abi.ABI
-	MerkleTreeLibAddress ethCmn.Address
+	// Rollup contract
+	RollupContract *rollup.Rollup
+	BalanceTree    *merkleTree.MerkleTree
+	EventLogger    *logger.Logger
 }
 
 // NewContractCaller contract caller
@@ -71,20 +69,27 @@ func NewContractCaller() (contractCaller ContractCaller, err error) {
 	if contractCaller.RollupContract, err = rollup.NewRollup(rollupContractAddress, contractCaller.EthClient); err != nil {
 		return contractCaller, err
 	}
-	if contractCaller.RollupContractABI, err = abi.JSON(strings.NewReader(rollup.RollupABI)); err != nil {
+	if contractCaller.ContractABI[common.ROLLUP_CONTRACT_KEY], err = abi.JSON(strings.NewReader(rollup.RollupABI)); err != nil {
 		return contractCaller, err
 	}
-	contractCaller.RollupContractAddress = rollupContractAddress
 
 	// initialise all variables for merkle tree contract
 	merkleTreeContractAddress := ethCmn.HexToAddress(config.GlobalCfg.MerkleTreeLibAddress)
 	if contractCaller.MerkleTreeContract, err = merkleTree.NewMerkleTree(merkleTreeContractAddress, contractCaller.EthClient); err != nil {
 		return contractCaller, err
 	}
-	if contractCaller.MerkleTreeABI, err = abi.JSON(strings.NewReader(merkleTree.MerkleTreeABI)); err != nil {
+	if contractCaller.ContractABI[common.BALANCE_TREE_KEY], err = abi.JSON(strings.NewReader(merkleTree.MerkleTreeABI)); err != nil {
 		return contractCaller, err
 	}
-	contractCaller.MerkleTreeLibAddress = merkleTreeContractAddress
+
+	// initialise all variables for event logger contract
+	loggerAddress := ethCmn.HexToAddress(config.GlobalCfg.LoggerAddress)
+	if contractCaller.EventLogger, err = logger.NewLogger(loggerAddress, contractCaller.EthClient); err != nil {
+		return contractCaller, err
+	}
+	if contractCaller.ContractABI[common.LOGGER_KEY], err = abi.JSON(strings.NewReader(logger.LoggerABI)); err != nil {
+		return contractCaller, err
+	}
 
 	contractCaller.Logger = common.Logger.With("contractCaller")
 	return contractCaller, nil

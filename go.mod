@@ -3,6 +3,7 @@ module github.com/BOPR
 go 1.13
 
 require (
+	github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 // indirect
 	github.com/VictoriaMetrics/fastcache v1.5.3
 	github.com/Workiva/go-datastructures v1.0.50
 	github.com/aristanetworks/goarista v0.0.0-20191106175434-873d404c7f40
@@ -10,6 +11,10 @@ require (
 	github.com/cbergoon/merkletree v0.2.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/deckarep/golang-set v1.7.1
+	github.com/docker/docker v1.4.2-0.20180625184442-8e610b2b55bf
+	github.com/docker/go-connections v0.4.0 // indirect
+	github.com/docker/go-metrics v0.0.1 // indirect
+	github.com/docker/go-units v0.4.0 // indirect
 	github.com/edsrzf/mmap-go v1.0.0
 	github.com/elastic/gosigar v0.10.5
 	github.com/enescakir/emoji v0.0.3 // indirect
@@ -40,6 +45,8 @@ require (
 	github.com/miguelmota/go-solidity-sha3 v0.1.0
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/olekukonko/tablewriter v0.0.3
+	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
+	github.com/opencontainers/image-spec v1.0.1 // indirect
 	github.com/pborman/uuid v0.0.0-20180906182336-adf5a7427709
 	github.com/pelletier/go-toml v1.6.0
 	github.com/philhofer/fwd v1.0.0 // indirect

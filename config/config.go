@@ -71,6 +71,7 @@ func GetDefaultConfig() Configuration {
 		AccountTreeAddress:   ethCmn.Address{}.String(),
 		MerkleTreeLibAddress: ethCmn.Address{}.String(),
 		TokenRegistryAddress: ethCmn.Address{}.String(),
+		LoggerAddress:        ethCmn.Address{}.String(),
 		OperatorKey:          "",
 		OperatorAddress:      "",
 		LastRecordedBlock:    "0",

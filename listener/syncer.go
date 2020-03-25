@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/BOPR/common"
+	"github.com/BOPR/config"
 	"github.com/BOPR/db"
 	"github.com/BOPR/types"
 	"github.com/ethereum/go-ethereum"
@@ -52,11 +53,12 @@ func NewSyncer() Syncer {
 	if err != nil {
 		panic(err)
 	}
-
-	abis := []*abi.ABI{
-		&contractCaller.RollupContractABI,
-		&contractCaller.MerkleTreeABI,
+	abis := []*abi.ABI
+	for _, v := range contractCaller.ContractABI{
+		abis.append(abis,v)
 	}
+
+	// abis for all the events
 	syncerService.abis = abis
 	syncerService.contractCaller = contractCaller
 	syncerService.HeaderChannel = make(chan *ethTypes.Header)
@@ -171,16 +173,17 @@ func (s *Syncer) startSubscription(ctx context.Context, subscription ethereum.Su
 
 func (s *Syncer) processHeader(header ethTypes.Header) {
 	lastLLog, err := s.DBInstance.GetLastListenerLog()
-	fmt.Println("lastlog =>", lastLLog, err)
+	
+	// we need to filter only by logger contracts
+	// since all events are emitted by it
 	query := ethereum.FilterQuery{
 		FromBlock: lastLLog.BigInt(),
 		ToBlock:   header.Number,
 		Addresses: []ethCmn.Address{
-			s.contractCaller.RollupContractAddress,
-			s.contractCaller.MerkleTreeLibAddress,
+			config.GlobalCfg.LoggerAddress,
 		},
 	}
-	fmt.Println("latest block =>", header.Number.String())
+	
 	err = s.DBInstance.StoreListenerLog(types.ListenerLog{LastRecordedBlock: header.Number.String()})
 	if err != nil {
 		fmt.Println("err=>", err)

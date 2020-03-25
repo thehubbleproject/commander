@@ -1,7 +1,7 @@
 // Code generated - DO NOT EDIT.
 // This file is a generated binding and any manual changes will be lost.
 
-package trial
+package logger
 
 import (
 	"math/big"
@@ -27,107 +27,107 @@ var (
 	_ = event.NewSubscription
 )
 
-// TrialABI is the input ABI used to generate the binding from.
-const TrialABI = "[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"batch_id\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"committer\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"stateRoot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txRoot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"stakeSlashed\",\"type\":\"uint256\"}],\"name\":\"BatchRollback\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[],\"name\":\"DepositLeafMerged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"destination\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"token\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"accountHash\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"pubkey\",\"type\":\"bytes\"}],\"name\":\"DepositQueued\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[],\"name\":\"DepositsProcessed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"committer\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txroot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"updatedRoot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"NewBatch\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"tokenContract\",\"type\":\"address\"}],\"name\":\"RegisteredToken\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"tokenContract\",\"type\":\"address\"}],\"name\":\"RegistrationRequest\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"totalBatchesSlashed\",\"type\":\"uint256\"}],\"name\":\"RollbackFinalisation\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"committed\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"batch_id\",\"type\":\"uint256\"}],\"name\":\"StakeWithdraw\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"committer\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"txroot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"updatedRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"logNewBatch\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"committed\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"batch_id\",\"type\":\"uint256\"}],\"name\":\"logStakeWithdraw\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"batch_id\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"committer\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"stateRoot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"txRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"stakeSlashed\",\"type\":\"uint256\"}],\"name\":\"logBatchRollback\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"totalBatchesSlashed\",\"type\":\"uint256\"}],\"name\":\"logRollbackFinalisation\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"tokenContract\",\"type\":\"address\"}],\"name\":\"logRegisteredToken\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenContract\",\"type\":\"address\"}],\"name\":\"logRegistrationRequest\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"destination\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"token\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"accountHash\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"pubkey\",\"type\":\"bytes\"}],\"name\":\"logDepositQueued\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"logDepositLeafMerged\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"logDepositsProcessed\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+// LoggerABI is the input ABI used to generate the binding from.
+const LoggerABI = "[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"batch_id\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"committer\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"stateRoot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txRoot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"stakeSlashed\",\"type\":\"uint256\"}],\"name\":\"BatchRollback\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[],\"name\":\"DepositLeafMerged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"destination\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"token\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"accountHash\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"pubkey\",\"type\":\"bytes\"}],\"name\":\"DepositQueued\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[],\"name\":\"DepositsProcessed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"committer\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txroot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"updatedRoot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"NewBatch\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"tokenContract\",\"type\":\"address\"}],\"name\":\"RegisteredToken\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"tokenContract\",\"type\":\"address\"}],\"name\":\"RegistrationRequest\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"totalBatchesSlashed\",\"type\":\"uint256\"}],\"name\":\"RollbackFinalisation\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"committed\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"batch_id\",\"type\":\"uint256\"}],\"name\":\"StakeWithdraw\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"committer\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"txroot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"updatedRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"logNewBatch\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"committed\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"batch_id\",\"type\":\"uint256\"}],\"name\":\"logStakeWithdraw\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"batch_id\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"committer\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"stateRoot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"txRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"stakeSlashed\",\"type\":\"uint256\"}],\"name\":\"logBatchRollback\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"totalBatchesSlashed\",\"type\":\"uint256\"}],\"name\":\"logRollbackFinalisation\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"tokenContract\",\"type\":\"address\"}],\"name\":\"logRegisteredToken\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenContract\",\"type\":\"address\"}],\"name\":\"logRegistrationRequest\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"destination\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"token\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"accountHash\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"pubkey\",\"type\":\"bytes\"}],\"name\":\"logDepositQueued\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"logDepositLeafMerged\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"logDepositsProcessed\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
 
-// Trial is an auto generated Go binding around an Ethereum contract.
-type Trial struct {
-	TrialCaller     // Read-only binding to the contract
-	TrialTransactor // Write-only binding to the contract
-	TrialFilterer   // Log filterer for contract events
+// Logger is an auto generated Go binding around an Ethereum contract.
+type Logger struct {
+	LoggerCaller     // Read-only binding to the contract
+	LoggerTransactor // Write-only binding to the contract
+	LoggerFilterer   // Log filterer for contract events
 }
 
-// TrialCaller is an auto generated read-only Go binding around an Ethereum contract.
-type TrialCaller struct {
+// LoggerCaller is an auto generated read-only Go binding around an Ethereum contract.
+type LoggerCaller struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
-// TrialTransactor is an auto generated write-only Go binding around an Ethereum contract.
-type TrialTransactor struct {
+// LoggerTransactor is an auto generated write-only Go binding around an Ethereum contract.
+type LoggerTransactor struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
-// TrialFilterer is an auto generated log filtering Go binding around an Ethereum contract events.
-type TrialFilterer struct {
+// LoggerFilterer is an auto generated log filtering Go binding around an Ethereum contract events.
+type LoggerFilterer struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
-// TrialSession is an auto generated Go binding around an Ethereum contract,
+// LoggerSession is an auto generated Go binding around an Ethereum contract,
 // with pre-set call and transact options.
-type TrialSession struct {
-	Contract     *Trial            // Generic contract binding to set the session for
+type LoggerSession struct {
+	Contract     *Logger           // Generic contract binding to set the session for
 	CallOpts     bind.CallOpts     // Call options to use throughout this session
 	TransactOpts bind.TransactOpts // Transaction auth options to use throughout this session
 }
 
-// TrialCallerSession is an auto generated read-only Go binding around an Ethereum contract,
+// LoggerCallerSession is an auto generated read-only Go binding around an Ethereum contract,
 // with pre-set call options.
-type TrialCallerSession struct {
-	Contract *TrialCaller  // Generic contract caller binding to set the session for
+type LoggerCallerSession struct {
+	Contract *LoggerCaller // Generic contract caller binding to set the session for
 	CallOpts bind.CallOpts // Call options to use throughout this session
 }
 
-// TrialTransactorSession is an auto generated write-only Go binding around an Ethereum contract,
+// LoggerTransactorSession is an auto generated write-only Go binding around an Ethereum contract,
 // with pre-set transact options.
-type TrialTransactorSession struct {
-	Contract     *TrialTransactor  // Generic contract transactor binding to set the session for
+type LoggerTransactorSession struct {
+	Contract     *LoggerTransactor // Generic contract transactor binding to set the session for
 	TransactOpts bind.TransactOpts // Transaction auth options to use throughout this session
 }
 
-// TrialRaw is an auto generated low-level Go binding around an Ethereum contract.
-type TrialRaw struct {
-	Contract *Trial // Generic contract binding to access the raw methods on
+// LoggerRaw is an auto generated low-level Go binding around an Ethereum contract.
+type LoggerRaw struct {
+	Contract *Logger // Generic contract binding to access the raw methods on
 }
 
-// TrialCallerRaw is an auto generated low-level read-only Go binding around an Ethereum contract.
-type TrialCallerRaw struct {
-	Contract *TrialCaller // Generic read-only contract binding to access the raw methods on
+// LoggerCallerRaw is an auto generated low-level read-only Go binding around an Ethereum contract.
+type LoggerCallerRaw struct {
+	Contract *LoggerCaller // Generic read-only contract binding to access the raw methods on
 }
 
-// TrialTransactorRaw is an auto generated low-level write-only Go binding around an Ethereum contract.
-type TrialTransactorRaw struct {
-	Contract *TrialTransactor // Generic write-only contract binding to access the raw methods on
+// LoggerTransactorRaw is an auto generated low-level write-only Go binding around an Ethereum contract.
+type LoggerTransactorRaw struct {
+	Contract *LoggerTransactor // Generic write-only contract binding to access the raw methods on
 }
 
-// NewTrial creates a new instance of Trial, bound to a specific deployed contract.
-func NewTrial(address common.Address, backend bind.ContractBackend) (*Trial, error) {
-	contract, err := bindTrial(address, backend, backend, backend)
+// NewLogger creates a new instance of Logger, bound to a specific deployed contract.
+func NewLogger(address common.Address, backend bind.ContractBackend) (*Logger, error) {
+	contract, err := bindLogger(address, backend, backend, backend)
 	if err != nil {
 		return nil, err
 	}
-	return &Trial{TrialCaller: TrialCaller{contract: contract}, TrialTransactor: TrialTransactor{contract: contract}, TrialFilterer: TrialFilterer{contract: contract}}, nil
+	return &Logger{LoggerCaller: LoggerCaller{contract: contract}, LoggerTransactor: LoggerTransactor{contract: contract}, LoggerFilterer: LoggerFilterer{contract: contract}}, nil
 }
 
-// NewTrialCaller creates a new read-only instance of Trial, bound to a specific deployed contract.
-func NewTrialCaller(address common.Address, caller bind.ContractCaller) (*TrialCaller, error) {
-	contract, err := bindTrial(address, caller, nil, nil)
+// NewLoggerCaller creates a new read-only instance of Logger, bound to a specific deployed contract.
+func NewLoggerCaller(address common.Address, caller bind.ContractCaller) (*LoggerCaller, error) {
+	contract, err := bindLogger(address, caller, nil, nil)
 	if err != nil {
 		return nil, err
 	}
-	return &TrialCaller{contract: contract}, nil
+	return &LoggerCaller{contract: contract}, nil
 }
 
-// NewTrialTransactor creates a new write-only instance of Trial, bound to a specific deployed contract.
-func NewTrialTransactor(address common.Address, transactor bind.ContractTransactor) (*TrialTransactor, error) {
-	contract, err := bindTrial(address, nil, transactor, nil)
+// NewLoggerTransactor creates a new write-only instance of Logger, bound to a specific deployed contract.
+func NewLoggerTransactor(address common.Address, transactor bind.ContractTransactor) (*LoggerTransactor, error) {
+	contract, err := bindLogger(address, nil, transactor, nil)
 	if err != nil {
 		return nil, err
 	}
-	return &TrialTransactor{contract: contract}, nil
+	return &LoggerTransactor{contract: contract}, nil
 }
 
-// NewTrialFilterer creates a new log filterer instance of Trial, bound to a specific deployed contract.
-func NewTrialFilterer(address common.Address, filterer bind.ContractFilterer) (*TrialFilterer, error) {
-	contract, err := bindTrial(address, nil, nil, filterer)
+// NewLoggerFilterer creates a new log filterer instance of Logger, bound to a specific deployed contract.
+func NewLoggerFilterer(address common.Address, filterer bind.ContractFilterer) (*LoggerFilterer, error) {
+	contract, err := bindLogger(address, nil, nil, filterer)
 	if err != nil {
 		return nil, err
 	}
-	return &TrialFilterer{contract: contract}, nil
+	return &LoggerFilterer{contract: contract}, nil
 }
 
-// bindTrial binds a generic wrapper to an already deployed contract.
-func bindTrial(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor, filterer bind.ContractFilterer) (*bind.BoundContract, error) {
-	parsed, err := abi.JSON(strings.NewReader(TrialABI))
+// bindLogger binds a generic wrapper to an already deployed contract.
+func bindLogger(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor, filterer bind.ContractFilterer) (*bind.BoundContract, error) {
+	parsed, err := abi.JSON(strings.NewReader(LoggerABI))
 	if err != nil {
 		return nil, err
 	}
@@ -138,232 +138,232 @@ func bindTrial(address common.Address, caller bind.ContractCaller, transactor bi
 // sets the output to result. The result type might be a single field for simple
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
-func (_Trial *TrialRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
-	return _Trial.Contract.TrialCaller.contract.Call(opts, result, method, params...)
+func (_Logger *LoggerRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
+	return _Logger.Contract.LoggerCaller.contract.Call(opts, result, method, params...)
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
 // its default method if one is available.
-func (_Trial *TrialRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
-	return _Trial.Contract.TrialTransactor.contract.Transfer(opts)
+func (_Logger *LoggerRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _Logger.Contract.LoggerTransactor.contract.Transfer(opts)
 }
 
 // Transact invokes the (paid) contract method with params as input values.
-func (_Trial *TrialRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
-	return _Trial.Contract.TrialTransactor.contract.Transact(opts, method, params...)
+func (_Logger *LoggerRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
+	return _Logger.Contract.LoggerTransactor.contract.Transact(opts, method, params...)
 }
 
 // Call invokes the (constant) contract method with params as input values and
 // sets the output to result. The result type might be a single field for simple
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
-func (_Trial *TrialCallerRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
-	return _Trial.Contract.contract.Call(opts, result, method, params...)
+func (_Logger *LoggerCallerRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
+	return _Logger.Contract.contract.Call(opts, result, method, params...)
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
 // its default method if one is available.
-func (_Trial *TrialTransactorRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
-	return _Trial.Contract.contract.Transfer(opts)
+func (_Logger *LoggerTransactorRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _Logger.Contract.contract.Transfer(opts)
 }
 
 // Transact invokes the (paid) contract method with params as input values.
-func (_Trial *TrialTransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
-	return _Trial.Contract.contract.Transact(opts, method, params...)
+func (_Logger *LoggerTransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
+	return _Logger.Contract.contract.Transact(opts, method, params...)
 }
 
 // LogBatchRollback is a paid mutator transaction binding the contract method 0xb4ba86b3.
 //
 // Solidity: function logBatchRollback(uint256 batch_id, address committer, bytes32 stateRoot, bytes32 txRoot, uint256 stakeSlashed) returns()
-func (_Trial *TrialTransactor) LogBatchRollback(opts *bind.TransactOpts, batch_id *big.Int, committer common.Address, stateRoot [32]byte, txRoot [32]byte, stakeSlashed *big.Int) (*types.Transaction, error) {
-	return _Trial.contract.Transact(opts, "logBatchRollback", batch_id, committer, stateRoot, txRoot, stakeSlashed)
+func (_Logger *LoggerTransactor) LogBatchRollback(opts *bind.TransactOpts, batch_id *big.Int, committer common.Address, stateRoot [32]byte, txRoot [32]byte, stakeSlashed *big.Int) (*types.Transaction, error) {
+	return _Logger.contract.Transact(opts, "logBatchRollback", batch_id, committer, stateRoot, txRoot, stakeSlashed)
 }
 
 // LogBatchRollback is a paid mutator transaction binding the contract method 0xb4ba86b3.
 //
 // Solidity: function logBatchRollback(uint256 batch_id, address committer, bytes32 stateRoot, bytes32 txRoot, uint256 stakeSlashed) returns()
-func (_Trial *TrialSession) LogBatchRollback(batch_id *big.Int, committer common.Address, stateRoot [32]byte, txRoot [32]byte, stakeSlashed *big.Int) (*types.Transaction, error) {
-	return _Trial.Contract.LogBatchRollback(&_Trial.TransactOpts, batch_id, committer, stateRoot, txRoot, stakeSlashed)
+func (_Logger *LoggerSession) LogBatchRollback(batch_id *big.Int, committer common.Address, stateRoot [32]byte, txRoot [32]byte, stakeSlashed *big.Int) (*types.Transaction, error) {
+	return _Logger.Contract.LogBatchRollback(&_Logger.TransactOpts, batch_id, committer, stateRoot, txRoot, stakeSlashed)
 }
 
 // LogBatchRollback is a paid mutator transaction binding the contract method 0xb4ba86b3.
 //
 // Solidity: function logBatchRollback(uint256 batch_id, address committer, bytes32 stateRoot, bytes32 txRoot, uint256 stakeSlashed) returns()
-func (_Trial *TrialTransactorSession) LogBatchRollback(batch_id *big.Int, committer common.Address, stateRoot [32]byte, txRoot [32]byte, stakeSlashed *big.Int) (*types.Transaction, error) {
-	return _Trial.Contract.LogBatchRollback(&_Trial.TransactOpts, batch_id, committer, stateRoot, txRoot, stakeSlashed)
+func (_Logger *LoggerTransactorSession) LogBatchRollback(batch_id *big.Int, committer common.Address, stateRoot [32]byte, txRoot [32]byte, stakeSlashed *big.Int) (*types.Transaction, error) {
+	return _Logger.Contract.LogBatchRollback(&_Logger.TransactOpts, batch_id, committer, stateRoot, txRoot, stakeSlashed)
 }
 
 // LogDepositLeafMerged is a paid mutator transaction binding the contract method 0xc5abe3c1.
 //
 // Solidity: function logDepositLeafMerged() returns()
-func (_Trial *TrialTransactor) LogDepositLeafMerged(opts *bind.TransactOpts) (*types.Transaction, error) {
-	return _Trial.contract.Transact(opts, "logDepositLeafMerged")
+func (_Logger *LoggerTransactor) LogDepositLeafMerged(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _Logger.contract.Transact(opts, "logDepositLeafMerged")
 }
 
 // LogDepositLeafMerged is a paid mutator transaction binding the contract method 0xc5abe3c1.
 //
 // Solidity: function logDepositLeafMerged() returns()
-func (_Trial *TrialSession) LogDepositLeafMerged() (*types.Transaction, error) {
-	return _Trial.Contract.LogDepositLeafMerged(&_Trial.TransactOpts)
+func (_Logger *LoggerSession) LogDepositLeafMerged() (*types.Transaction, error) {
+	return _Logger.Contract.LogDepositLeafMerged(&_Logger.TransactOpts)
 }
 
 // LogDepositLeafMerged is a paid mutator transaction binding the contract method 0xc5abe3c1.
 //
 // Solidity: function logDepositLeafMerged() returns()
-func (_Trial *TrialTransactorSession) LogDepositLeafMerged() (*types.Transaction, error) {
-	return _Trial.Contract.LogDepositLeafMerged(&_Trial.TransactOpts)
+func (_Logger *LoggerTransactorSession) LogDepositLeafMerged() (*types.Transaction, error) {
+	return _Logger.Contract.LogDepositLeafMerged(&_Logger.TransactOpts)
 }
 
 // LogDepositQueued is a paid mutator transaction binding the contract method 0x10e4bacc.
 //
 // Solidity: function logDepositQueued(address destination, uint256 amount, uint256 token, bytes32 accountHash, bytes pubkey) returns()
-func (_Trial *TrialTransactor) LogDepositQueued(opts *bind.TransactOpts, destination common.Address, amount *big.Int, token *big.Int, accountHash [32]byte, pubkey []byte) (*types.Transaction, error) {
-	return _Trial.contract.Transact(opts, "logDepositQueued", destination, amount, token, accountHash, pubkey)
+func (_Logger *LoggerTransactor) LogDepositQueued(opts *bind.TransactOpts, destination common.Address, amount *big.Int, token *big.Int, accountHash [32]byte, pubkey []byte) (*types.Transaction, error) {
+	return _Logger.contract.Transact(opts, "logDepositQueued", destination, amount, token, accountHash, pubkey)
 }
 
 // LogDepositQueued is a paid mutator transaction binding the contract method 0x10e4bacc.
 //
 // Solidity: function logDepositQueued(address destination, uint256 amount, uint256 token, bytes32 accountHash, bytes pubkey) returns()
-func (_Trial *TrialSession) LogDepositQueued(destination common.Address, amount *big.Int, token *big.Int, accountHash [32]byte, pubkey []byte) (*types.Transaction, error) {
-	return _Trial.Contract.LogDepositQueued(&_Trial.TransactOpts, destination, amount, token, accountHash, pubkey)
+func (_Logger *LoggerSession) LogDepositQueued(destination common.Address, amount *big.Int, token *big.Int, accountHash [32]byte, pubkey []byte) (*types.Transaction, error) {
+	return _Logger.Contract.LogDepositQueued(&_Logger.TransactOpts, destination, amount, token, accountHash, pubkey)
 }
 
 // LogDepositQueued is a paid mutator transaction binding the contract method 0x10e4bacc.
 //
 // Solidity: function logDepositQueued(address destination, uint256 amount, uint256 token, bytes32 accountHash, bytes pubkey) returns()
-func (_Trial *TrialTransactorSession) LogDepositQueued(destination common.Address, amount *big.Int, token *big.Int, accountHash [32]byte, pubkey []byte) (*types.Transaction, error) {
-	return _Trial.Contract.LogDepositQueued(&_Trial.TransactOpts, destination, amount, token, accountHash, pubkey)
+func (_Logger *LoggerTransactorSession) LogDepositQueued(destination common.Address, amount *big.Int, token *big.Int, accountHash [32]byte, pubkey []byte) (*types.Transaction, error) {
+	return _Logger.Contract.LogDepositQueued(&_Logger.TransactOpts, destination, amount, token, accountHash, pubkey)
 }
 
 // LogDepositsProcessed is a paid mutator transaction binding the contract method 0xd45cff88.
 //
 // Solidity: function logDepositsProcessed() returns()
-func (_Trial *TrialTransactor) LogDepositsProcessed(opts *bind.TransactOpts) (*types.Transaction, error) {
-	return _Trial.contract.Transact(opts, "logDepositsProcessed")
+func (_Logger *LoggerTransactor) LogDepositsProcessed(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _Logger.contract.Transact(opts, "logDepositsProcessed")
 }
 
 // LogDepositsProcessed is a paid mutator transaction binding the contract method 0xd45cff88.
 //
 // Solidity: function logDepositsProcessed() returns()
-func (_Trial *TrialSession) LogDepositsProcessed() (*types.Transaction, error) {
-	return _Trial.Contract.LogDepositsProcessed(&_Trial.TransactOpts)
+func (_Logger *LoggerSession) LogDepositsProcessed() (*types.Transaction, error) {
+	return _Logger.Contract.LogDepositsProcessed(&_Logger.TransactOpts)
 }
 
 // LogDepositsProcessed is a paid mutator transaction binding the contract method 0xd45cff88.
 //
 // Solidity: function logDepositsProcessed() returns()
-func (_Trial *TrialTransactorSession) LogDepositsProcessed() (*types.Transaction, error) {
-	return _Trial.Contract.LogDepositsProcessed(&_Trial.TransactOpts)
+func (_Logger *LoggerTransactorSession) LogDepositsProcessed() (*types.Transaction, error) {
+	return _Logger.Contract.LogDepositsProcessed(&_Logger.TransactOpts)
 }
 
 // LogNewBatch is a paid mutator transaction binding the contract method 0xcea4592f.
 //
 // Solidity: function logNewBatch(address committer, bytes32 txroot, bytes32 updatedRoot, uint256 index) returns()
-func (_Trial *TrialTransactor) LogNewBatch(opts *bind.TransactOpts, committer common.Address, txroot [32]byte, updatedRoot [32]byte, index *big.Int) (*types.Transaction, error) {
-	return _Trial.contract.Transact(opts, "logNewBatch", committer, txroot, updatedRoot, index)
+func (_Logger *LoggerTransactor) LogNewBatch(opts *bind.TransactOpts, committer common.Address, txroot [32]byte, updatedRoot [32]byte, index *big.Int) (*types.Transaction, error) {
+	return _Logger.contract.Transact(opts, "logNewBatch", committer, txroot, updatedRoot, index)
 }
 
 // LogNewBatch is a paid mutator transaction binding the contract method 0xcea4592f.
 //
 // Solidity: function logNewBatch(address committer, bytes32 txroot, bytes32 updatedRoot, uint256 index) returns()
-func (_Trial *TrialSession) LogNewBatch(committer common.Address, txroot [32]byte, updatedRoot [32]byte, index *big.Int) (*types.Transaction, error) {
-	return _Trial.Contract.LogNewBatch(&_Trial.TransactOpts, committer, txroot, updatedRoot, index)
+func (_Logger *LoggerSession) LogNewBatch(committer common.Address, txroot [32]byte, updatedRoot [32]byte, index *big.Int) (*types.Transaction, error) {
+	return _Logger.Contract.LogNewBatch(&_Logger.TransactOpts, committer, txroot, updatedRoot, index)
 }
 
 // LogNewBatch is a paid mutator transaction binding the contract method 0xcea4592f.
 //
 // Solidity: function logNewBatch(address committer, bytes32 txroot, bytes32 updatedRoot, uint256 index) returns()
-func (_Trial *TrialTransactorSession) LogNewBatch(committer common.Address, txroot [32]byte, updatedRoot [32]byte, index *big.Int) (*types.Transaction, error) {
-	return _Trial.Contract.LogNewBatch(&_Trial.TransactOpts, committer, txroot, updatedRoot, index)
+func (_Logger *LoggerTransactorSession) LogNewBatch(committer common.Address, txroot [32]byte, updatedRoot [32]byte, index *big.Int) (*types.Transaction, error) {
+	return _Logger.Contract.LogNewBatch(&_Logger.TransactOpts, committer, txroot, updatedRoot, index)
 }
 
 // LogRegisteredToken is a paid mutator transaction binding the contract method 0x88870639.
 //
 // Solidity: function logRegisteredToken(uint256 tokenType, address tokenContract) returns()
-func (_Trial *TrialTransactor) LogRegisteredToken(opts *bind.TransactOpts, tokenType *big.Int, tokenContract common.Address) (*types.Transaction, error) {
-	return _Trial.contract.Transact(opts, "logRegisteredToken", tokenType, tokenContract)
+func (_Logger *LoggerTransactor) LogRegisteredToken(opts *bind.TransactOpts, tokenType *big.Int, tokenContract common.Address) (*types.Transaction, error) {
+	return _Logger.contract.Transact(opts, "logRegisteredToken", tokenType, tokenContract)
 }
 
 // LogRegisteredToken is a paid mutator transaction binding the contract method 0x88870639.
 //
 // Solidity: function logRegisteredToken(uint256 tokenType, address tokenContract) returns()
-func (_Trial *TrialSession) LogRegisteredToken(tokenType *big.Int, tokenContract common.Address) (*types.Transaction, error) {
-	return _Trial.Contract.LogRegisteredToken(&_Trial.TransactOpts, tokenType, tokenContract)
+func (_Logger *LoggerSession) LogRegisteredToken(tokenType *big.Int, tokenContract common.Address) (*types.Transaction, error) {
+	return _Logger.Contract.LogRegisteredToken(&_Logger.TransactOpts, tokenType, tokenContract)
 }
 
 // LogRegisteredToken is a paid mutator transaction binding the contract method 0x88870639.
 //
 // Solidity: function logRegisteredToken(uint256 tokenType, address tokenContract) returns()
-func (_Trial *TrialTransactorSession) LogRegisteredToken(tokenType *big.Int, tokenContract common.Address) (*types.Transaction, error) {
-	return _Trial.Contract.LogRegisteredToken(&_Trial.TransactOpts, tokenType, tokenContract)
+func (_Logger *LoggerTransactorSession) LogRegisteredToken(tokenType *big.Int, tokenContract common.Address) (*types.Transaction, error) {
+	return _Logger.Contract.LogRegisteredToken(&_Logger.TransactOpts, tokenType, tokenContract)
 }
 
 // LogRegistrationRequest is a paid mutator transaction binding the contract method 0x4c7637d2.
 //
 // Solidity: function logRegistrationRequest(address tokenContract) returns()
-func (_Trial *TrialTransactor) LogRegistrationRequest(opts *bind.TransactOpts, tokenContract common.Address) (*types.Transaction, error) {
-	return _Trial.contract.Transact(opts, "logRegistrationRequest", tokenContract)
+func (_Logger *LoggerTransactor) LogRegistrationRequest(opts *bind.TransactOpts, tokenContract common.Address) (*types.Transaction, error) {
+	return _Logger.contract.Transact(opts, "logRegistrationRequest", tokenContract)
 }
 
 // LogRegistrationRequest is a paid mutator transaction binding the contract method 0x4c7637d2.
 //
 // Solidity: function logRegistrationRequest(address tokenContract) returns()
-func (_Trial *TrialSession) LogRegistrationRequest(tokenContract common.Address) (*types.Transaction, error) {
-	return _Trial.Contract.LogRegistrationRequest(&_Trial.TransactOpts, tokenContract)
+func (_Logger *LoggerSession) LogRegistrationRequest(tokenContract common.Address) (*types.Transaction, error) {
+	return _Logger.Contract.LogRegistrationRequest(&_Logger.TransactOpts, tokenContract)
 }
 
 // LogRegistrationRequest is a paid mutator transaction binding the contract method 0x4c7637d2.
 //
 // Solidity: function logRegistrationRequest(address tokenContract) returns()
-func (_Trial *TrialTransactorSession) LogRegistrationRequest(tokenContract common.Address) (*types.Transaction, error) {
-	return _Trial.Contract.LogRegistrationRequest(&_Trial.TransactOpts, tokenContract)
+func (_Logger *LoggerTransactorSession) LogRegistrationRequest(tokenContract common.Address) (*types.Transaction, error) {
+	return _Logger.Contract.LogRegistrationRequest(&_Logger.TransactOpts, tokenContract)
 }
 
 // LogRollbackFinalisation is a paid mutator transaction binding the contract method 0xaeedf0c7.
 //
 // Solidity: function logRollbackFinalisation(uint256 totalBatchesSlashed) returns()
-func (_Trial *TrialTransactor) LogRollbackFinalisation(opts *bind.TransactOpts, totalBatchesSlashed *big.Int) (*types.Transaction, error) {
-	return _Trial.contract.Transact(opts, "logRollbackFinalisation", totalBatchesSlashed)
+func (_Logger *LoggerTransactor) LogRollbackFinalisation(opts *bind.TransactOpts, totalBatchesSlashed *big.Int) (*types.Transaction, error) {
+	return _Logger.contract.Transact(opts, "logRollbackFinalisation", totalBatchesSlashed)
 }
 
 // LogRollbackFinalisation is a paid mutator transaction binding the contract method 0xaeedf0c7.
 //
 // Solidity: function logRollbackFinalisation(uint256 totalBatchesSlashed) returns()
-func (_Trial *TrialSession) LogRollbackFinalisation(totalBatchesSlashed *big.Int) (*types.Transaction, error) {
-	return _Trial.Contract.LogRollbackFinalisation(&_Trial.TransactOpts, totalBatchesSlashed)
+func (_Logger *LoggerSession) LogRollbackFinalisation(totalBatchesSlashed *big.Int) (*types.Transaction, error) {
+	return _Logger.Contract.LogRollbackFinalisation(&_Logger.TransactOpts, totalBatchesSlashed)
 }
 
 // LogRollbackFinalisation is a paid mutator transaction binding the contract method 0xaeedf0c7.
 //
 // Solidity: function logRollbackFinalisation(uint256 totalBatchesSlashed) returns()
-func (_Trial *TrialTransactorSession) LogRollbackFinalisation(totalBatchesSlashed *big.Int) (*types.Transaction, error) {
-	return _Trial.Contract.LogRollbackFinalisation(&_Trial.TransactOpts, totalBatchesSlashed)
+func (_Logger *LoggerTransactorSession) LogRollbackFinalisation(totalBatchesSlashed *big.Int) (*types.Transaction, error) {
+	return _Logger.Contract.LogRollbackFinalisation(&_Logger.TransactOpts, totalBatchesSlashed)
 }
 
 // LogStakeWithdraw is a paid mutator transaction binding the contract method 0xd54404ae.
 //
 // Solidity: function logStakeWithdraw(address committed, uint256 amount, uint256 batch_id) returns()
-func (_Trial *TrialTransactor) LogStakeWithdraw(opts *bind.TransactOpts, committed common.Address, amount *big.Int, batch_id *big.Int) (*types.Transaction, error) {
-	return _Trial.contract.Transact(opts, "logStakeWithdraw", committed, amount, batch_id)
+func (_Logger *LoggerTransactor) LogStakeWithdraw(opts *bind.TransactOpts, committed common.Address, amount *big.Int, batch_id *big.Int) (*types.Transaction, error) {
+	return _Logger.contract.Transact(opts, "logStakeWithdraw", committed, amount, batch_id)
 }
 
 // LogStakeWithdraw is a paid mutator transaction binding the contract method 0xd54404ae.
 //
 // Solidity: function logStakeWithdraw(address committed, uint256 amount, uint256 batch_id) returns()
-func (_Trial *TrialSession) LogStakeWithdraw(committed common.Address, amount *big.Int, batch_id *big.Int) (*types.Transaction, error) {
-	return _Trial.Contract.LogStakeWithdraw(&_Trial.TransactOpts, committed, amount, batch_id)
+func (_Logger *LoggerSession) LogStakeWithdraw(committed common.Address, amount *big.Int, batch_id *big.Int) (*types.Transaction, error) {
+	return _Logger.Contract.LogStakeWithdraw(&_Logger.TransactOpts, committed, amount, batch_id)
 }
 
 // LogStakeWithdraw is a paid mutator transaction binding the contract method 0xd54404ae.
 //
 // Solidity: function logStakeWithdraw(address committed, uint256 amount, uint256 batch_id) returns()
-func (_Trial *TrialTransactorSession) LogStakeWithdraw(committed common.Address, amount *big.Int, batch_id *big.Int) (*types.Transaction, error) {
-	return _Trial.Contract.LogStakeWithdraw(&_Trial.TransactOpts, committed, amount, batch_id)
+func (_Logger *LoggerTransactorSession) LogStakeWithdraw(committed common.Address, amount *big.Int, batch_id *big.Int) (*types.Transaction, error) {
+	return _Logger.Contract.LogStakeWithdraw(&_Logger.TransactOpts, committed, amount, batch_id)
 }
 
-// TrialBatchRollbackIterator is returned from FilterBatchRollback and is used to iterate over the raw logs and unpacked data for BatchRollback events raised by the Trial contract.
-type TrialBatchRollbackIterator struct {
-	Event *TrialBatchRollback // Event containing the contract specifics and raw log
+// LoggerBatchRollbackIterator is returned from FilterBatchRollback and is used to iterate over the raw logs and unpacked data for BatchRollback events raised by the Logger contract.
+type LoggerBatchRollbackIterator struct {
+	Event *LoggerBatchRollback // Event containing the contract specifics and raw log
 
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
@@ -377,7 +377,7 @@ type TrialBatchRollbackIterator struct {
 // Next advances the iterator to the subsequent event, returning whether there
 // are any more events found. In case of a retrieval or parsing error, false is
 // returned and Error() can be queried for the exact failure.
-func (it *TrialBatchRollbackIterator) Next() bool {
+func (it *LoggerBatchRollbackIterator) Next() bool {
 	// If the iterator failed, stop iterating
 	if it.fail != nil {
 		return false
@@ -386,7 +386,7 @@ func (it *TrialBatchRollbackIterator) Next() bool {
 	if it.done {
 		select {
 		case log := <-it.logs:
-			it.Event = new(TrialBatchRollback)
+			it.Event = new(LoggerBatchRollback)
 			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 				it.fail = err
 				return false
@@ -401,7 +401,7 @@ func (it *TrialBatchRollbackIterator) Next() bool {
 	// Iterator still in progress, wait for either a data or an error event
 	select {
 	case log := <-it.logs:
-		it.Event = new(TrialBatchRollback)
+		it.Event = new(LoggerBatchRollback)
 		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 			it.fail = err
 			return false
@@ -417,19 +417,19 @@ func (it *TrialBatchRollbackIterator) Next() bool {
 }
 
 // Error returns any retrieval or parsing error occurred during filtering.
-func (it *TrialBatchRollbackIterator) Error() error {
+func (it *LoggerBatchRollbackIterator) Error() error {
 	return it.fail
 }
 
 // Close terminates the iteration process, releasing any pending underlying
 // resources.
-func (it *TrialBatchRollbackIterator) Close() error {
+func (it *LoggerBatchRollbackIterator) Close() error {
 	it.sub.Unsubscribe()
 	return nil
 }
 
-// TrialBatchRollback represents a BatchRollback event raised by the Trial contract.
-type TrialBatchRollback struct {
+// LoggerBatchRollback represents a BatchRollback event raised by the Logger contract.
+type LoggerBatchRollback struct {
 	BatchId      *big.Int
 	Committer    common.Address
 	StateRoot    [32]byte
@@ -441,21 +441,21 @@ type TrialBatchRollback struct {
 // FilterBatchRollback is a free log retrieval operation binding the contract event 0xff0d01a3ea09eec8d9dc11b606f70fbf5aa373d5647db792e5886fc4285c38fc.
 //
 // Solidity: event BatchRollback(uint256 batch_id, address committer, bytes32 stateRoot, bytes32 txRoot, uint256 stakeSlashed)
-func (_Trial *TrialFilterer) FilterBatchRollback(opts *bind.FilterOpts) (*TrialBatchRollbackIterator, error) {
+func (_Logger *LoggerFilterer) FilterBatchRollback(opts *bind.FilterOpts) (*LoggerBatchRollbackIterator, error) {
 
-	logs, sub, err := _Trial.contract.FilterLogs(opts, "BatchRollback")
+	logs, sub, err := _Logger.contract.FilterLogs(opts, "BatchRollback")
 	if err != nil {
 		return nil, err
 	}
-	return &TrialBatchRollbackIterator{contract: _Trial.contract, event: "BatchRollback", logs: logs, sub: sub}, nil
+	return &LoggerBatchRollbackIterator{contract: _Logger.contract, event: "BatchRollback", logs: logs, sub: sub}, nil
 }
 
 // WatchBatchRollback is a free log subscription operation binding the contract event 0xff0d01a3ea09eec8d9dc11b606f70fbf5aa373d5647db792e5886fc4285c38fc.
 //
 // Solidity: event BatchRollback(uint256 batch_id, address committer, bytes32 stateRoot, bytes32 txRoot, uint256 stakeSlashed)
-func (_Trial *TrialFilterer) WatchBatchRollback(opts *bind.WatchOpts, sink chan<- *TrialBatchRollback) (event.Subscription, error) {
+func (_Logger *LoggerFilterer) WatchBatchRollback(opts *bind.WatchOpts, sink chan<- *LoggerBatchRollback) (event.Subscription, error) {
 
-	logs, sub, err := _Trial.contract.WatchLogs(opts, "BatchRollback")
+	logs, sub, err := _Logger.contract.WatchLogs(opts, "BatchRollback")
 	if err != nil {
 		return nil, err
 	}
@@ -465,8 +465,8 @@ func (_Trial *TrialFilterer) WatchBatchRollback(opts *bind.WatchOpts, sink chan<
 			select {
 			case log := <-logs:
 				// New log arrived, parse the event and forward to the user
-				event := new(TrialBatchRollback)
-				if err := _Trial.contract.UnpackLog(event, "BatchRollback", log); err != nil {
+				event := new(LoggerBatchRollback)
+				if err := _Logger.contract.UnpackLog(event, "BatchRollback", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -490,17 +490,17 @@ func (_Trial *TrialFilterer) WatchBatchRollback(opts *bind.WatchOpts, sink chan<
 // ParseBatchRollback is a log parse operation binding the contract event 0xff0d01a3ea09eec8d9dc11b606f70fbf5aa373d5647db792e5886fc4285c38fc.
 //
 // Solidity: event BatchRollback(uint256 batch_id, address committer, bytes32 stateRoot, bytes32 txRoot, uint256 stakeSlashed)
-func (_Trial *TrialFilterer) ParseBatchRollback(log types.Log) (*TrialBatchRollback, error) {
-	event := new(TrialBatchRollback)
-	if err := _Trial.contract.UnpackLog(event, "BatchRollback", log); err != nil {
+func (_Logger *LoggerFilterer) ParseBatchRollback(log types.Log) (*LoggerBatchRollback, error) {
+	event := new(LoggerBatchRollback)
+	if err := _Logger.contract.UnpackLog(event, "BatchRollback", log); err != nil {
 		return nil, err
 	}
 	return event, nil
 }
 
-// TrialDepositLeafMergedIterator is returned from FilterDepositLeafMerged and is used to iterate over the raw logs and unpacked data for DepositLeafMerged events raised by the Trial contract.
-type TrialDepositLeafMergedIterator struct {
-	Event *TrialDepositLeafMerged // Event containing the contract specifics and raw log
+// LoggerDepositLeafMergedIterator is returned from FilterDepositLeafMerged and is used to iterate over the raw logs and unpacked data for DepositLeafMerged events raised by the Logger contract.
+type LoggerDepositLeafMergedIterator struct {
+	Event *LoggerDepositLeafMerged // Event containing the contract specifics and raw log
 
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
@@ -514,7 +514,7 @@ type TrialDepositLeafMergedIterator struct {
 // Next advances the iterator to the subsequent event, returning whether there
 // are any more events found. In case of a retrieval or parsing error, false is
 // returned and Error() can be queried for the exact failure.
-func (it *TrialDepositLeafMergedIterator) Next() bool {
+func (it *LoggerDepositLeafMergedIterator) Next() bool {
 	// If the iterator failed, stop iterating
 	if it.fail != nil {
 		return false
@@ -523,7 +523,7 @@ func (it *TrialDepositLeafMergedIterator) Next() bool {
 	if it.done {
 		select {
 		case log := <-it.logs:
-			it.Event = new(TrialDepositLeafMerged)
+			it.Event = new(LoggerDepositLeafMerged)
 			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 				it.fail = err
 				return false
@@ -538,7 +538,7 @@ func (it *TrialDepositLeafMergedIterator) Next() bool {
 	// Iterator still in progress, wait for either a data or an error event
 	select {
 	case log := <-it.logs:
-		it.Event = new(TrialDepositLeafMerged)
+		it.Event = new(LoggerDepositLeafMerged)
 		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 			it.fail = err
 			return false
@@ -554,40 +554,40 @@ func (it *TrialDepositLeafMergedIterator) Next() bool {
 }
 
 // Error returns any retrieval or parsing error occurred during filtering.
-func (it *TrialDepositLeafMergedIterator) Error() error {
+func (it *LoggerDepositLeafMergedIterator) Error() error {
 	return it.fail
 }
 
 // Close terminates the iteration process, releasing any pending underlying
 // resources.
-func (it *TrialDepositLeafMergedIterator) Close() error {
+func (it *LoggerDepositLeafMergedIterator) Close() error {
 	it.sub.Unsubscribe()
 	return nil
 }
 
-// TrialDepositLeafMerged represents a DepositLeafMerged event raised by the Trial contract.
-type TrialDepositLeafMerged struct {
+// LoggerDepositLeafMerged represents a DepositLeafMerged event raised by the Logger contract.
+type LoggerDepositLeafMerged struct {
 	Raw types.Log // Blockchain specific contextual infos
 }
 
 // FilterDepositLeafMerged is a free log retrieval operation binding the contract event 0xe08d4467ae1c0717bba6e77edc5bc5394ea260848bee1f763aba623e6e1dc864.
 //
 // Solidity: event DepositLeafMerged()
-func (_Trial *TrialFilterer) FilterDepositLeafMerged(opts *bind.FilterOpts) (*TrialDepositLeafMergedIterator, error) {
+func (_Logger *LoggerFilterer) FilterDepositLeafMerged(opts *bind.FilterOpts) (*LoggerDepositLeafMergedIterator, error) {
 
-	logs, sub, err := _Trial.contract.FilterLogs(opts, "DepositLeafMerged")
+	logs, sub, err := _Logger.contract.FilterLogs(opts, "DepositLeafMerged")
 	if err != nil {
 		return nil, err
 	}
-	return &TrialDepositLeafMergedIterator{contract: _Trial.contract, event: "DepositLeafMerged", logs: logs, sub: sub}, nil
+	return &LoggerDepositLeafMergedIterator{contract: _Logger.contract, event: "DepositLeafMerged", logs: logs, sub: sub}, nil
 }
 
 // WatchDepositLeafMerged is a free log subscription operation binding the contract event 0xe08d4467ae1c0717bba6e77edc5bc5394ea260848bee1f763aba623e6e1dc864.
 //
 // Solidity: event DepositLeafMerged()
-func (_Trial *TrialFilterer) WatchDepositLeafMerged(opts *bind.WatchOpts, sink chan<- *TrialDepositLeafMerged) (event.Subscription, error) {
+func (_Logger *LoggerFilterer) WatchDepositLeafMerged(opts *bind.WatchOpts, sink chan<- *LoggerDepositLeafMerged) (event.Subscription, error) {
 
-	logs, sub, err := _Trial.contract.WatchLogs(opts, "DepositLeafMerged")
+	logs, sub, err := _Logger.contract.WatchLogs(opts, "DepositLeafMerged")
 	if err != nil {
 		return nil, err
 	}
@@ -597,8 +597,8 @@ func (_Trial *TrialFilterer) WatchDepositLeafMerged(opts *bind.WatchOpts, sink c
 			select {
 			case log := <-logs:
 				// New log arrived, parse the event and forward to the user
-				event := new(TrialDepositLeafMerged)
-				if err := _Trial.contract.UnpackLog(event, "DepositLeafMerged", log); err != nil {
+				event := new(LoggerDepositLeafMerged)
+				if err := _Logger.contract.UnpackLog(event, "DepositLeafMerged", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -622,17 +622,17 @@ func (_Trial *TrialFilterer) WatchDepositLeafMerged(opts *bind.WatchOpts, sink c
 // ParseDepositLeafMerged is a log parse operation binding the contract event 0xe08d4467ae1c0717bba6e77edc5bc5394ea260848bee1f763aba623e6e1dc864.
 //
 // Solidity: event DepositLeafMerged()
-func (_Trial *TrialFilterer) ParseDepositLeafMerged(log types.Log) (*TrialDepositLeafMerged, error) {
-	event := new(TrialDepositLeafMerged)
-	if err := _Trial.contract.UnpackLog(event, "DepositLeafMerged", log); err != nil {
+func (_Logger *LoggerFilterer) ParseDepositLeafMerged(log types.Log) (*LoggerDepositLeafMerged, error) {
+	event := new(LoggerDepositLeafMerged)
+	if err := _Logger.contract.UnpackLog(event, "DepositLeafMerged", log); err != nil {
 		return nil, err
 	}
 	return event, nil
 }
 
-// TrialDepositQueuedIterator is returned from FilterDepositQueued and is used to iterate over the raw logs and unpacked data for DepositQueued events raised by the Trial contract.
-type TrialDepositQueuedIterator struct {
-	Event *TrialDepositQueued // Event containing the contract specifics and raw log
+// LoggerDepositQueuedIterator is returned from FilterDepositQueued and is used to iterate over the raw logs and unpacked data for DepositQueued events raised by the Logger contract.
+type LoggerDepositQueuedIterator struct {
+	Event *LoggerDepositQueued // Event containing the contract specifics and raw log
 
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
@@ -646,7 +646,7 @@ type TrialDepositQueuedIterator struct {
 // Next advances the iterator to the subsequent event, returning whether there
 // are any more events found. In case of a retrieval or parsing error, false is
 // returned and Error() can be queried for the exact failure.
-func (it *TrialDepositQueuedIterator) Next() bool {
+func (it *LoggerDepositQueuedIterator) Next() bool {
 	// If the iterator failed, stop iterating
 	if it.fail != nil {
 		return false
@@ -655,7 +655,7 @@ func (it *TrialDepositQueuedIterator) Next() bool {
 	if it.done {
 		select {
 		case log := <-it.logs:
-			it.Event = new(TrialDepositQueued)
+			it.Event = new(LoggerDepositQueued)
 			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 				it.fail = err
 				return false
@@ -670,7 +670,7 @@ func (it *TrialDepositQueuedIterator) Next() bool {
 	// Iterator still in progress, wait for either a data or an error event
 	select {
 	case log := <-it.logs:
-		it.Event = new(TrialDepositQueued)
+		it.Event = new(LoggerDepositQueued)
 		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 			it.fail = err
 			return false
@@ -686,19 +686,19 @@ func (it *TrialDepositQueuedIterator) Next() bool {
 }
 
 // Error returns any retrieval or parsing error occurred during filtering.
-func (it *TrialDepositQueuedIterator) Error() error {
+func (it *LoggerDepositQueuedIterator) Error() error {
 	return it.fail
 }
 
 // Close terminates the iteration process, releasing any pending underlying
 // resources.
-func (it *TrialDepositQueuedIterator) Close() error {
+func (it *LoggerDepositQueuedIterator) Close() error {
 	it.sub.Unsubscribe()
 	return nil
 }
 
-// TrialDepositQueued represents a DepositQueued event raised by the Trial contract.
-type TrialDepositQueued struct {
+// LoggerDepositQueued represents a DepositQueued event raised by the Logger contract.
+type LoggerDepositQueued struct {
 	Destination common.Address
 	Amount      *big.Int
 	Token       *big.Int
@@ -710,21 +710,21 @@ type TrialDepositQueued struct {
 // FilterDepositQueued is a free log retrieval operation binding the contract event 0xcb241fd5af8b0d42828bb79881d3965c2443fd98dc31f73604f538aa7a609c9b.
 //
 // Solidity: event DepositQueued(address destination, uint256 amount, uint256 token, bytes32 accountHash, bytes pubkey)
-func (_Trial *TrialFilterer) FilterDepositQueued(opts *bind.FilterOpts) (*TrialDepositQueuedIterator, error) {
+func (_Logger *LoggerFilterer) FilterDepositQueued(opts *bind.FilterOpts) (*LoggerDepositQueuedIterator, error) {
 
-	logs, sub, err := _Trial.contract.FilterLogs(opts, "DepositQueued")
+	logs, sub, err := _Logger.contract.FilterLogs(opts, "DepositQueued")
 	if err != nil {
 		return nil, err
 	}
-	return &TrialDepositQueuedIterator{contract: _Trial.contract, event: "DepositQueued", logs: logs, sub: sub}, nil
+	return &LoggerDepositQueuedIterator{contract: _Logger.contract, event: "DepositQueued", logs: logs, sub: sub}, nil
 }
 
 // WatchDepositQueued is a free log subscription operation binding the contract event 0xcb241fd5af8b0d42828bb79881d3965c2443fd98dc31f73604f538aa7a609c9b.
 //
 // Solidity: event DepositQueued(address destination, uint256 amount, uint256 token, bytes32 accountHash, bytes pubkey)
-func (_Trial *TrialFilterer) WatchDepositQueued(opts *bind.WatchOpts, sink chan<- *TrialDepositQueued) (event.Subscription, error) {
+func (_Logger *LoggerFilterer) WatchDepositQueued(opts *bind.WatchOpts, sink chan<- *LoggerDepositQueued) (event.Subscription, error) {
 
-	logs, sub, err := _Trial.contract.WatchLogs(opts, "DepositQueued")
+	logs, sub, err := _Logger.contract.WatchLogs(opts, "DepositQueued")
 	if err != nil {
 		return nil, err
 	}
@@ -734,8 +734,8 @@ func (_Trial *TrialFilterer) WatchDepositQueued(opts *bind.WatchOpts, sink chan<
 			select {
 			case log := <-logs:
 				// New log arrived, parse the event and forward to the user
-				event := new(TrialDepositQueued)
-				if err := _Trial.contract.UnpackLog(event, "DepositQueued", log); err != nil {
+				event := new(LoggerDepositQueued)
+				if err := _Logger.contract.UnpackLog(event, "DepositQueued", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -759,17 +759,17 @@ func (_Trial *TrialFilterer) WatchDepositQueued(opts *bind.WatchOpts, sink chan<
 // ParseDepositQueued is a log parse operation binding the contract event 0xcb241fd5af8b0d42828bb79881d3965c2443fd98dc31f73604f538aa7a609c9b.
 //
 // Solidity: event DepositQueued(address destination, uint256 amount, uint256 token, bytes32 accountHash, bytes pubkey)
-func (_Trial *TrialFilterer) ParseDepositQueued(log types.Log) (*TrialDepositQueued, error) {
-	event := new(TrialDepositQueued)
-	if err := _Trial.contract.UnpackLog(event, "DepositQueued", log); err != nil {
+func (_Logger *LoggerFilterer) ParseDepositQueued(log types.Log) (*LoggerDepositQueued, error) {
+	event := new(LoggerDepositQueued)
+	if err := _Logger.contract.UnpackLog(event, "DepositQueued", log); err != nil {
 		return nil, err
 	}
 	return event, nil
 }
 
-// TrialDepositsProcessedIterator is returned from FilterDepositsProcessed and is used to iterate over the raw logs and unpacked data for DepositsProcessed events raised by the Trial contract.
-type TrialDepositsProcessedIterator struct {
-	Event *TrialDepositsProcessed // Event containing the contract specifics and raw log
+// LoggerDepositsProcessedIterator is returned from FilterDepositsProcessed and is used to iterate over the raw logs and unpacked data for DepositsProcessed events raised by the Logger contract.
+type LoggerDepositsProcessedIterator struct {
+	Event *LoggerDepositsProcessed // Event containing the contract specifics and raw log
 
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
@@ -783,7 +783,7 @@ type TrialDepositsProcessedIterator struct {
 // Next advances the iterator to the subsequent event, returning whether there
 // are any more events found. In case of a retrieval or parsing error, false is
 // returned and Error() can be queried for the exact failure.
-func (it *TrialDepositsProcessedIterator) Next() bool {
+func (it *LoggerDepositsProcessedIterator) Next() bool {
 	// If the iterator failed, stop iterating
 	if it.fail != nil {
 		return false
@@ -792,7 +792,7 @@ func (it *TrialDepositsProcessedIterator) Next() bool {
 	if it.done {
 		select {
 		case log := <-it.logs:
-			it.Event = new(TrialDepositsProcessed)
+			it.Event = new(LoggerDepositsProcessed)
 			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 				it.fail = err
 				return false
@@ -807,7 +807,7 @@ func (it *TrialDepositsProcessedIterator) Next() bool {
 	// Iterator still in progress, wait for either a data or an error event
 	select {
 	case log := <-it.logs:
-		it.Event = new(TrialDepositsProcessed)
+		it.Event = new(LoggerDepositsProcessed)
 		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 			it.fail = err
 			return false
@@ -823,40 +823,40 @@ func (it *TrialDepositsProcessedIterator) Next() bool {
 }
 
 // Error returns any retrieval or parsing error occurred during filtering.
-func (it *TrialDepositsProcessedIterator) Error() error {
+func (it *LoggerDepositsProcessedIterator) Error() error {
 	return it.fail
 }
 
 // Close terminates the iteration process, releasing any pending underlying
 // resources.
-func (it *TrialDepositsProcessedIterator) Close() error {
+func (it *LoggerDepositsProcessedIterator) Close() error {
 	it.sub.Unsubscribe()
 	return nil
 }
 
-// TrialDepositsProcessed represents a DepositsProcessed event raised by the Trial contract.
-type TrialDepositsProcessed struct {
+// LoggerDepositsProcessed represents a DepositsProcessed event raised by the Logger contract.
+type LoggerDepositsProcessed struct {
 	Raw types.Log // Blockchain specific contextual infos
 }
 
 // FilterDepositsProcessed is a free log retrieval operation binding the contract event 0x663ea3b3fa88c877f70d364fe14a3b85f410a60df236737b37fcc0796225fe33.
 //
 // Solidity: event DepositsProcessed()
-func (_Trial *TrialFilterer) FilterDepositsProcessed(opts *bind.FilterOpts) (*TrialDepositsProcessedIterator, error) {
+func (_Logger *LoggerFilterer) FilterDepositsProcessed(opts *bind.FilterOpts) (*LoggerDepositsProcessedIterator, error) {
 
-	logs, sub, err := _Trial.contract.FilterLogs(opts, "DepositsProcessed")
+	logs, sub, err := _Logger.contract.FilterLogs(opts, "DepositsProcessed")
 	if err != nil {
 		return nil, err
 	}
-	return &TrialDepositsProcessedIterator{contract: _Trial.contract, event: "DepositsProcessed", logs: logs, sub: sub}, nil
+	return &LoggerDepositsProcessedIterator{contract: _Logger.contract, event: "DepositsProcessed", logs: logs, sub: sub}, nil
 }
 
 // WatchDepositsProcessed is a free log subscription operation binding the contract event 0x663ea3b3fa88c877f70d364fe14a3b85f410a60df236737b37fcc0796225fe33.
 //
 // Solidity: event DepositsProcessed()
-func (_Trial *TrialFilterer) WatchDepositsProcessed(opts *bind.WatchOpts, sink chan<- *TrialDepositsProcessed) (event.Subscription, error) {
+func (_Logger *LoggerFilterer) WatchDepositsProcessed(opts *bind.WatchOpts, sink chan<- *LoggerDepositsProcessed) (event.Subscription, error) {
 
-	logs, sub, err := _Trial.contract.WatchLogs(opts, "DepositsProcessed")
+	logs, sub, err := _Logger.contract.WatchLogs(opts, "DepositsProcessed")
 	if err != nil {
 		return nil, err
 	}
@@ -866,8 +866,8 @@ func (_Trial *TrialFilterer) WatchDepositsProcessed(opts *bind.WatchOpts, sink c
 			select {
 			case log := <-logs:
 				// New log arrived, parse the event and forward to the user
-				event := new(TrialDepositsProcessed)
-				if err := _Trial.contract.UnpackLog(event, "DepositsProcessed", log); err != nil {
+				event := new(LoggerDepositsProcessed)
+				if err := _Logger.contract.UnpackLog(event, "DepositsProcessed", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -891,17 +891,17 @@ func (_Trial *TrialFilterer) WatchDepositsProcessed(opts *bind.WatchOpts, sink c
 // ParseDepositsProcessed is a log parse operation binding the contract event 0x663ea3b3fa88c877f70d364fe14a3b85f410a60df236737b37fcc0796225fe33.
 //
 // Solidity: event DepositsProcessed()
-func (_Trial *TrialFilterer) ParseDepositsProcessed(log types.Log) (*TrialDepositsProcessed, error) {
-	event := new(TrialDepositsProcessed)
-	if err := _Trial.contract.UnpackLog(event, "DepositsProcessed", log); err != nil {
+func (_Logger *LoggerFilterer) ParseDepositsProcessed(log types.Log) (*LoggerDepositsProcessed, error) {
+	event := new(LoggerDepositsProcessed)
+	if err := _Logger.contract.UnpackLog(event, "DepositsProcessed", log); err != nil {
 		return nil, err
 	}
 	return event, nil
 }
 
-// TrialNewBatchIterator is returned from FilterNewBatch and is used to iterate over the raw logs and unpacked data for NewBatch events raised by the Trial contract.
-type TrialNewBatchIterator struct {
-	Event *TrialNewBatch // Event containing the contract specifics and raw log
+// LoggerNewBatchIterator is returned from FilterNewBatch and is used to iterate over the raw logs and unpacked data for NewBatch events raised by the Logger contract.
+type LoggerNewBatchIterator struct {
+	Event *LoggerNewBatch // Event containing the contract specifics and raw log
 
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
@@ -915,7 +915,7 @@ type TrialNewBatchIterator struct {
 // Next advances the iterator to the subsequent event, returning whether there
 // are any more events found. In case of a retrieval or parsing error, false is
 // returned and Error() can be queried for the exact failure.
-func (it *TrialNewBatchIterator) Next() bool {
+func (it *LoggerNewBatchIterator) Next() bool {
 	// If the iterator failed, stop iterating
 	if it.fail != nil {
 		return false
@@ -924,7 +924,7 @@ func (it *TrialNewBatchIterator) Next() bool {
 	if it.done {
 		select {
 		case log := <-it.logs:
-			it.Event = new(TrialNewBatch)
+			it.Event = new(LoggerNewBatch)
 			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 				it.fail = err
 				return false
@@ -939,7 +939,7 @@ func (it *TrialNewBatchIterator) Next() bool {
 	// Iterator still in progress, wait for either a data or an error event
 	select {
 	case log := <-it.logs:
-		it.Event = new(TrialNewBatch)
+		it.Event = new(LoggerNewBatch)
 		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 			it.fail = err
 			return false
@@ -955,19 +955,19 @@ func (it *TrialNewBatchIterator) Next() bool {
 }
 
 // Error returns any retrieval or parsing error occurred during filtering.
-func (it *TrialNewBatchIterator) Error() error {
+func (it *LoggerNewBatchIterator) Error() error {
 	return it.fail
 }
 
 // Close terminates the iteration process, releasing any pending underlying
 // resources.
-func (it *TrialNewBatchIterator) Close() error {
+func (it *LoggerNewBatchIterator) Close() error {
 	it.sub.Unsubscribe()
 	return nil
 }
 
-// TrialNewBatch represents a NewBatch event raised by the Trial contract.
-type TrialNewBatch struct {
+// LoggerNewBatch represents a NewBatch event raised by the Logger contract.
+type LoggerNewBatch struct {
 	Committer   common.Address
 	Txroot      [32]byte
 	UpdatedRoot [32]byte
@@ -978,21 +978,21 @@ type TrialNewBatch struct {
 // FilterNewBatch is a free log retrieval operation binding the contract event 0x1914387dd72c107202016df3d09390ff777fa6399bf12f0e5a0ed11a0b0650bb.
 //
 // Solidity: event NewBatch(address committer, bytes32 txroot, bytes32 updatedRoot, uint256 index)
-func (_Trial *TrialFilterer) FilterNewBatch(opts *bind.FilterOpts) (*TrialNewBatchIterator, error) {
+func (_Logger *LoggerFilterer) FilterNewBatch(opts *bind.FilterOpts) (*LoggerNewBatchIterator, error) {
 
-	logs, sub, err := _Trial.contract.FilterLogs(opts, "NewBatch")
+	logs, sub, err := _Logger.contract.FilterLogs(opts, "NewBatch")
 	if err != nil {
 		return nil, err
 	}
-	return &TrialNewBatchIterator{contract: _Trial.contract, event: "NewBatch", logs: logs, sub: sub}, nil
+	return &LoggerNewBatchIterator{contract: _Logger.contract, event: "NewBatch", logs: logs, sub: sub}, nil
 }
 
 // WatchNewBatch is a free log subscription operation binding the contract event 0x1914387dd72c107202016df3d09390ff777fa6399bf12f0e5a0ed11a0b0650bb.
 //
 // Solidity: event NewBatch(address committer, bytes32 txroot, bytes32 updatedRoot, uint256 index)
-func (_Trial *TrialFilterer) WatchNewBatch(opts *bind.WatchOpts, sink chan<- *TrialNewBatch) (event.Subscription, error) {
+func (_Logger *LoggerFilterer) WatchNewBatch(opts *bind.WatchOpts, sink chan<- *LoggerNewBatch) (event.Subscription, error) {
 
-	logs, sub, err := _Trial.contract.WatchLogs(opts, "NewBatch")
+	logs, sub, err := _Logger.contract.WatchLogs(opts, "NewBatch")
 	if err != nil {
 		return nil, err
 	}
@@ -1002,8 +1002,8 @@ func (_Trial *TrialFilterer) WatchNewBatch(opts *bind.WatchOpts, sink chan<- *Tr
 			select {
 			case log := <-logs:
 				// New log arrived, parse the event and forward to the user
-				event := new(TrialNewBatch)
-				if err := _Trial.contract.UnpackLog(event, "NewBatch", log); err != nil {
+				event := new(LoggerNewBatch)
+				if err := _Logger.contract.UnpackLog(event, "NewBatch", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -1027,17 +1027,17 @@ func (_Trial *TrialFilterer) WatchNewBatch(opts *bind.WatchOpts, sink chan<- *Tr
 // ParseNewBatch is a log parse operation binding the contract event 0x1914387dd72c107202016df3d09390ff777fa6399bf12f0e5a0ed11a0b0650bb.
 //
 // Solidity: event NewBatch(address committer, bytes32 txroot, bytes32 updatedRoot, uint256 index)
-func (_Trial *TrialFilterer) ParseNewBatch(log types.Log) (*TrialNewBatch, error) {
-	event := new(TrialNewBatch)
-	if err := _Trial.contract.UnpackLog(event, "NewBatch", log); err != nil {
+func (_Logger *LoggerFilterer) ParseNewBatch(log types.Log) (*LoggerNewBatch, error) {
+	event := new(LoggerNewBatch)
+	if err := _Logger.contract.UnpackLog(event, "NewBatch", log); err != nil {
 		return nil, err
 	}
 	return event, nil
 }
 
-// TrialRegisteredTokenIterator is returned from FilterRegisteredToken and is used to iterate over the raw logs and unpacked data for RegisteredToken events raised by the Trial contract.
-type TrialRegisteredTokenIterator struct {
-	Event *TrialRegisteredToken // Event containing the contract specifics and raw log
+// LoggerRegisteredTokenIterator is returned from FilterRegisteredToken and is used to iterate over the raw logs and unpacked data for RegisteredToken events raised by the Logger contract.
+type LoggerRegisteredTokenIterator struct {
+	Event *LoggerRegisteredToken // Event containing the contract specifics and raw log
 
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
@@ -1051,7 +1051,7 @@ type TrialRegisteredTokenIterator struct {
 // Next advances the iterator to the subsequent event, returning whether there
 // are any more events found. In case of a retrieval or parsing error, false is
 // returned and Error() can be queried for the exact failure.
-func (it *TrialRegisteredTokenIterator) Next() bool {
+func (it *LoggerRegisteredTokenIterator) Next() bool {
 	// If the iterator failed, stop iterating
 	if it.fail != nil {
 		return false
@@ -1060,7 +1060,7 @@ func (it *TrialRegisteredTokenIterator) Next() bool {
 	if it.done {
 		select {
 		case log := <-it.logs:
-			it.Event = new(TrialRegisteredToken)
+			it.Event = new(LoggerRegisteredToken)
 			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 				it.fail = err
 				return false
@@ -1075,7 +1075,7 @@ func (it *TrialRegisteredTokenIterator) Next() bool {
 	// Iterator still in progress, wait for either a data or an error event
 	select {
 	case log := <-it.logs:
-		it.Event = new(TrialRegisteredToken)
+		it.Event = new(LoggerRegisteredToken)
 		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 			it.fail = err
 			return false
@@ -1091,19 +1091,19 @@ func (it *TrialRegisteredTokenIterator) Next() bool {
 }
 
 // Error returns any retrieval or parsing error occurred during filtering.
-func (it *TrialRegisteredTokenIterator) Error() error {
+func (it *LoggerRegisteredTokenIterator) Error() error {
 	return it.fail
 }
 
 // Close terminates the iteration process, releasing any pending underlying
 // resources.
-func (it *TrialRegisteredTokenIterator) Close() error {
+func (it *LoggerRegisteredTokenIterator) Close() error {
 	it.sub.Unsubscribe()
 	return nil
 }
 
-// TrialRegisteredToken represents a RegisteredToken event raised by the Trial contract.
-type TrialRegisteredToken struct {
+// LoggerRegisteredToken represents a RegisteredToken event raised by the Logger contract.
+type LoggerRegisteredToken struct {
 	TokenType     *big.Int
 	TokenContract common.Address
 	Raw           types.Log // Blockchain specific contextual infos
@@ -1112,21 +1112,21 @@ type TrialRegisteredToken struct {
 // FilterRegisteredToken is a free log retrieval operation binding the contract event 0x5dbaa701a7acef513f72a61799f7e50f4653f462b9f780d88d1b9bec89de2168.
 //
 // Solidity: event RegisteredToken(uint256 tokenType, address tokenContract)
-func (_Trial *TrialFilterer) FilterRegisteredToken(opts *bind.FilterOpts) (*TrialRegisteredTokenIterator, error) {
+func (_Logger *LoggerFilterer) FilterRegisteredToken(opts *bind.FilterOpts) (*LoggerRegisteredTokenIterator, error) {
 
-	logs, sub, err := _Trial.contract.FilterLogs(opts, "RegisteredToken")
+	logs, sub, err := _Logger.contract.FilterLogs(opts, "RegisteredToken")
 	if err != nil {
 		return nil, err
 	}
-	return &TrialRegisteredTokenIterator{contract: _Trial.contract, event: "RegisteredToken", logs: logs, sub: sub}, nil
+	return &LoggerRegisteredTokenIterator{contract: _Logger.contract, event: "RegisteredToken", logs: logs, sub: sub}, nil
 }
 
 // WatchRegisteredToken is a free log subscription operation binding the contract event 0x5dbaa701a7acef513f72a61799f7e50f4653f462b9f780d88d1b9bec89de2168.
 //
 // Solidity: event RegisteredToken(uint256 tokenType, address tokenContract)
-func (_Trial *TrialFilterer) WatchRegisteredToken(opts *bind.WatchOpts, sink chan<- *TrialRegisteredToken) (event.Subscription, error) {
+func (_Logger *LoggerFilterer) WatchRegisteredToken(opts *bind.WatchOpts, sink chan<- *LoggerRegisteredToken) (event.Subscription, error) {
 
-	logs, sub, err := _Trial.contract.WatchLogs(opts, "RegisteredToken")
+	logs, sub, err := _Logger.contract.WatchLogs(opts, "RegisteredToken")
 	if err != nil {
 		return nil, err
 	}
@@ -1136,8 +1136,8 @@ func (_Trial *TrialFilterer) WatchRegisteredToken(opts *bind.WatchOpts, sink cha
 			select {
 			case log := <-logs:
 				// New log arrived, parse the event and forward to the user
-				event := new(TrialRegisteredToken)
-				if err := _Trial.contract.UnpackLog(event, "RegisteredToken", log); err != nil {
+				event := new(LoggerRegisteredToken)
+				if err := _Logger.contract.UnpackLog(event, "RegisteredToken", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -1161,17 +1161,17 @@ func (_Trial *TrialFilterer) WatchRegisteredToken(opts *bind.WatchOpts, sink cha
 // ParseRegisteredToken is a log parse operation binding the contract event 0x5dbaa701a7acef513f72a61799f7e50f4653f462b9f780d88d1b9bec89de2168.
 //
 // Solidity: event RegisteredToken(uint256 tokenType, address tokenContract)
-func (_Trial *TrialFilterer) ParseRegisteredToken(log types.Log) (*TrialRegisteredToken, error) {
-	event := new(TrialRegisteredToken)
-	if err := _Trial.contract.UnpackLog(event, "RegisteredToken", log); err != nil {
+func (_Logger *LoggerFilterer) ParseRegisteredToken(log types.Log) (*LoggerRegisteredToken, error) {
+	event := new(LoggerRegisteredToken)
+	if err := _Logger.contract.UnpackLog(event, "RegisteredToken", log); err != nil {
 		return nil, err
 	}
 	return event, nil
 }
 
-// TrialRegistrationRequestIterator is returned from FilterRegistrationRequest and is used to iterate over the raw logs and unpacked data for RegistrationRequest events raised by the Trial contract.
-type TrialRegistrationRequestIterator struct {
-	Event *TrialRegistrationRequest // Event containing the contract specifics and raw log
+// LoggerRegistrationRequestIterator is returned from FilterRegistrationRequest and is used to iterate over the raw logs and unpacked data for RegistrationRequest events raised by the Logger contract.
+type LoggerRegistrationRequestIterator struct {
+	Event *LoggerRegistrationRequest // Event containing the contract specifics and raw log
 
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
@@ -1185,7 +1185,7 @@ type TrialRegistrationRequestIterator struct {
 // Next advances the iterator to the subsequent event, returning whether there
 // are any more events found. In case of a retrieval or parsing error, false is
 // returned and Error() can be queried for the exact failure.
-func (it *TrialRegistrationRequestIterator) Next() bool {
+func (it *LoggerRegistrationRequestIterator) Next() bool {
 	// If the iterator failed, stop iterating
 	if it.fail != nil {
 		return false
@@ -1194,7 +1194,7 @@ func (it *TrialRegistrationRequestIterator) Next() bool {
 	if it.done {
 		select {
 		case log := <-it.logs:
-			it.Event = new(TrialRegistrationRequest)
+			it.Event = new(LoggerRegistrationRequest)
 			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 				it.fail = err
 				return false
@@ -1209,7 +1209,7 @@ func (it *TrialRegistrationRequestIterator) Next() bool {
 	// Iterator still in progress, wait for either a data or an error event
 	select {
 	case log := <-it.logs:
-		it.Event = new(TrialRegistrationRequest)
+		it.Event = new(LoggerRegistrationRequest)
 		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 			it.fail = err
 			return false
@@ -1225,19 +1225,19 @@ func (it *TrialRegistrationRequestIterator) Next() bool {
 }
 
 // Error returns any retrieval or parsing error occurred during filtering.
-func (it *TrialRegistrationRequestIterator) Error() error {
+func (it *LoggerRegistrationRequestIterator) Error() error {
 	return it.fail
 }
 
 // Close terminates the iteration process, releasing any pending underlying
 // resources.
-func (it *TrialRegistrationRequestIterator) Close() error {
+func (it *LoggerRegistrationRequestIterator) Close() error {
 	it.sub.Unsubscribe()
 	return nil
 }
 
-// TrialRegistrationRequest represents a RegistrationRequest event raised by the Trial contract.
-type TrialRegistrationRequest struct {
+// LoggerRegistrationRequest represents a RegistrationRequest event raised by the Logger contract.
+type LoggerRegistrationRequest struct {
 	TokenContract common.Address
 	Raw           types.Log // Blockchain specific contextual infos
 }
@@ -1245,21 +1245,21 @@ type TrialRegistrationRequest struct {
 // FilterRegistrationRequest is a free log retrieval operation binding the contract event 0xdc79fc57451962cfe3916e686997a49229af75ce2055deb4c0f0fdf3d5d2e7c1.
 //
 // Solidity: event RegistrationRequest(address tokenContract)
-func (_Trial *TrialFilterer) FilterRegistrationRequest(opts *bind.FilterOpts) (*TrialRegistrationRequestIterator, error) {
+func (_Logger *LoggerFilterer) FilterRegistrationRequest(opts *bind.FilterOpts) (*LoggerRegistrationRequestIterator, error) {
 
-	logs, sub, err := _Trial.contract.FilterLogs(opts, "RegistrationRequest")
+	logs, sub, err := _Logger.contract.FilterLogs(opts, "RegistrationRequest")
 	if err != nil {
 		return nil, err
 	}
-	return &TrialRegistrationRequestIterator{contract: _Trial.contract, event: "RegistrationRequest", logs: logs, sub: sub}, nil
+	return &LoggerRegistrationRequestIterator{contract: _Logger.contract, event: "RegistrationRequest", logs: logs, sub: sub}, nil
 }
 
 // WatchRegistrationRequest is a free log subscription operation binding the contract event 0xdc79fc57451962cfe3916e686997a49229af75ce2055deb4c0f0fdf3d5d2e7c1.
 //
 // Solidity: event RegistrationRequest(address tokenContract)
-func (_Trial *TrialFilterer) WatchRegistrationRequest(opts *bind.WatchOpts, sink chan<- *TrialRegistrationRequest) (event.Subscription, error) {
+func (_Logger *LoggerFilterer) WatchRegistrationRequest(opts *bind.WatchOpts, sink chan<- *LoggerRegistrationRequest) (event.Subscription, error) {
 
-	logs, sub, err := _Trial.contract.WatchLogs(opts, "RegistrationRequest")
+	logs, sub, err := _Logger.contract.WatchLogs(opts, "RegistrationRequest")
 	if err != nil {
 		return nil, err
 	}
@@ -1269,8 +1269,8 @@ func (_Trial *TrialFilterer) WatchRegistrationRequest(opts *bind.WatchOpts, sink
 			select {
 			case log := <-logs:
 				// New log arrived, parse the event and forward to the user
-				event := new(TrialRegistrationRequest)
-				if err := _Trial.contract.UnpackLog(event, "RegistrationRequest", log); err != nil {
+				event := new(LoggerRegistrationRequest)
+				if err := _Logger.contract.UnpackLog(event, "RegistrationRequest", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -1294,17 +1294,17 @@ func (_Trial *TrialFilterer) WatchRegistrationRequest(opts *bind.WatchOpts, sink
 // ParseRegistrationRequest is a log parse operation binding the contract event 0xdc79fc57451962cfe3916e686997a49229af75ce2055deb4c0f0fdf3d5d2e7c1.
 //
 // Solidity: event RegistrationRequest(address tokenContract)
-func (_Trial *TrialFilterer) ParseRegistrationRequest(log types.Log) (*TrialRegistrationRequest, error) {
-	event := new(TrialRegistrationRequest)
-	if err := _Trial.contract.UnpackLog(event, "RegistrationRequest", log); err != nil {
+func (_Logger *LoggerFilterer) ParseRegistrationRequest(log types.Log) (*LoggerRegistrationRequest, error) {
+	event := new(LoggerRegistrationRequest)
+	if err := _Logger.contract.UnpackLog(event, "RegistrationRequest", log); err != nil {
 		return nil, err
 	}
 	return event, nil
 }
 
-// TrialRollbackFinalisationIterator is returned from FilterRollbackFinalisation and is used to iterate over the raw logs and unpacked data for RollbackFinalisation events raised by the Trial contract.
-type TrialRollbackFinalisationIterator struct {
-	Event *TrialRollbackFinalisation // Event containing the contract specifics and raw log
+// LoggerRollbackFinalisationIterator is returned from FilterRollbackFinalisation and is used to iterate over the raw logs and unpacked data for RollbackFinalisation events raised by the Logger contract.
+type LoggerRollbackFinalisationIterator struct {
+	Event *LoggerRollbackFinalisation // Event containing the contract specifics and raw log
 
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
@@ -1318,7 +1318,7 @@ type TrialRollbackFinalisationIterator struct {
 // Next advances the iterator to the subsequent event, returning whether there
 // are any more events found. In case of a retrieval or parsing error, false is
 // returned and Error() can be queried for the exact failure.
-func (it *TrialRollbackFinalisationIterator) Next() bool {
+func (it *LoggerRollbackFinalisationIterator) Next() bool {
 	// If the iterator failed, stop iterating
 	if it.fail != nil {
 		return false
@@ -1327,7 +1327,7 @@ func (it *TrialRollbackFinalisationIterator) Next() bool {
 	if it.done {
 		select {
 		case log := <-it.logs:
-			it.Event = new(TrialRollbackFinalisation)
+			it.Event = new(LoggerRollbackFinalisation)
 			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 				it.fail = err
 				return false
@@ -1342,7 +1342,7 @@ func (it *TrialRollbackFinalisationIterator) Next() bool {
 	// Iterator still in progress, wait for either a data or an error event
 	select {
 	case log := <-it.logs:
-		it.Event = new(TrialRollbackFinalisation)
+		it.Event = new(LoggerRollbackFinalisation)
 		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 			it.fail = err
 			return false
@@ -1358,19 +1358,19 @@ func (it *TrialRollbackFinalisationIterator) Next() bool {
 }
 
 // Error returns any retrieval or parsing error occurred during filtering.
-func (it *TrialRollbackFinalisationIterator) Error() error {
+func (it *LoggerRollbackFinalisationIterator) Error() error {
 	return it.fail
 }
 
 // Close terminates the iteration process, releasing any pending underlying
 // resources.
-func (it *TrialRollbackFinalisationIterator) Close() error {
+func (it *LoggerRollbackFinalisationIterator) Close() error {
 	it.sub.Unsubscribe()
 	return nil
 }
 
-// TrialRollbackFinalisation represents a RollbackFinalisation event raised by the Trial contract.
-type TrialRollbackFinalisation struct {
+// LoggerRollbackFinalisation represents a RollbackFinalisation event raised by the Logger contract.
+type LoggerRollbackFinalisation struct {
 	TotalBatchesSlashed *big.Int
 	Raw                 types.Log // Blockchain specific contextual infos
 }
@@ -1378,21 +1378,21 @@ type TrialRollbackFinalisation struct {
 // FilterRollbackFinalisation is a free log retrieval operation binding the contract event 0x8efd02dfe309f172ea08425236aa43cec05abc25ebbb9cd4ed1de0d5048fc91a.
 //
 // Solidity: event RollbackFinalisation(uint256 totalBatchesSlashed)
-func (_Trial *TrialFilterer) FilterRollbackFinalisation(opts *bind.FilterOpts) (*TrialRollbackFinalisationIterator, error) {
+func (_Logger *LoggerFilterer) FilterRollbackFinalisation(opts *bind.FilterOpts) (*LoggerRollbackFinalisationIterator, error) {
 
-	logs, sub, err := _Trial.contract.FilterLogs(opts, "RollbackFinalisation")
+	logs, sub, err := _Logger.contract.FilterLogs(opts, "RollbackFinalisation")
 	if err != nil {
 		return nil, err
 	}
-	return &TrialRollbackFinalisationIterator{contract: _Trial.contract, event: "RollbackFinalisation", logs: logs, sub: sub}, nil
+	return &LoggerRollbackFinalisationIterator{contract: _Logger.contract, event: "RollbackFinalisation", logs: logs, sub: sub}, nil
 }
 
 // WatchRollbackFinalisation is a free log subscription operation binding the contract event 0x8efd02dfe309f172ea08425236aa43cec05abc25ebbb9cd4ed1de0d5048fc91a.
 //
 // Solidity: event RollbackFinalisation(uint256 totalBatchesSlashed)
-func (_Trial *TrialFilterer) WatchRollbackFinalisation(opts *bind.WatchOpts, sink chan<- *TrialRollbackFinalisation) (event.Subscription, error) {
+func (_Logger *LoggerFilterer) WatchRollbackFinalisation(opts *bind.WatchOpts, sink chan<- *LoggerRollbackFinalisation) (event.Subscription, error) {
 
-	logs, sub, err := _Trial.contract.WatchLogs(opts, "RollbackFinalisation")
+	logs, sub, err := _Logger.contract.WatchLogs(opts, "RollbackFinalisation")
 	if err != nil {
 		return nil, err
 	}
@@ -1402,8 +1402,8 @@ func (_Trial *TrialFilterer) WatchRollbackFinalisation(opts *bind.WatchOpts, sin
 			select {
 			case log := <-logs:
 				// New log arrived, parse the event and forward to the user
-				event := new(TrialRollbackFinalisation)
-				if err := _Trial.contract.UnpackLog(event, "RollbackFinalisation", log); err != nil {
+				event := new(LoggerRollbackFinalisation)
+				if err := _Logger.contract.UnpackLog(event, "RollbackFinalisation", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -1427,17 +1427,17 @@ func (_Trial *TrialFilterer) WatchRollbackFinalisation(opts *bind.WatchOpts, sin
 // ParseRollbackFinalisation is a log parse operation binding the contract event 0x8efd02dfe309f172ea08425236aa43cec05abc25ebbb9cd4ed1de0d5048fc91a.
 //
 // Solidity: event RollbackFinalisation(uint256 totalBatchesSlashed)
-func (_Trial *TrialFilterer) ParseRollbackFinalisation(log types.Log) (*TrialRollbackFinalisation, error) {
-	event := new(TrialRollbackFinalisation)
-	if err := _Trial.contract.UnpackLog(event, "RollbackFinalisation", log); err != nil {
+func (_Logger *LoggerFilterer) ParseRollbackFinalisation(log types.Log) (*LoggerRollbackFinalisation, error) {
+	event := new(LoggerRollbackFinalisation)
+	if err := _Logger.contract.UnpackLog(event, "RollbackFinalisation", log); err != nil {
 		return nil, err
 	}
 	return event, nil
 }
 
-// TrialStakeWithdrawIterator is returned from FilterStakeWithdraw and is used to iterate over the raw logs and unpacked data for StakeWithdraw events raised by the Trial contract.
-type TrialStakeWithdrawIterator struct {
-	Event *TrialStakeWithdraw // Event containing the contract specifics and raw log
+// LoggerStakeWithdrawIterator is returned from FilterStakeWithdraw and is used to iterate over the raw logs and unpacked data for StakeWithdraw events raised by the Logger contract.
+type LoggerStakeWithdrawIterator struct {
+	Event *LoggerStakeWithdraw // Event containing the contract specifics and raw log
 
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
@@ -1451,7 +1451,7 @@ type TrialStakeWithdrawIterator struct {
 // Next advances the iterator to the subsequent event, returning whether there
 // are any more events found. In case of a retrieval or parsing error, false is
 // returned and Error() can be queried for the exact failure.
-func (it *TrialStakeWithdrawIterator) Next() bool {
+func (it *LoggerStakeWithdrawIterator) Next() bool {
 	// If the iterator failed, stop iterating
 	if it.fail != nil {
 		return false
@@ -1460,7 +1460,7 @@ func (it *TrialStakeWithdrawIterator) Next() bool {
 	if it.done {
 		select {
 		case log := <-it.logs:
-			it.Event = new(TrialStakeWithdraw)
+			it.Event = new(LoggerStakeWithdraw)
 			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 				it.fail = err
 				return false
@@ -1475,7 +1475,7 @@ func (it *TrialStakeWithdrawIterator) Next() bool {
 	// Iterator still in progress, wait for either a data or an error event
 	select {
 	case log := <-it.logs:
-		it.Event = new(TrialStakeWithdraw)
+		it.Event = new(LoggerStakeWithdraw)
 		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 			it.fail = err
 			return false
@@ -1491,19 +1491,19 @@ func (it *TrialStakeWithdrawIterator) Next() bool {
 }
 
 // Error returns any retrieval or parsing error occurred during filtering.
-func (it *TrialStakeWithdrawIterator) Error() error {
+func (it *LoggerStakeWithdrawIterator) Error() error {
 	return it.fail
 }
 
 // Close terminates the iteration process, releasing any pending underlying
 // resources.
-func (it *TrialStakeWithdrawIterator) Close() error {
+func (it *LoggerStakeWithdrawIterator) Close() error {
 	it.sub.Unsubscribe()
 	return nil
 }
 
-// TrialStakeWithdraw represents a StakeWithdraw event raised by the Trial contract.
-type TrialStakeWithdraw struct {
+// LoggerStakeWithdraw represents a StakeWithdraw event raised by the Logger contract.
+type LoggerStakeWithdraw struct {
 	Committed common.Address
 	Amount    *big.Int
 	BatchId   *big.Int
@@ -1513,21 +1513,21 @@ type TrialStakeWithdraw struct {
 // FilterStakeWithdraw is a free log retrieval operation binding the contract event 0xb00cb3d8b4494806e139df1041902f1984526ffe765fa4d7e12d64f4a47362fe.
 //
 // Solidity: event StakeWithdraw(address committed, uint256 amount, uint256 batch_id)
-func (_Trial *TrialFilterer) FilterStakeWithdraw(opts *bind.FilterOpts) (*TrialStakeWithdrawIterator, error) {
+func (_Logger *LoggerFilterer) FilterStakeWithdraw(opts *bind.FilterOpts) (*LoggerStakeWithdrawIterator, error) {
 
-	logs, sub, err := _Trial.contract.FilterLogs(opts, "StakeWithdraw")
+	logs, sub, err := _Logger.contract.FilterLogs(opts, "StakeWithdraw")
 	if err != nil {
 		return nil, err
 	}
-	return &TrialStakeWithdrawIterator{contract: _Trial.contract, event: "StakeWithdraw", logs: logs, sub: sub}, nil
+	return &LoggerStakeWithdrawIterator{contract: _Logger.contract, event: "StakeWithdraw", logs: logs, sub: sub}, nil
 }
 
 // WatchStakeWithdraw is a free log subscription operation binding the contract event 0xb00cb3d8b4494806e139df1041902f1984526ffe765fa4d7e12d64f4a47362fe.
 //
 // Solidity: event StakeWithdraw(address committed, uint256 amount, uint256 batch_id)
-func (_Trial *TrialFilterer) WatchStakeWithdraw(opts *bind.WatchOpts, sink chan<- *TrialStakeWithdraw) (event.Subscription, error) {
+func (_Logger *LoggerFilterer) WatchStakeWithdraw(opts *bind.WatchOpts, sink chan<- *LoggerStakeWithdraw) (event.Subscription, error) {
 
-	logs, sub, err := _Trial.contract.WatchLogs(opts, "StakeWithdraw")
+	logs, sub, err := _Logger.contract.WatchLogs(opts, "StakeWithdraw")
 	if err != nil {
 		return nil, err
 	}
@@ -1537,8 +1537,8 @@ func (_Trial *TrialFilterer) WatchStakeWithdraw(opts *bind.WatchOpts, sink chan<
 			select {
 			case log := <-logs:
 				// New log arrived, parse the event and forward to the user
-				event := new(TrialStakeWithdraw)
-				if err := _Trial.contract.UnpackLog(event, "StakeWithdraw", log); err != nil {
+				event := new(LoggerStakeWithdraw)
+				if err := _Logger.contract.UnpackLog(event, "StakeWithdraw", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -1562,9 +1562,9 @@ func (_Trial *TrialFilterer) WatchStakeWithdraw(opts *bind.WatchOpts, sink chan<
 // ParseStakeWithdraw is a log parse operation binding the contract event 0xb00cb3d8b4494806e139df1041902f1984526ffe765fa4d7e12d64f4a47362fe.
 //
 // Solidity: event StakeWithdraw(address committed, uint256 amount, uint256 batch_id)
-func (_Trial *TrialFilterer) ParseStakeWithdraw(log types.Log) (*TrialStakeWithdraw, error) {
-	event := new(TrialStakeWithdraw)
-	if err := _Trial.contract.UnpackLog(event, "StakeWithdraw", log); err != nil {
+func (_Logger *LoggerFilterer) ParseStakeWithdraw(log types.Log) (*LoggerStakeWithdraw, error) {
+	event := new(LoggerStakeWithdraw)
+	if err := _Logger.contract.UnpackLog(event, "StakeWithdraw", log); err != nil {
 		return nil, err
 	}
 	return event, nil
