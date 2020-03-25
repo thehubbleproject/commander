@@ -2,6 +2,7 @@ package listener
 
 import (
 	"fmt"
+	"math/big"
 
 	"github.com/BOPR/common"
 	"github.com/BOPR/types"
@@ -18,8 +19,9 @@ func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *eth
 
 	err := common.UnpackLog(abiObject, event, eventName, vLog)
 	if err != nil {
+		// TODO do something with this error
 		fmt.Println("Unable to unpack log:", err)
-		return
+		panic(err)
 	}
 	s.Logger.Info(
 		"⬜ New event found",
@@ -34,7 +36,27 @@ func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *eth
 	// if any tx is fraud, challenge
 
 	// pick the calldata for the batch
-	_ = vLog.TxHash
+	txHash := vLog.TxHash
+	txs, err := s.contractCaller.FetchBatchInputData(txHash)
+	if err != nil {
+		// TODO do something with this error
+		panic(err)
+	}
+	newBatch := types.Batch{
+		Index:                event.Index.Uint64(),
+		StateRoot:            types.ByteArray(event.UpdatedRoot),
+		TxRoot:               types.ByteArray(event.Txroot),
+		Committer:            types.Address(event.Committer),
+		StakeAmount:          100,
+		FinalisesOn:          *big.NewInt(100),
+		TransactionsIncluded: txs,
+	}
+
+	err = s.DBInstance.AddNewBatch(newBatch)
+	if err != nil {
+		// TODO do something with this error
+		panic(err)
+	}
 
 }
 

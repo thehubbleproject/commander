@@ -28,3 +28,7 @@ func (db *DB) GetBatchCount() (int, error) {
 	db.Instance.Table("batches").Count(&count)
 	return count, nil
 }
+
+func (db *DB) AddNewBatch(batch types.Batch) error {
+	return db.Instance.Create(batch).Error
+}

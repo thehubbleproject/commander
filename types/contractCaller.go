@@ -28,6 +28,7 @@ import (
 // IContractCaller is the common interface using which we will interact with the contracts
 // and the ethereum chain
 type IContractCaller interface {
+	FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, err error)
 }
 
 // TODO use context to remove this completely
@@ -55,7 +56,10 @@ type ContractCaller struct {
 // NewContractCaller contract caller
 // NOTE: Reads configration from the config.toml file
 func NewContractCaller() (contractCaller ContractCaller, err error) {
+	// TODO remove
+	config.SetOperatorKeys(config.GlobalCfg.OperatorKey)
 	config.ParseAndInitGlobalConfig()
+
 	if RPCClient, err := rpc.Dial(config.GlobalCfg.EthRPC); err != nil {
 		return contractCaller, err
 	} else {
@@ -105,13 +109,22 @@ func (c *ContractCaller) TotalBatches() (uint64, error) {
 }
 
 // FetchBatchWithIndex fetched a block with index
-func (c *ContractCaller) FetchBatchWithIndex(index uint64) (Batch, error) {
-	crudeBatch, err := c.RollupContract.Batches(nil, big.NewInt(0).SetUint64(index))
-	if err != nil {
-		return Batch{}, err
-	}
-	return NewBatch(crudeBatch.StateRoot, Address(crudeBatch.Committer), crudeBatch.TxRoot), nil
-}
+// func (c *ContractCaller) FetchBatchWithIndex(index uint64) (Batch, error) {
+// 	crudeBatch, err := c.RollupContract.Batches(nil, big.NewInt(0).SetUint64(index))
+// 	if err != nil {
+// 		return Batch{}, err
+// 	}
+// 	batch := Batch{
+// 		Index: ,
+// 		StateRoot: ,
+// 		Committer: ,
+// 		TxRoot: ,
+// 		StakeCommitted: ,
+// 		FinalisesOn: ,
+
+// 	}
+// 	return NewBatch(crudeBatch.StateRoot, Address(crudeBatch.Committer), crudeBatch.TxRoot), nil
+// }
 
 func (c *ContractCaller) FetchBalanceTreeRoot() (ByteArray, error) {
 	root, err := c.RollupContract.GetBalanceTreeRoot(nil)
@@ -156,10 +169,6 @@ func (c *ContractCaller) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, 
 // }
 
 func GenerateAuthObj(client *ethclient.Client, callMsg ethereum.CallMsg) (auth *bind.TransactOpts, err error) {
-	// TODO remove
-	config.ParseAndInitGlobalConfig()
-	config.SetOperatorKeys(config.GlobalCfg.OperatorKey)
-
 	// from address
 	fromAddress := config.OperatorAddress()
 
