@@ -16,7 +16,7 @@ type UserAccount struct {
 
 	// ID is the path of the user account in the PDA Tree
 	// Cannot be changed once created
-	ID uint64
+	AccountID uint64
 	// Token type of the user account
 	// Cannot be changed once creation
 	TokenType uint64
@@ -33,7 +33,7 @@ type UserAccount struct {
 
 func NewUserAccount(id, balance, tokenType, nonce uint64) UserAccount {
 	return UserAccount{
-		ID:        id,
+		AccountID: id,
 		Balance:   balance,
 		TokenType: tokenType,
 		Nonce:     nonce,
@@ -42,7 +42,7 @@ func NewUserAccount(id, balance, tokenType, nonce uint64) UserAccount {
 
 func (acc *UserAccount) ToABIAccount() rollup.DataTypesUserAccount {
 	return rollup.DataTypesUserAccount{
-		ID:        UintToBigInt(acc.ID),
+		ID:        UintToBigInt(acc.AccountID),
 		Balance:   UintToBigInt(acc.Balance),
 		TokenType: UintToBigInt(acc.TokenType),
 		Nonce:     UintToBigInt(acc.Nonce),

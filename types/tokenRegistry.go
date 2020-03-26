@@ -9,5 +9,5 @@ type Token struct {
 	Address Address `json:"address"`
 
 	// token ID allocated to the token
-	ID uint `json:"tokenID"`
+	TokenID uint `json:"tokenID"`
 }
