@@ -1,10 +1,7 @@
 package types
 
-import "github.com/jinzhu/gorm"
-
 type Token struct {
-	gorm.Model
-
+	DBModel
 	// Token Address on eth chain.
 	Address Address `json:"address"`
 

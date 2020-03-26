@@ -5,6 +5,7 @@ import (
 )
 
 type ListenerLog struct {
+	DBModel
 	LastRecordedBlock string `json:"lastRecordedBlock"`
 }
 

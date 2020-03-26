@@ -44,15 +44,16 @@ func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *eth
 	}
 
 	newBatch := types.Batch{
-		Index:       event.Index.Uint64(),
-		StateRoot:   types.ByteArray(event.UpdatedRoot),
-		TxRoot:      types.ByteArray(event.Txroot),
-		Committer:   types.Address(event.Committer),
-		StakeAmount: 100,
-		FinalisesOn: *big.NewInt(100),
+		Index:                event.Index.Uint64(),
+		StateRoot:            types.ByteArray(event.UpdatedRoot),
+		TxRoot:               types.ByteArray(event.Txroot),
+		TransactionsIncluded: txs,
+		Committer:            event.Committer.String(),
+		StakeAmount:          100,
+		FinalisesOn:          *big.NewInt(100),
 	}
 
-	err = s.DBInstance.AddNewBatch(newBatch, txs)
+	err = s.DBInstance.AddNewBatch(newBatch)
 	if err != nil {
 		// TODO do something with this error
 		panic(err)

@@ -7,13 +7,11 @@ import (
 	"github.com/BOPR/common"
 	"github.com/BOPR/contracts/rollup"
 	"github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/jinzhu/gorm"
 )
 
 // UserAccount is the user data stored on the node per user
 type UserAccount struct {
-	gorm.Model
-
+	DBModel
 	// ID is the path of the user account in the PDA Tree
 	// Cannot be changed once created
 	AccountID uint64
@@ -77,7 +75,7 @@ func (acc *UserAccount) ABIEncode() ([]byte, error) {
 		},
 	}
 	bytes, err := arguments.Pack(
-		big.NewInt(int64(acc.ID)),
+		big.NewInt(int64(acc.AccountID)),
 		big.NewInt(int64(acc.Balance)),
 		big.NewInt(int64(acc.TokenType)),
 		big.NewInt(int64(acc.Nonce)),

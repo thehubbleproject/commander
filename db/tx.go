@@ -33,7 +33,7 @@ func (db *DB) PopTxs() (txs []types.Tx, err error) {
 
 	fmt.Println("found txs", pendingTxs)
 
-	var ids []uint
+	var ids []string
 	for _, tx := range pendingTxs {
 		ids = append(ids, tx.ID)
 	}

@@ -10,12 +10,11 @@ func init() {
 	m := &Migration{
 		ID: "1585168847",
 		Up: func(db *gorm.DB) error {
-			// TODO add up migration here
 			if !db.HasTable(&types.Tx{}) {
 				db.CreateTable(&types.Tx{})
 			}
-			if !db.HasTable(&types.Batch{}) {
-				db.CreateTable(&types.Batch{})
+			if !db.HasTable(&types.BatchModel{}) {
+				db.CreateTable(&types.BatchModel{})
 			}
 			if !db.HasTable(&types.ListenerLog{}) {
 				db.CreateTable(&types.ListenerLog{})
@@ -33,7 +32,7 @@ func init() {
 		},
 		Down: func(db *gorm.DB) error {
 			db.DropTableIfExists(&types.Tx{})
-			db.DropTableIfExists(&types.Batch{})
+			db.DropTableIfExists(&types.BatchModel{})
 			db.DropTableIfExists(&types.Params{})
 			db.DropTableIfExists(&types.ListenerLog{})
 			db.DropTableIfExists(&types.Token{})

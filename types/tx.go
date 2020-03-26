@@ -7,13 +7,12 @@ import (
 	"github.com/BOPR/contracts/rollup"
 	ethCmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/sha3"
 )
 
 // Tx represets the transaction on BOPRU
 type Tx struct {
-	gorm.Model
+	DBModel
 
 	To        uint64 `json:"to"`
 	From      uint64 `json:"from"`

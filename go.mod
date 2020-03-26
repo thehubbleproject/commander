@@ -54,6 +54,7 @@ require (
 	github.com/prometheus/tsdb v0.10.0
 	github.com/rjeczalik/notify v0.9.2
 	github.com/rs/cors v1.7.0
+	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/afero v1.2.2
 	github.com/spf13/cast v1.3.0
 	github.com/spf13/cobra v0.0.5
