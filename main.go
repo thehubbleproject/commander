@@ -25,7 +25,7 @@ import (
 )
 
 func main() {
-	TestABIEncodeAndDecode()
+	TestSyncer()
 }
 
 func TestABIEncodeAndDecode() {
@@ -103,6 +103,8 @@ func TestCallData() {
 func TestSyncer() {
 	config.ParseAndInitGlobalConfig()
 	syncer := listener.NewSyncer()
+	batch := types.Batch{StakeAmount: 100}
+	syncer.DBInstance.AddNewBatch(batch)
 	syncer.DBInstance.StoreListenerLog(types.ListenerLog{LastRecordedBlock: "101"})
 	if err := syncer.Start(); err != nil {
 		log.Fatalln("Unable to start syncer", "error")

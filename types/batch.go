@@ -17,5 +17,5 @@ type Batch struct {
 	StakeAmount          uint64
 	FinalisesOn          big.Int
 	SubmissionHash       Hash
-	TransactionsIncluded [][]byte
+	TransactionsIncluded []byte
 }

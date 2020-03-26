@@ -53,9 +53,9 @@ func NewSyncer() Syncer {
 	if err != nil {
 		panic(err)
 	}
-	abis := []*abi.ABI
-	for _, v := range contractCaller.ContractABI{
-		abis.append(abis,v)
+	var abis []*abi.ABI
+	for _, v := range contractCaller.ContractABI {
+		abis = append(abis, &v)
 	}
 
 	// abis for all the events
@@ -93,7 +93,7 @@ func (s *Syncer) OnStart() error {
 	subscription, err := s.contractCaller.EthClient.SubscribeNewHead(ctx, s.HeaderChannel)
 	if err != nil {
 		// start go routine to poll for new header using client object
-		go s.startPolling(ctx, 1*time.Second)
+		go s.startPolling(ctx, config.GlobalCfg.PollingInterval)
 	} else {
 		// start go routine to listen new header using subscription
 		go s.startSubscription(ctx, subscription)
@@ -142,6 +142,7 @@ func (s *Syncer) startPolling(ctx context.Context, pollInterval time.Duration) {
 	for {
 		select {
 		case <-ticker.C:
+			s.Logger.Info("Searching for new logs...")
 			header, err := s.contractCaller.EthClient.HeaderByNumber(ctx, nil)
 			if err == nil && header != nil {
 				// send data to channel
@@ -173,17 +174,17 @@ func (s *Syncer) startSubscription(ctx context.Context, subscription ethereum.Su
 
 func (s *Syncer) processHeader(header ethTypes.Header) {
 	lastLLog, err := s.DBInstance.GetLastListenerLog()
-	
+
 	// we need to filter only by logger contracts
 	// since all events are emitted by it
 	query := ethereum.FilterQuery{
 		FromBlock: lastLLog.BigInt(),
 		ToBlock:   header.Number,
 		Addresses: []ethCmn.Address{
-			config.GlobalCfg.LoggerAddress,
+			ethCmn.HexToAddress(config.GlobalCfg.LoggerAddress),
 		},
 	}
-	
+
 	err = s.DBInstance.StoreListenerLog(types.ListenerLog{LastRecordedBlock: header.Number.String()})
 	if err != nil {
 		fmt.Println("err=>", err)

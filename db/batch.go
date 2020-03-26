@@ -1,6 +1,7 @@
 package db
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/BOPR/types"
@@ -29,6 +30,11 @@ func (db *DB) GetBatchCount() (int, error) {
 	return count, nil
 }
 
-func (db *DB) AddNewBatch(batch types.Batch) error {
+func (db *DB) AddNewBatch(batch types.Batch, transactionsIncluded [][]byte) error {
+	bz, err := json.Marshal(transactionsIncluded)
+	if err != nil {
+		return err
+	}
+	batch.TransactionsIncluded = bz
 	return db.Instance.Create(batch).Error
 }

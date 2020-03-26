@@ -63,7 +63,7 @@ func NewContractCaller() (contractCaller ContractCaller, err error) {
 	} else {
 		contractCaller.EthClient = ethclient.NewClient(RPCClient)
 	}
-
+	contractCaller.ContractABI = make(map[string]abi.ABI)
 	// initialise all variables for rollup contract
 	rollupContractAddress := ethCmn.HexToAddress(config.GlobalCfg.RollupAddress)
 	if contractCaller.RollupContract, err = rollup.NewRollup(rollupContractAddress, contractCaller.EthClient); err != nil {
@@ -74,8 +74,8 @@ func NewContractCaller() (contractCaller ContractCaller, err error) {
 	}
 
 	// initialise all variables for merkle tree contract
-	merkleTreeContractAddress := ethCmn.HexToAddress(config.GlobalCfg.MerkleTreeLibAddress)
-	if contractCaller.MerkleTreeContract, err = merkleTree.NewMerkleTree(merkleTreeContractAddress, contractCaller.EthClient); err != nil {
+	balanceTreeContractAddress := ethCmn.HexToAddress(config.GlobalCfg.BalanceTreeAddress)
+	if contractCaller.BalanceTree, err = merkleTree.NewMerkleTree(balanceTreeContractAddress, contractCaller.EthClient); err != nil {
 		return contractCaller, err
 	}
 	if contractCaller.ContractABI[common.BALANCE_TREE_KEY], err = abi.JSON(strings.NewReader(merkleTree.MerkleTreeABI)); err != nil {
@@ -157,8 +157,7 @@ func (c *ContractCaller) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, 
 
 	inputDataMap := make(map[string]interface{})
 
-	method := c.RollupContractABI.Methods["SubmitBatch"]
-
+	method := c.ContractABI[common.ROLLUP_CONTRACT_KEY].Methods["SubmitBatch"]
 	err = method.Inputs.UnpackIntoMap(inputDataMap, decodedPayload)
 	if err != nil {
 		fmt.Println("Error unpacking payload", "Error", err)
