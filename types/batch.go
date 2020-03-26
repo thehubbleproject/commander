@@ -49,8 +49,6 @@ func (b *Batch) DBModel() (BatchModel, error) {
 // We are encoding the whole struct because we will save some operations
 // if we can just read the model for data in some cases and only decode when we need the encoded data
 type BatchModel struct {
-	DBModel
-
 	Index                uint64
 	StateRoot            []byte
 	Committer            string

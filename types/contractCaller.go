@@ -3,7 +3,6 @@ package types
 import (
 	"context"
 	"errors"
-	"fmt"
 	big "math/big"
 	"strings"
 
@@ -91,7 +90,7 @@ func NewContractCaller() (contractCaller ContractCaller, err error) {
 		return contractCaller, err
 	}
 
-	contractCaller.Logger = common.Logger.With("contractCaller")
+	contractCaller.Logger = common.Logger.With("module", "contractCaller")
 	return contractCaller, nil
 }
 
@@ -153,16 +152,17 @@ func (c *ContractCaller) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, 
 	}
 
 	payload := tx.Data()
+	c.Logger.Debug("Payload received from tx", "payload", payload)
 	decodedPayload := payload[4:]
 
 	inputDataMap := make(map[string]interface{})
-
-	method := c.ContractABI[common.ROLLUP_CONTRACT_KEY].Methods["SubmitBatch"]
+	method := c.ContractABI[common.ROLLUP_CONTRACT_KEY].Methods["submitBatch"]
 	err = method.Inputs.UnpackIntoMap(inputDataMap, decodedPayload)
 	if err != nil {
-		fmt.Println("Error unpacking payload", "Error", err)
+		c.Logger.Error("Error unpacking payload", "Error", err)
 		return
 	}
+	c.Logger.Debug("Created input data map", "InputData", inputDataMap)
 
 	return GetTxsFromInput(inputDataMap), nil
 }

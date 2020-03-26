@@ -2,7 +2,6 @@ package listener
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/BOPR/common"
@@ -41,7 +40,7 @@ type Syncer struct {
 
 func NewSyncer() Syncer {
 	// create logger
-	logger := common.Logger.With(SyncerServiceName)
+	logger := common.Logger.With("module", SyncerServiceName)
 
 	// create syncer obj
 	syncerService := &Syncer{}
@@ -98,13 +97,13 @@ func (s *Syncer) OnStart() error {
 		// start go routine to listen new header using subscription
 		go s.startSubscription(ctx, subscription)
 	}
+	s.Logger.Info("Starting syncer", "LoggingContract", config.GlobalCfg.LoggerAddress)
 	return nil
 }
 
 // OnStop stops all necessary go routines
 func (s *Syncer) OnStop() {
 
-	fmt.Println("Stopping services")
 	s.BaseService.OnStop() // Always call the overridden method.
 
 	// cancel subscription if any
@@ -118,7 +117,6 @@ func (s *Syncer) OnStop() {
 
 // startHeaderProcess starts header process when they get new header
 func (s *Syncer) startHeaderProcess(ctx context.Context) {
-	fmt.Println("starting header process")
 	for {
 		select {
 		case newHeader := <-s.HeaderChannel:
@@ -174,7 +172,10 @@ func (s *Syncer) startSubscription(ctx context.Context, subscription ethereum.Su
 
 func (s *Syncer) processHeader(header ethTypes.Header) {
 	lastLLog, err := s.DBInstance.GetLastListenerLog()
-
+	if err != nil {
+		s.Logger.Error("Unable to fetch listener log", "error", err)
+	}
+	s.Logger.Debug("Fetched last block indexed", "LastLogIndexed", lastLLog)
 	// we need to filter only by logger contracts
 	// since all events are emitted by it
 	query := ethereum.FilterQuery{
@@ -187,9 +188,8 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 
 	err = s.DBInstance.StoreListenerLog(types.ListenerLog{LastRecordedBlock: header.Number.String()})
 	if err != nil {
-		fmt.Println("err=>", err)
+		s.Logger.Error("Unable to update listener log", "error", err)
 	}
-	lastLLog, err = s.DBInstance.GetLastListenerLog()
 
 	// get all logs
 	logs, err := s.contractCaller.EthClient.FilterLogs(context.Background(), query)
@@ -210,7 +210,7 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 				switch selectedEvent.Name {
 				case "deposit":
 					s.processDeposit(selectedEvent.Name, abiObject, &vLog)
-				case "newBatch":
+				case "NewBatch":
 					s.processNewBatch(selectedEvent.Name, abiObject, &vLog)
 				case "newAccount":
 					s.processNewAccount(selectedEvent.Name, abiObject, &vLog)
