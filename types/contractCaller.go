@@ -152,7 +152,6 @@ func (c *ContractCaller) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, 
 	}
 
 	payload := tx.Data()
-	c.Logger.Debug("Payload received from tx", "payload", payload)
 	decodedPayload := payload[4:]
 
 	inputDataMap := make(map[string]interface{})

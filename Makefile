@@ -10,6 +10,7 @@ contracts:
 	abigen --abi=contracts/trial/trial.abi --pkg=trial --out=contracts/trial/trial.go
 	abigen --abi=contracts/logger/logger.abi --pkg=logger --out=contracts/logger/logger.go
 
+
 clean:
 	rm -rf build
 

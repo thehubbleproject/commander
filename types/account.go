@@ -27,6 +27,11 @@ type UserAccount struct {
 	// Path from root to leaf
 	// NOTE: not a part of the leaf
 	Path uint
+
+	// Pending = 0 means has deposit but not merged to balance tree
+	// Active = 1
+	// InActive = 2 means user has withdrawn amount and is inactive
+	Status int
 }
 
 func NewUserAccount(id, balance, tokenType, nonce uint64) UserAccount {
@@ -35,6 +40,17 @@ func NewUserAccount(id, balance, tokenType, nonce uint64) UserAccount {
 		Balance:   balance,
 		TokenType: tokenType,
 		Nonce:     nonce,
+	}
+}
+
+func NewPendingUserAccount(id, balance, tokenType uint64) UserAccount {
+	return UserAccount{
+		AccountID: id,
+		TokenType: tokenType,
+		Balance:   balance,
+		Nonce:     0,
+		Path:      0,
+		Status:    0,
 	}
 }
 

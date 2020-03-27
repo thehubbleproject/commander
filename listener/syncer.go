@@ -208,11 +208,13 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 			if selectedEvent != nil {
 				s.Logger.Debug("Found an event", "name", selectedEvent.Name)
 				switch selectedEvent.Name {
-				case "deposit":
+				case "RegisteredToken":
+					s.processRegisteredToken(selectedEvent.Name, abiObject, &vLog)
+				case "RegistrationRequest":
 					s.processDeposit(selectedEvent.Name, abiObject, &vLog)
 				case "NewBatch":
 					s.processNewBatch(selectedEvent.Name, abiObject, &vLog)
-				case "newAccount":
+				case "DepositQueued":
 					s.processNewAccount(selectedEvent.Name, abiObject, &vLog)
 				}
 				// break the inner loop

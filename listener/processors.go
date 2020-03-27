@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 
+	"github.com/BOPR/contracts/logger"
 	"github.com/BOPR/contracts/rollup"
 )
 
@@ -49,7 +50,7 @@ func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *eth
 		TxRoot:               types.ByteArray(event.Txroot),
 		TransactionsIncluded: txs,
 		Committer:            event.Committer.String(),
-		StakeAmount:          100,
+		StakeAmount:          32,
 		FinalisesOn:          *big.NewInt(100),
 	}
 
@@ -62,10 +63,62 @@ func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *eth
 
 func (s *Syncer) processNewAccount(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
 	s.Logger.Info("New account found")
+	// unpack event
+	event := new(logger.LoggerDepositQueued)
+
+	err := common.UnpackLog(abiObject, event, eventName, vLog)
+	if err != nil {
+		// TODO do something with this error
+		fmt.Println("Unable to unpack log:", err)
+		panic(err)
+	}
+
+	s.Logger.Info(
+		"⬜ New event found",
+		"event", eventName,
+		"accountID", event.AccountID.String(),
+		"Amount", event.Amount.String(),
+		"TokenID", event.Token.String(),
+		"AccountHash", event.AccountHash,
+		"pubkey", event.Pubkey,
+	)
+
+	// add account as pending
+	newAccount := types.NewPendingUserAccount(event.AccountID.Uint64(), event.Amount.Uint64(), event.Token.Uint64())
+	if err := s.DBInstance.InsertAccount(newAccount); err != nil {
+		panic(err)
+	}
 }
 
 func (s *Syncer) processDeposit(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
 	s.Logger.Info("New deposit found")
-	// add deposit to the account DB
 
+	// unpack event
+
+	// find all the pending accounts that have been included in this merge
+
+	// update all the account statuses and give them path's
+
+}
+
+func (s *Syncer) processRegisteredToken(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
+	s.Logger.Info("New token registered")
+	event := new(logger.LoggerRegisteredToken)
+
+	err := common.UnpackLog(abiObject, event, eventName, vLog)
+	if err != nil {
+		// TODO do something with this error
+		fmt.Println("Unable to unpack log:", err)
+		panic(err)
+	}
+	s.Logger.Info(
+		"⬜ New event found",
+		"event", eventName,
+		"TokenAddress", event.TokenContract.String(),
+		"TokenID", event.TokenType,
+	)
+	newToken := types.Token{TokenID: event.TokenType, Address: event.TokenContract}
+	if err := s.DBInstance.AddToken(newToken); err != nil {
+		panic(err)
+	}
 }

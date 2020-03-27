@@ -41,8 +41,7 @@ func (db *DB) GetAccount(ID uint64) (types.UserAccount, error) {
 }
 
 func (db *DB) InsertAccount(account types.UserAccount) error {
-	db.Instance.Create(account)
-	return nil
+	return db.Instance.Create(account).Error
 }
 
 func (db *DB) InsertBulkAccounts(accounts []types.UserAccount) error {
