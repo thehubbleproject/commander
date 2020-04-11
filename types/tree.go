@@ -8,6 +8,12 @@ import (
 	"golang.org/x/crypto/sha3"
 )
 
+type DepositTree struct {
+	Height           uint64
+	NumberOfDeposits uint64
+	Root             ByteArray
+}
+
 type LeafData []byte
 
 //CalculateHash hashes the values of a TestContent

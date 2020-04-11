@@ -210,12 +210,18 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 				switch selectedEvent.Name {
 				case "RegisteredToken":
 					s.processRegisteredToken(selectedEvent.Name, abiObject, &vLog)
-				case "RegistrationRequest":
-					s.processDeposit(selectedEvent.Name, abiObject, &vLog)
+				// case "RegistrationRequest":
+				// 	s.processRegisteredToken(selectedEvent.Name, abiObject, &vLog)
+				// case "RegistrationRequest":
+				// 	s.processDeposit(selectedEvent.Name, abiObject, &vLog)
 				case "NewBatch":
 					s.processNewBatch(selectedEvent.Name, abiObject, &vLog)
 				case "DepositQueued":
-					s.processNewAccount(selectedEvent.Name, abiObject, &vLog)
+					s.processDepositQueued(selectedEvent.Name, abiObject, &vLog)
+				case "DepositLeafMerged":
+					s.processDepositLeafMerged(selectedEvent.Name, abiObject, &vLog)
+				case "DepositFinalised":
+					s.processDepositFinalised(selectedEvent.Name, abiObject, &vLog)
 				}
 				// break the inner loop
 				break

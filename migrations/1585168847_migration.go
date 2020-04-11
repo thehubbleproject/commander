@@ -28,6 +28,9 @@ func init() {
 			if !db.HasTable(&types.UserAccount{}) {
 				db.CreateTable(&types.UserAccount{})
 			}
+			if !db.HasTable(&types.DepositTree{}) {
+				db.CreateTable(&types.DepositTree{})
+			}
 			return nil
 		},
 		Down: func(db *gorm.DB) error {
@@ -37,6 +40,7 @@ func init() {
 			db.DropTableIfExists(&types.ListenerLog{})
 			db.DropTableIfExists(&types.Token{})
 			db.DropTableIfExists(&types.UserAccount{})
+			db.DropTableIfExists(&types.DepositTree{})
 			return nil
 		},
 	}

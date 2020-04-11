@@ -16,14 +16,15 @@ import (
 )
 
 const (
-	DATABASENAME              = "BOPR"
-	DefaultMongoDB            = "mongodb://localhost:27017"
-	DefaultDB                 = "mysql"
-	DefaultDbUrlPrefix        = "mysql://root:root@(localhost:3306)"
-	DefaultEthRPC             = "http://localhost:8545"
-	DefaultPollingInterval    = 5 * time.Second
-	DefaultSeverPort          = "8080"
-	DefaultConfirmationBlocks = 5
+	DATABASENAME                = "BOPR"
+	DefaultMongoDB              = "mongodb://localhost:27017"
+	DefaultDB                   = "mysql"
+	DefaultDbUrlPrefix          = "mysql://root:root@(localhost:3306)"
+	DefaultEthRPC               = "http://localhost:8545"
+	DefaultPollingInterval      = 5 * time.Second
+	DefaultSeverPort            = "8080"
+	DefaultConfirmationBlocks   = 5
+	DefaultDepositSubTreeHeight = 4
 )
 
 var GlobalCfg Configuration
@@ -53,28 +54,31 @@ type Configuration struct {
 	OperatorKey       string `mapstructure:"operator_key"`
 	OperatorAddress   string `mapstructure:"operator_address"`
 	LastRecordedBlock string `mapstructure:"last_recorded_block"`
+
+	DepositTreeFinalisationHeight uint64 `mapstructure:"deposit_tree_finalisation_height"`
 }
 
 // GetDefaultConfig returns the default configration options
 func GetDefaultConfig() Configuration {
 	return Configuration{
-		DB:                   DefaultDB,
-		DBURL:                GetDBURL(),
-		Trace:                false,
-		DBLogMode:            true,
-		EthRPC:               DefaultEthRPC,
-		PollingInterval:      DefaultPollingInterval,
-		ServerPort:           DefaultSeverPort,
-		ConfirmationBlocks:   DefaultConfirmationBlocks,
-		RollupAddress:        ethCmn.Address{}.String(),
-		BalanceTreeAddress:   ethCmn.Address{}.String(),
-		AccountTreeAddress:   ethCmn.Address{}.String(),
-		MerkleTreeLibAddress: ethCmn.Address{}.String(),
-		TokenRegistryAddress: ethCmn.Address{}.String(),
-		LoggerAddress:        ethCmn.Address{}.String(),
-		OperatorKey:          "",
-		OperatorAddress:      "",
-		LastRecordedBlock:    "0",
+		DB:                            DefaultDB,
+		DBURL:                         GetDBURL(),
+		Trace:                         false,
+		DBLogMode:                     true,
+		EthRPC:                        DefaultEthRPC,
+		PollingInterval:               DefaultPollingInterval,
+		ServerPort:                    DefaultSeverPort,
+		ConfirmationBlocks:            DefaultConfirmationBlocks,
+		RollupAddress:                 ethCmn.Address{}.String(),
+		BalanceTreeAddress:            ethCmn.Address{}.String(),
+		AccountTreeAddress:            ethCmn.Address{}.String(),
+		MerkleTreeLibAddress:          ethCmn.Address{}.String(),
+		TokenRegistryAddress:          ethCmn.Address{}.String(),
+		LoggerAddress:                 ethCmn.Address{}.String(),
+		OperatorKey:                   "",
+		OperatorAddress:               "",
+		LastRecordedBlock:             "0",
+		DepositTreeFinalisationHeight: DefaultDepositSubTreeHeight,
 	}
 }
 

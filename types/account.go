@@ -24,6 +24,9 @@ type UserAccount struct {
 	// Nonce of the account
 	Nonce uint64
 
+	// Public key for the user
+	PublicKey string
+
 	// Path from root to leaf
 	// NOTE: not a part of the leaf
 	Path uint
@@ -43,7 +46,7 @@ func NewUserAccount(id, balance, tokenType, nonce uint64) UserAccount {
 	}
 }
 
-func NewPendingUserAccount(id, balance, tokenType uint64) UserAccount {
+func NewPendingUserAccount(id, balance, tokenType uint64, _pubkey string) UserAccount {
 	return UserAccount{
 		AccountID: id,
 		TokenType: tokenType,
@@ -51,6 +54,7 @@ func NewPendingUserAccount(id, balance, tokenType uint64) UserAccount {
 		Nonce:     0,
 		Path:      0,
 		Status:    0,
+		PublicKey: _pubkey,
 	}
 }
 
