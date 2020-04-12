@@ -16,6 +16,6 @@ func NewMerkleProof(account UserAccount, siblings []UserAccount) MerkleProof {
 func (m *MerkleProof) ToABIVersion(path int64) rollup.DataTypesAccountMerkleProof {
 	return rollup.DataTypesAccountMerkleProof{
 		AccountIP: m.Account.AccountInclusionProof(path),
-		Siblings:  AccsToLeafHashes(m.Siblings),
+		// Siblings:  AccsToLeafHashes(m.Siblings),
 	}
 }

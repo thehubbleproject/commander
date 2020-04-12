@@ -1,1 +1,114 @@
 package types
+
+import (
+	"github.com/BOPR/common"
+	"github.com/ethereum/go-ethereum/accounts/abi"
+)
+
+var defaultHashes []ByteArray
+var ZERO_VALUE_LEAF ByteArray
+
+func init() {
+	var err error
+	ZERO_VALUE_LEAF, err = HexToByteArray("290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563")
+	if err != nil {
+		panic(err)
+	}
+
+	// TODO change and pick from global config
+	defaultHashes, err = GenDefaultHashes(4)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func GenDefaultHashes(depth int) ([]ByteArray, error) {
+	hashes := make([]ByteArray, depth)
+	hashes[0] = ZERO_VALUE_LEAF
+	for i := 1; i < depth; i++ {
+		parent, err := GetParent(hashes[i-1], hashes[i-1])
+		if err != nil {
+			return hashes, err
+		}
+		hashes[i] = parent
+	}
+	return hashes, nil
+}
+
+type Content struct {
+	data []byte
+}
+
+func GetMerkleRoot(c []Content, numberOfElements int) (root ByteArray, err error) {
+	nextLevelLength := numberOfElements
+	currentLevel := 0
+	nodes := make([]ByteArray, numberOfElements+1)
+	for i := 0; i < numberOfElements; i++ {
+		nodes[i] = Keccak256AndConvertToByteArray(c[i].data)
+	}
+	if numberOfElements == 1 {
+		return nodes[0], nil
+	}
+
+	if nextLevelLength%2 == 1 {
+		nodes[nextLevelLength] = defaultHashes[currentLevel]
+		nextLevelLength += 1
+	}
+
+	for nextLevelLength > 1 {
+		currentLevel += 1
+		for i := 0; i < nextLevelLength/2; i++ {
+			nodes[i], err = GetParent(nodes[i*2], nodes[i*2+1])
+			if err != nil {
+				return
+			}
+
+			nextLevelLength = nextLevelLength / 2
+			// Check if we will need to add an extra node
+			if nextLevelLength%2 == 1 && nextLevelLength != 1 {
+				nodes[nextLevelLength] = defaultHashes[currentLevel]
+				nextLevelLength += 1
+			}
+		}
+	}
+	return nodes[0], nil
+}
+
+func GetParent(left, right ByteArray) (parent ByteArray, err error) {
+	data, err := EncodeChildren(left, right)
+	if err != nil {
+		return parent, err
+	}
+	leaf := common.Keccak256(data)
+	return BytesToByteArray(leaf.Bytes()), nil
+}
+
+func EncodeChildren(left, right ByteArray) (result []byte, err error) {
+	bytes32Type, err := abi.NewType("bytes32", "bytes32", nil)
+	if err != nil {
+		return
+	}
+
+	arguments := abi.Arguments{
+		{
+			Type: bytes32Type,
+		},
+		{
+			Type: bytes32Type,
+		},
+	}
+	bz, err := arguments.Pack(
+		[32]byte(left),
+		[32]byte(right),
+	)
+	if err != nil {
+		return
+	}
+
+	return bz, nil
+}
+
+func Keccak256AndConvertToByteArray(data []byte) ByteArray {
+	hash := common.Keccak256(data)
+	return BytesToByteArray(hash.Bytes())
+}

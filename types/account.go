@@ -1,10 +1,8 @@
 package types
 
 import (
-	"fmt"
 	"math/big"
 
-	"github.com/BOPR/common"
 	"github.com/BOPR/contracts/rollup"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 )
@@ -107,14 +105,14 @@ func (acc *UserAccount) ABIEncode() ([]byte, error) {
 	return bytes, nil
 }
 
-func AccsToLeafHashes(accs []UserAccount) (result [][32]byte) {
-	for i, acc := range accs {
-		accEncoded, err := acc.ABIEncode()
-		if err != nil {
-			fmt.Println("Error while abi encoding accounts", err)
-			return
-		}
-		result[i] = BytesToByteArray(common.Hash(accEncoded))
-	}
-	return
-}
+// func AccsToLeafHashes(accs []UserAccount) (result [][32]byte) {
+// 	for i, acc := range accs {
+// 		accEncoded, err := acc.ABIEncode()
+// 		if err != nil {
+// 			fmt.Println("Error while abi encoding accounts", err)
+// 			return
+// 		}
+// 		result[i] = BytesToByteArray(common.Hash(accEncoded))
+// 	}
+// 	return
+// }
