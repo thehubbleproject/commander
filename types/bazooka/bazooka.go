@@ -19,11 +19,11 @@ import (
 
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 
+	"github.com/BOPR/types"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	ethCmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/tendermint/tendermint/libs/log"
-	"github.com/BOPR/types"
 )
 
 // IContractCaller is the common interface using which we will interact with the contracts
@@ -34,7 +34,7 @@ type IBazooka interface {
 
 // TODO use context to remove this completely
 // Global Contract Caller Object
-var BazookaInstance Bazooka
+var LoadedBazooka Bazooka
 
 // ContractCaller satisfies the IContractCaller interface and contains all the variables required to interact
 // With the ethereum chain along with contract addresses and ABI's
@@ -53,7 +53,7 @@ type Bazooka struct {
 
 // NewContractCaller contract caller
 // NOTE: Reads configration from the config.toml file
-func NewLoadedBazooka() (bazooka Bazooka, err error) {
+func NewPreLoadedBazooka() (bazooka Bazooka, err error) {
 	// TODO remove
 	config.SetOperatorKeys(config.GlobalCfg.OperatorKey)
 	config.ParseAndInitGlobalConfig()

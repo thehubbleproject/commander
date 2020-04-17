@@ -13,9 +13,8 @@ import (
 	"github.com/BOPR/listener"
 	"github.com/BOPR/poller"
 	"github.com/BOPR/rest"
-	"github.com/BOPR/types"
+	"github.com/BOPR/types/bazooka"
 	"github.com/gorilla/mux"
-	"github.com/jinzhu/gorm"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -62,7 +61,7 @@ func StartCmd() *cobra.Command {
 			db.DBInstance = tempDB
 
 			// create and init global config object
-			types.ContractCallerObj, err = types.NewContractCaller()
+			bazooka.LoadedBazooka, err = bazooka.NewPreLoadedBazooka()
 			common.PanicIfError(err)
 
 			//
@@ -80,7 +79,7 @@ func StartCmd() *cobra.Command {
 			//
 
 			// fetch number of batches submitted on-chain
-			batchCount, err := types.ContractCallerObj.TotalBatches()
+			batchCount, err := bazooka.LoadedBazooka.TotalBatches()
 			common.PanicIfError(err)
 
 			// if there are batches submitted already, start syncer
@@ -122,15 +121,15 @@ func StartCmd() *cobra.Command {
 			}
 
 			// set last recorded block in DB for syncer
-			llog, err := db.DBInstance.GetLastListenerLog()
-			if err != nil && gorm.IsRecordNotFoundError(err) {
-				// if no record is present so insert the record in config.toml
-				err := db.DBInstance.StoreListenerLog(types.ListenerLog{LastRecordedBlock: cfg.LastRecordedBlock})
-				common.PanicIfError(err)
-			} else if err != nil && !gorm.IsRecordNotFoundError(err) {
-				common.PanicIfError(err)
-			}
-			fmt.Println("Last recorded block for syncer present", llog.LastRecordedBlock)
+			// llog, err := db.DBInstance.GetLastListenerLog()
+			// if err != nil && gorm.IsRecordNotFoundError(err) {
+			// 	// if no record is present so insert the record in config.toml
+			// 	err := db.DBInstance.StoreListenerLog(types.ListenerLog{LastRecordedBlock: cfg.LastRecordedBlock})
+			// 	common.PanicIfError(err)
+			// } else if err != nil && !gorm.IsRecordNotFoundError(err) {
+			// 	common.PanicIfError(err)
+			// }
+			//fmt.Println("Last recorded block for syncer present", llog.LastRecordedBlock)
 
 			// go routine to catch signal
 			catchSignal := make(chan os.Signal, 1)

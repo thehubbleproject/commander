@@ -48,7 +48,7 @@ func NewSyncer() Syncer {
 	// create new base service
 	syncerService.BaseService = *types.NewBaseService(logger, SyncerServiceName, syncerService)
 
-	loadedBazooka, err := bazooka.NewLoadedBazooka()
+	loadedBazooka, err := bazooka.NewPreLoadedBazooka()
 	if err != nil {
 		panic(err)
 	}
@@ -171,22 +171,22 @@ func (s *Syncer) startSubscription(ctx context.Context, subscription ethereum.Su
 }
 
 func (s *Syncer) processHeader(header ethTypes.Header) {
-	lastLLog, err := s.DBInstance.GetLastListenerLog()
+	syncStatus, err := s.DBInstance.GetSyncStatus()
 	if err != nil {
 		s.Logger.Error("Unable to fetch listener log", "error", err)
 	}
-	s.Logger.Debug("Fetched last block indexed", "LastLogIndexed", lastLLog)
+	s.Logger.Debug("Fetched last block indexed", "LastLogIndexed", syncStatus.LastEthBlockBigInt().String())
 	// we need to filter only by logger contracts
 	// since all events are emitted by it
 	query := ethereum.FilterQuery{
-		FromBlock: lastLLog.BigInt(),
+		FromBlock: syncStatus.LastEthBlockBigInt(),
 		ToBlock:   header.Number,
 		Addresses: []ethCmn.Address{
 			ethCmn.HexToAddress(config.GlobalCfg.LoggerAddress),
 		},
 	}
 
-	err = s.DBInstance.StoreListenerLog(types.ListenerLog{LastRecordedBlock: header.Number.String()})
+	err = s.DBInstance.UpdateSyncStatusWithBlockNumber(header.Number.Uint64())
 	if err != nil {
 		s.Logger.Error("Unable to update listener log", "error", err)
 	}

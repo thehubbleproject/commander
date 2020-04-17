@@ -1,5 +1,7 @@
 package types
 
+import "math/big"
+
 // Params stores all the parameters which are maintained on-chain and keeps updating
 // them whenever they change on-chain
 type Params struct {
@@ -24,14 +26,14 @@ type Params struct {
 type SyncStatus struct {
 	DBModel
 	// Last eth block seen by the syncer is persisted here so that we can resume sync from it
-	LastEthBlockRecorded uint `json:"lastEthBlockRecorded"`
+	LastEthBlockRecorded uint64 `json:"lastEthBlockRecorded"`
 
 	// Last batch index is recorded for this field
-	LastBatchRecorded uint `json:"lastBatchRecorded"`
+	LastBatchRecorded uint64 `json:"lastBatchRecorded"`
 }
 
-// func (l *ListenerLog) BigInt() *big.Int {
-// 	n := new(big.Int)
-// 	n, _ = n.SetString(l.LastRecordedBlock, 10)
-// 	return n
-// }
+func (ss *SyncStatus) LastEthBlockBigInt() *big.Int {
+	n := new(big.Int)
+	return n.SetUint64(ss.LastEthBlockRecorded)
+
+}
