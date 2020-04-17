@@ -25,6 +25,7 @@ const (
 	DefaultSeverPort            = "8080"
 	DefaultConfirmationBlocks   = 5
 	DefaultDepositSubTreeHeight = 4
+	DefaultMaxDepth             = 2
 )
 
 var GlobalCfg Configuration
@@ -51,10 +52,10 @@ type Configuration struct {
 	TokenRegistryAddress string `mapstructure:"token_registry_address"`
 	LoggerAddress        string `mapstructure:"logger_address"`
 
-	OperatorKey       string `mapstructure:"operator_key"`
-	OperatorAddress   string `mapstructure:"operator_address"`
-	LastRecordedBlock string `mapstructure:"last_recorded_block"`
-
+	OperatorKey                   string `mapstructure:"operator_key"`
+	OperatorAddress               string `mapstructure:"operator_address"`
+	LastRecordedBlock             string `mapstructure:"last_recorded_block"`
+	MaxDepth                      uint64 `mapstructure:"max_depth"`
 	DepositTreeFinalisationHeight uint64 `mapstructure:"deposit_tree_finalisation_height"`
 }
 

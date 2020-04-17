@@ -1,6 +1,8 @@
 package types
 
 import (
+	"encoding/hex"
+
 	"github.com/BOPR/common"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 )
@@ -16,7 +18,7 @@ func init() {
 	}
 
 	// TODO change and pick from global config
-	defaultHashes, err = GenDefaultHashes(4)
+	defaultHashes, err = GenDefaultHashes(10)
 	if err != nil {
 		panic(err)
 	}
@@ -37,6 +39,25 @@ func GenDefaultHashes(depth int) ([]ByteArray, error) {
 
 type Content struct {
 	data []byte
+}
+
+func (c *Content) Populate(data []byte) {
+	c.data = data
+
+}
+
+func NewContentList(dataLeaves []string) ([]Content, error) {
+	var contentList []Content
+	for _, dataLeaf := range dataLeaves {
+		var c Content
+		bz, err := hex.DecodeString(dataLeaf)
+		if err != nil {
+			return contentList, err
+		}
+		c.Populate(bz)
+		contentList = append(contentList, c)
+	}
+	return contentList, nil
 }
 
 func GetMerkleRoot(c []Content, numberOfElements int) (root ByteArray, err error) {
@@ -62,13 +83,12 @@ func GetMerkleRoot(c []Content, numberOfElements int) (root ByteArray, err error
 			if err != nil {
 				return
 			}
-
-			nextLevelLength = nextLevelLength / 2
-			// Check if we will need to add an extra node
-			if nextLevelLength%2 == 1 && nextLevelLength != 1 {
-				nodes[nextLevelLength] = defaultHashes[currentLevel]
-				nextLevelLength += 1
-			}
+		}
+		nextLevelLength = nextLevelLength / 2
+		// Check if we will need to add an extra node
+		if nextLevelLength%2 == 1 && nextLevelLength != 1 {
+			nodes[nextLevelLength] = defaultHashes[currentLevel]
+			nextLevelLength += 1
 		}
 	}
 	return nodes[0], nil

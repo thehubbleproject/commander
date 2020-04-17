@@ -1,9 +1,12 @@
 package common
 
 import (
-	"crypto/sha256"
 	"encoding/binary"
+	"encoding/hex"
 	"math"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 func UintTo2Byte(a uint32) [2]byte {
@@ -47,7 +50,15 @@ func FlipBit(bit int) int {
 	return 1
 }
 
-func Hash(data []byte) []byte {
-	h := sha256.New()
-	return h.Sum(data)
+func Keccak256(data []byte) common.Hash {
+	return crypto.Keccak256Hash(data)
+}
+
+func KeccakFromString(data string) (hash common.Hash, err error) {
+	bz, err := hex.DecodeString(data)
+	if err != nil {
+		return
+	}
+	return Keccak256(bz), nil
+
 }

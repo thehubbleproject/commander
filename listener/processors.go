@@ -14,53 +14,6 @@ import (
 	"github.com/BOPR/contracts/rollup"
 )
 
-func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
-	s.Logger.Info("New batch submitted on eth chain")
-
-	event := new(rollup.RollupNewBatch)
-
-	err := common.UnpackLog(abiObject, event, eventName, vLog)
-	if err != nil {
-		// TODO do something with this error
-		fmt.Println("Unable to unpack log:", err)
-		panic(err)
-	}
-	s.Logger.Info(
-		"⬜ New event found",
-		"event", eventName,
-		"BatchNumber", event.Index.String(),
-		"TxRoot", types.ByteArray(event.Txroot).String(),
-		"NewStateRoot", types.ByteArray(event.UpdatedRoot).String(),
-		"Committer", event.Committer.String(),
-	)
-
-	// TODO run the transactions through ProcessTx present on-chain
-	// if any tx is fraud, challenge
-
-	// pick the calldata for the batch
-	txHash := vLog.TxHash
-	txs, err := s.contractCaller.FetchBatchInputData(txHash)
-	if err != nil {
-		// TODO do something with this error
-		panic(err)
-	}
-
-	newBatch := types.Batch{
-		Index:                event.Index.Uint64(),
-		StateRoot:            types.ByteArray(event.UpdatedRoot),
-		TxRoot:               types.ByteArray(event.Txroot),
-		TransactionsIncluded: txs,
-		Committer:            event.Committer.String(),
-		StakeAmount:          32,
-		FinalisesOn:          *big.NewInt(100),
-	}
-
-	err = s.DBInstance.AddNewBatch(newBatch)
-	if err != nil {
-		// TODO do something with this error
-		panic(err)
-	}
-}
 func (s *Syncer) processDepositQueued(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
 	s.Logger.Info("New deposit found")
 
@@ -89,7 +42,6 @@ func (s *Syncer) processDepositQueued(eventName string, abiObject *abi.ABI, vLog
 	if err := s.DBInstance.InsertAccount(newAccount); err != nil {
 		panic(err)
 	}
-
 }
 
 func (s *Syncer) processDepositLeafMerged(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
@@ -157,6 +109,53 @@ func (s *Syncer) processDepositFinalised(eventName string, abiObject *abi.ABI, v
 	s.DBInstance.FinaliseDeposits(accountsRoot, pathToDepositSubTree.Uint64(), newBalanceRoot)
 }
 
+func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
+	s.Logger.Info("New batch submitted on eth chain")
+
+	event := new(rollup.RollupNewBatch)
+
+	err := common.UnpackLog(abiObject, event, eventName, vLog)
+	if err != nil {
+		// TODO do something with this error
+		fmt.Println("Unable to unpack log:", err)
+		panic(err)
+	}
+	s.Logger.Info(
+		"⬜ New event found",
+		"event", eventName,
+		"BatchNumber", event.Index.String(),
+		"TxRoot", types.ByteArray(event.Txroot).String(),
+		"NewStateRoot", types.ByteArray(event.UpdatedRoot).String(),
+		"Committer", event.Committer.String(),
+	)
+
+	// TODO run the transactions through ProcessTx present on-chain
+	// if any tx is fraud, challenge
+
+	// pick the calldata for the batch
+	txHash := vLog.TxHash
+	txs, err := s.contractCaller.FetchBatchInputData(txHash)
+	if err != nil {
+		// TODO do something with this error
+		panic(err)
+	}
+
+	newBatch := types.Batch{
+		Index:                event.Index.Uint64(),
+		StateRoot:            types.ByteArray(event.UpdatedRoot),
+		TxRoot:               types.ByteArray(event.Txroot),
+		TransactionsIncluded: txs,
+		Committer:            event.Committer.String(),
+		StakeAmount:          32,
+		FinalisesOn:          *big.NewInt(100),
+	}
+
+	err = s.DBInstance.AddNewBatch(newBatch)
+	if err != nil {
+		// TODO do something with this error
+		panic(err)
+	}
+}
 func (s *Syncer) processRegisteredToken(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
 	s.Logger.Info("New token registered")
 	event := new(logger.LoggerRegisteredToken)

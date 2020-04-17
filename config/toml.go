@@ -37,6 +37,7 @@ account_tree_address = "{{ .AccountTreeAddress }}"
 merkle_lib_address = "{{ .MerkleTreeLibAddress }}"
 token_registry_address = "{{ .TokenRegistryAddress }}"
 logger_address = "{{ .LoggerAddress }}"
+max_depth = "{{ .MaxDepth }}"
 deposit_tree_finalisation_height = "{{ .DepositTreeFinalisationHeight }}"
 `
 
