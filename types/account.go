@@ -32,6 +32,7 @@ type UserAccount struct {
 	// Pending = 0 means has deposit but not merged to balance tree
 	// Active = 1
 	// InActive = 2 means user has withdrawn amount and is inactive
+	// NonInitialised = 100
 	Status int
 }
 

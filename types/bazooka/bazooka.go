@@ -1,4 +1,4 @@
-package types
+package bazooka
 
 import (
 	"context"
@@ -23,21 +23,22 @@ import (
 	ethCmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/tendermint/tendermint/libs/log"
+	"github.com/BOPR/types"
 )
 
 // IContractCaller is the common interface using which we will interact with the contracts
 // and the ethereum chain
-type IContractCaller interface {
+type IBazooka interface {
 	FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, err error)
 }
 
 // TODO use context to remove this completely
 // Global Contract Caller Object
-var ContractCallerObj ContractCaller
+var BazookaInstance Bazooka
 
 // ContractCaller satisfies the IContractCaller interface and contains all the variables required to interact
 // With the ethereum chain along with contract addresses and ABI's
-type ContractCaller struct {
+type Bazooka struct {
 	Logger log.Logger
 
 	EthClient *ethclient.Client
@@ -52,51 +53,51 @@ type ContractCaller struct {
 
 // NewContractCaller contract caller
 // NOTE: Reads configration from the config.toml file
-func NewContractCaller() (contractCaller ContractCaller, err error) {
+func NewLoadedBazooka() (bazooka Bazooka, err error) {
 	// TODO remove
 	config.SetOperatorKeys(config.GlobalCfg.OperatorKey)
 	config.ParseAndInitGlobalConfig()
 
 	if RPCClient, err := rpc.Dial(config.GlobalCfg.EthRPC); err != nil {
-		return contractCaller, err
+		return bazooka, err
 	} else {
-		contractCaller.EthClient = ethclient.NewClient(RPCClient)
+		bazooka.EthClient = ethclient.NewClient(RPCClient)
 	}
-	contractCaller.ContractABI = make(map[string]abi.ABI)
+	bazooka.ContractABI = make(map[string]abi.ABI)
 	// initialise all variables for rollup contract
 	rollupContractAddress := ethCmn.HexToAddress(config.GlobalCfg.RollupAddress)
-	if contractCaller.RollupContract, err = rollup.NewRollup(rollupContractAddress, contractCaller.EthClient); err != nil {
-		return contractCaller, err
+	if bazooka.RollupContract, err = rollup.NewRollup(rollupContractAddress, bazooka.EthClient); err != nil {
+		return bazooka, err
 	}
-	if contractCaller.ContractABI[common.ROLLUP_CONTRACT_KEY], err = abi.JSON(strings.NewReader(rollup.RollupABI)); err != nil {
-		return contractCaller, err
+	if bazooka.ContractABI[common.ROLLUP_CONTRACT_KEY], err = abi.JSON(strings.NewReader(rollup.RollupABI)); err != nil {
+		return bazooka, err
 	}
 
 	// initialise all variables for merkle tree contract
 	balanceTreeContractAddress := ethCmn.HexToAddress(config.GlobalCfg.BalanceTreeAddress)
-	if contractCaller.BalanceTree, err = merkleTree.NewMerkleTree(balanceTreeContractAddress, contractCaller.EthClient); err != nil {
-		return contractCaller, err
+	if bazooka.BalanceTree, err = merkleTree.NewMerkleTree(balanceTreeContractAddress, bazooka.EthClient); err != nil {
+		return bazooka, err
 	}
-	if contractCaller.ContractABI[common.BALANCE_TREE_KEY], err = abi.JSON(strings.NewReader(merkleTree.MerkleTreeABI)); err != nil {
-		return contractCaller, err
+	if bazooka.ContractABI[common.BALANCE_TREE_KEY], err = abi.JSON(strings.NewReader(merkleTree.MerkleTreeABI)); err != nil {
+		return bazooka, err
 	}
 
 	// initialise all variables for event logger contract
 	loggerAddress := ethCmn.HexToAddress(config.GlobalCfg.LoggerAddress)
-	if contractCaller.EventLogger, err = logger.NewLogger(loggerAddress, contractCaller.EthClient); err != nil {
-		return contractCaller, err
+	if bazooka.EventLogger, err = logger.NewLogger(loggerAddress, bazooka.EthClient); err != nil {
+		return bazooka, err
 	}
-	if contractCaller.ContractABI[common.LOGGER_KEY], err = abi.JSON(strings.NewReader(logger.LoggerABI)); err != nil {
-		return contractCaller, err
+	if bazooka.ContractABI[common.LOGGER_KEY], err = abi.JSON(strings.NewReader(logger.LoggerABI)); err != nil {
+		return bazooka, err
 	}
 
-	contractCaller.Logger = common.Logger.With("module", "contractCaller")
-	return contractCaller, nil
+	bazooka.Logger = common.Logger.With("module", "bazooka")
+	return bazooka, nil
 }
 
 // get main chain block header
-func (c *ContractCaller) GetMainChainBlock(blockNum *big.Int) (header *ethTypes.Header, err error) {
-	latestBlock, err := c.EthClient.HeaderByNumber(context.Background(), blockNum)
+func (b *Bazooka) GetMainChainBlock(blockNum *big.Int) (header *ethTypes.Header, err error) {
+	latestBlock, err := b.EthClient.HeaderByNumber(context.Background(), blockNum)
 	if err != nil {
 		return
 	}
@@ -104,8 +105,8 @@ func (c *ContractCaller) GetMainChainBlock(blockNum *big.Int) (header *ethTypes.
 }
 
 // TotalBatches returns the total number of batches that have been submitted on chain
-func (c *ContractCaller) TotalBatches() (uint64, error) {
-	totalBatches, err := c.RollupContract.NumberOfBatches(nil)
+func (b *Bazooka) TotalBatches() (uint64, error) {
+	totalBatches, err := b.RollupContract.NumberOfBatches(nil)
 	if err != nil {
 		return 0, err
 	}
@@ -130,24 +131,24 @@ func (c *ContractCaller) TotalBatches() (uint64, error) {
 // 	return NewBatch(crudeBatch.StateRoot, Address(crudeBatch.Committer), crudeBatch.TxRoot), nil
 // }
 
-func (c *ContractCaller) FetchBalanceTreeRoot() (ByteArray, error) {
-	root, err := c.RollupContract.GetBalanceTreeRoot(nil)
+func (b *Bazooka) FetchBalanceTreeRoot() (types.ByteArray, error) {
+	root, err := b.RollupContract.GetBalanceTreeRoot(nil)
 	if err != nil {
-		return ByteArray{}, err
+		return types.ByteArray{}, err
 	}
 	return root, nil
 }
 
-func (c *ContractCaller) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, err error) {
-	tx, isPending, err := c.EthClient.TransactionByHash(context.Background(), txHash)
+func (b *Bazooka) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, err error) {
+	tx, isPending, err := b.EthClient.TransactionByHash(context.Background(), txHash)
 	if err != nil {
-		c.Logger.Error("Cannot fetch transaction from hash", "Error", err)
+		b.Logger.Error("Cannot fetch transaction from hash", "Error", err)
 		return
 	}
 
 	if isPending {
 		err := errors.New("Transaction is pending")
-		c.Logger.Error("Transaction is still pending, cannot process", "Error", err)
+		b.Logger.Error("Transaction is still pending, cannot process", "Error", err)
 		return txs, err
 	}
 
@@ -155,13 +156,13 @@ func (c *ContractCaller) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, 
 	decodedPayload := payload[4:]
 
 	inputDataMap := make(map[string]interface{})
-	method := c.ContractABI[common.ROLLUP_CONTRACT_KEY].Methods["submitBatch"]
+	method := b.ContractABI[common.ROLLUP_CONTRACT_KEY].Methods["submitBatch"]
 	err = method.Inputs.UnpackIntoMap(inputDataMap, decodedPayload)
 	if err != nil {
-		c.Logger.Error("Error unpacking payload", "Error", err)
+		b.Logger.Error("Error unpacking payload", "Error", err)
 		return
 	}
-	c.Logger.Debug("Created input data map", "InputData", inputDataMap)
+	b.Logger.Debug("Created input data map", "InputData", inputDataMap)
 
 	return GetTxsFromInput(inputDataMap), nil
 }
@@ -201,7 +202,7 @@ func GenerateAuthObj(client *ethclient.Client, callMsg ethereum.CallMsg) (auth *
 
 // ProcessTx calls the ProcessTx function on the contract to verify the tx
 // returns the updated accounts and the new balance root
-func (c *ContractCaller) ProcessTx(balanceTreeRoot ByteArray, tx Tx, fromMerkleProof, toMerkleProof MerkleProof) (newBalanceRoot ByteArray, from, to UserAccount, err error) {
+func (b *Bazooka) ProcessTx(balanceTreeRoot types.ByteArray, tx types.Tx, fromMerkleProof, toMerkleProof types.MerkleProof) (newBalanceRoot types.ByteArray, from, to types.UserAccount, err error) {
 	// txReceipt, err := c.RollupContract.ProcessTxUpdate(nil, balanceTreeRoot,
 	// 	tx.ToABIVersion(fromMerkleProof.Account.ToABIAccount(), toMerkleProof.Account.ToABIAccount()),
 	// 	fromMerkleProof.ToABIVersion(),

@@ -7,12 +7,12 @@ import (
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 	"github.com/BOPR/db"
-	"github.com/BOPR/types"
+	types "github.com/BOPR/types"
+	bazooka "github.com/BOPR/types/bazooka"
 	"github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/accounts/abi"
 	ethCmn "github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
-
-	"github.com/ethereum/go-ethereum/accounts/abi"
 )
 
 // Syncer to sync events from ethereum chain
@@ -27,7 +27,7 @@ type Syncer struct {
 	DBInstance db.DB
 
 	// contract caller to interact with contracts
-	contractCaller types.ContractCaller
+	loadedBazooka bazooka.Bazooka
 
 	// header channel
 	HeaderChannel chan *ethTypes.Header
@@ -48,18 +48,18 @@ func NewSyncer() Syncer {
 	// create new base service
 	syncerService.BaseService = *types.NewBaseService(logger, SyncerServiceName, syncerService)
 
-	contractCaller, err := types.NewContractCaller()
+	loadedBazooka, err := bazooka.NewLoadedBazooka()
 	if err != nil {
 		panic(err)
 	}
 	var abis []*abi.ABI
-	for _, v := range contractCaller.ContractABI {
+	for _, v := range loadedBazooka.ContractABI {
 		abis = append(abis, &v)
 	}
 
 	// abis for all the events
 	syncerService.abis = abis
-	syncerService.contractCaller = contractCaller
+	syncerService.loadedBazooka = loadedBazooka
 	syncerService.HeaderChannel = make(chan *ethTypes.Header)
 	syncerService.DBInstance, err = db.NewDB()
 	if err != nil {
@@ -89,7 +89,7 @@ func (s *Syncer) OnStart() error {
 	go s.startHeaderProcess(headerCtx)
 
 	// subscribe to new head
-	subscription, err := s.contractCaller.EthClient.SubscribeNewHead(ctx, s.HeaderChannel)
+	subscription, err := s.loadedBazooka.EthClient.SubscribeNewHead(ctx, s.HeaderChannel)
 	if err != nil {
 		// start go routine to poll for new header using client object
 		go s.startPolling(ctx, config.GlobalCfg.PollingInterval)
@@ -141,7 +141,7 @@ func (s *Syncer) startPolling(ctx context.Context, pollInterval time.Duration) {
 		select {
 		case <-ticker.C:
 			s.Logger.Info("Searching for new logs...")
-			header, err := s.contractCaller.EthClient.HeaderByNumber(ctx, nil)
+			header, err := s.loadedBazooka.EthClient.HeaderByNumber(ctx, nil)
 			if err == nil && header != nil {
 				// send data to channel
 				s.HeaderChannel <- header
@@ -192,7 +192,7 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 	}
 
 	// get all logs
-	logs, err := s.contractCaller.EthClient.FilterLogs(context.Background(), query)
+	logs, err := s.loadedBazooka.EthClient.FilterLogs(context.Background(), query)
 	if err != nil {
 		s.Logger.Error("Error while filtering logs from syncer", "error", err)
 		return
@@ -200,6 +200,15 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 		s.Logger.Debug("New logs found", "numberOfLogs", len(logs))
 	}
 
+	/* We search for the following events in the blockchain
+	1. Token Registration request
+	2. Token Finalisation declaration
+	3. New Batch created
+	4. New Deposit Queued
+	5. Deposit Leaf merged
+	6. Deposit Finalisation declaration
+	7. Param variable updates ( see types/param.go)
+	*/
 	// TODO test if this works if one block has more than one log
 	for _, vLog := range logs {
 		topic := vLog.Topics[0].Bytes()

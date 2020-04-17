@@ -134,7 +134,7 @@ func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *eth
 
 	// pick the calldata for the batch
 	txHash := vLog.TxHash
-	txs, err := s.contractCaller.FetchBatchInputData(txHash)
+	txs, err := s.loadedBazooka.FetchBatchInputData(txHash)
 	if err != nil {
 		// TODO do something with this error
 		panic(err)
@@ -179,6 +179,7 @@ func (s *Syncer) processRegisteredToken(eventName string, abiObject *abi.ABI, vL
 }
 
 func (s *Syncer) sendDepositFinalisationTx() {
+
 	// fetch all the data from s.DBInstance.sendDepositFinalisationTx
 
 	// send transaction to ethereum chain

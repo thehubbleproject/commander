@@ -16,8 +16,8 @@ func init() {
 			if !db.HasTable(&types.BatchModel{}) {
 				db.CreateTable(&types.BatchModel{})
 			}
-			if !db.HasTable(&types.ListenerLog{}) {
-				db.CreateTable(&types.ListenerLog{})
+			if !db.HasTable(&types.SyncStatus{}) {
+				db.CreateTable(&types.SyncStatus{})
 			}
 			if !db.HasTable(&types.Params{}) {
 				db.CreateTable(&types.Params{})
@@ -37,7 +37,7 @@ func init() {
 			db.DropTableIfExists(&types.Tx{})
 			db.DropTableIfExists(&types.BatchModel{})
 			db.DropTableIfExists(&types.Params{})
-			db.DropTableIfExists(&types.ListenerLog{})
+			db.DropTableIfExists(&types.SyncStatus{})
 			db.DropTableIfExists(&types.Token{})
 			db.DropTableIfExists(&types.UserAccount{})
 			db.DropTableIfExists(&types.DepositTree{})
