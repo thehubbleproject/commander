@@ -9,9 +9,17 @@ import (
 	"github.com/BOPR/common"
 )
 
+type Genesis struct {
+	StartEthBlock           string          `json:"startEthBlock"`
+	MaxTreeDepth            string          `json:"maxTreeDepth"`
+	MaxDepositSubTreeHeight string          `json:"maxDepositSubTreeHeight"`
+	GenesisAccounts         GenesisAccounts `json:"genesisAccounts"`
+}
+
 //  GenUserAccount exists to allow remove circular dependency with types
 // and to allow storing more data about the account than the data in UserAccount
 type GenUserAccount struct {
+	ID        uint64 `json:"ID"`
 	Path      uint64
 	Balance   uint64
 	TokenType uint64
