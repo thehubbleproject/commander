@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -10,9 +9,10 @@ import (
 )
 
 type Genesis struct {
-	StartEthBlock           string          `json:"startEthBlock"`
-	MaxTreeDepth            string          `json:"maxTreeDepth"`
-	MaxDepositSubTreeHeight string          `json:"maxDepositSubTreeHeight"`
+	StartEthBlock           uint64          `json:"startEthBlock"`
+	MaxTreeDepth            uint64          `json:"maxTreeDepth"`
+	MaxDepositSubTreeHeight uint64          `json:"maxDepositSubTreeHeight"`
+	StakeAmount             uint64          `json:"stakeAmount"`
 	GenesisAccounts         GenesisAccounts `json:"genesisAccounts"`
 }
 
@@ -24,14 +24,17 @@ type GenUserAccount struct {
 	Balance   uint64
 	TokenType uint64
 	Nonce     uint64
+	PublicKey string
 }
 
-func NewGenUserAccount(path, balance, tokenType, nonce uint64) GenUserAccount {
+func NewGenUserAccount(id, path, balance, tokenType, nonce uint64, publicKey string) GenUserAccount {
 	return GenUserAccount{
+		ID:        id,
 		Path:      path,
 		Balance:   balance,
 		TokenType: tokenType,
 		Nonce:     nonce,
+		PublicKey: publicKey,
 	}
 }
 
@@ -45,32 +48,43 @@ func NewGenesisAccounts(accounts []GenUserAccount) GenesisAccounts {
 
 func DefaultGenesisAccounts() GenesisAccounts {
 	var accounts []GenUserAccount
-	acc := NewGenUserAccount(common.DEAFULT_PATH, common.DEFAULT_BALANCE, common.DEFAULT_TOKEN_TYPE, common.DEFAULT_TOKEN_TYPE)
+
+	// add coordinator account
+	acc := NewGenUserAccount(common.COORDINATOR, common.COORDINATOR, common.COORDINATOR, common.COORDINATOR, common.COORDINATOR, common.COORDINATOR_PUBKEY)
 	accounts = append(accounts, acc)
 	return NewGenesisAccounts(accounts)
 }
 
-func ReadGenesisFile() (GenesisAccounts, error) {
-	var genAccounts GenesisAccounts
+func DefaultGenesis() Genesis {
+	return Genesis{
+		StartEthBlock:           0,
+		MaxTreeDepth:            common.DEFAULT_DEPTH,
+		MaxDepositSubTreeHeight: common.DEFAULT_DEPTH,
+		StakeAmount:             32,
+		GenesisAccounts:         DefaultGenesisAccounts(),
+	}
+}
+
+func ReadGenesisFile() (Genesis, error) {
+	var genesis Genesis
 
 	genesisFile, err := os.Open("genesis.json")
 	if err != nil {
-		fmt.Println(err)
-		return genAccounts, err
+		return genesis, err
 	}
 	defer genesisFile.Close()
 
 	genBytes, err := ioutil.ReadAll(genesisFile)
 	if err != nil {
-		fmt.Println(err)
-		return genAccounts, err
+		return genesis, err
 	}
-	err = json.Unmarshal(genBytes, &genAccounts)
-	return genAccounts, err
+
+	err = json.Unmarshal(genBytes, &genesis)
+	return genesis, err
 }
 
-func WriteGenesisFile(genesis GenesisAccounts) error {
-	bz, err := json.Marshal(genesis)
+func WriteGenesisFile(genesis Genesis) error {
+	bz, err := json.MarshalIndent(genesis, "", "    ")
 	if err != nil {
 		return err
 	}

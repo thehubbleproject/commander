@@ -40,9 +40,11 @@ func (db *DB) InsertAccount(account types.UserAccount) error {
 
 func (db *DB) InsertBulkAccounts(accounts []types.UserAccount) error {
 	for _, account := range accounts {
+		fmt.Println("adding new account", account)
 		err := db.InsertAccount(account)
 		if err != nil {
-			return ErrUnableToCreateRecord(fmt.Sprintf("Unable to add account with ID:%v to DB", account.ID))
+			fmt.Println("error", err)
+			return ErrUnableToCreateRecord(fmt.Sprintf("Unable to add account with ID:%v to DB", account.AccountID))
 		}
 	}
 	return nil
@@ -51,8 +53,8 @@ func (db *DB) InsertBulkAccounts(accounts []types.UserAccount) error {
 func (db *DB) InsertGenAccounts(genAccs []config.GenUserAccount) error {
 	var accLeafs []types.UserAccount
 	for _, acc := range genAccs {
-		newAccLeaf := types.NewUserAccount(acc.Path, acc.Balance, acc.TokenType, acc.Nonce)
-		accLeafs = append(accLeafs, newAccLeaf)
+		newAccLeaf := types.NewUserAccount(acc.ID, acc.Balance, acc.TokenType, acc.Nonce, acc.Path, 1, acc.PublicKey)
+		accLeafs = append(accLeafs, *newAccLeaf)
 	}
 	return db.InsertBulkAccounts(accLeafs)
 }

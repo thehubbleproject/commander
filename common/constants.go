@@ -7,11 +7,12 @@ const (
 	ACCOUNT_COLLECTION     = "accounts"
 	BATCH_COLLECTION       = "batches"
 
-	DEAFULT_PATH       = 100
-	DEFAULT_HEIGHT     = 2
-	DEFAULT_BALANCE    = 100
-	DEFAULT_NONCE      = 0
-	DEFAULT_TOKEN_TYPE = 0
+	DEFAULT_DEPTH   = 2
+	DEFAULT_BALANCE = 0
+	DEFAULT_NONCE   = 0
+
+	COORDINATOR        = 0
+	COORDINATOR_PUBKEY = "0"
 
 	PrivKeyPath = "./privKey.json"
 	//

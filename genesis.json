@@ -1,1 +1,18 @@
-{"gen_accounts":[{"Path":100,"Balance":100,"TokenType":0,"Nonce":0}]}
+{
+  "startEthBlock": 100,
+  "maxTreeDepth": 2,
+  "maxDepositSubTreeHeight": 2,
+  "stakeAmount": 32,
+  "genesisAccounts": {
+    "gen_accounts": [
+      {
+        "ID": 0,
+        "Path": 0,
+        "Balance": 0,
+        "TokenType": 0,
+        "Nonce": 0,
+        "PublicKey": "0"
+      }
+    ]
+  }
+}

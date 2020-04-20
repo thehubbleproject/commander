@@ -9,7 +9,7 @@ import (
 
 // UserAccount is the user data stored on the node per user
 type UserAccount struct {
-	DBModel
+	// DBModel
 	// ID is the path of the user account in the PDA Tree
 	// Cannot be changed once created
 	AccountID uint64
@@ -27,7 +27,7 @@ type UserAccount struct {
 
 	// Path from root to leaf
 	// NOTE: not a part of the leaf
-	Path uint
+	Path uint64
 
 	// Pending = 0 means has deposit but not merged to balance tree
 	// Active = 1
@@ -36,12 +36,15 @@ type UserAccount struct {
 	Status int
 }
 
-func NewUserAccount(id, balance, tokenType, nonce uint64) UserAccount {
-	return UserAccount{
+func NewUserAccount(id, balance, tokenType, nonce, path uint64, status int, pubkey string) *UserAccount {
+	return &UserAccount{
 		AccountID: id,
+		PublicKey: pubkey,
 		Balance:   balance,
 		TokenType: tokenType,
 		Nonce:     nonce,
+		Path:      path,
+		Status:    status,
 	}
 }
 

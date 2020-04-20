@@ -24,8 +24,8 @@ type Executor struct {
 
 func main() {
 	rootCmd := &cobra.Command{
-		Use:   "bopr",
-		Short: "Beacon Optimistic Rollup Daemon (server)",
+		Use:   "hubble",
+		Short: "Optimistic Rollup Daemon (server)",
 	}
 
 	// add new persistent flag for heimdall-config

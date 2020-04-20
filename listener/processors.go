@@ -5,7 +5,6 @@ import (
 	"math/big"
 
 	"github.com/BOPR/common"
-	"github.com/BOPR/config"
 	"github.com/BOPR/types"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
@@ -73,9 +72,12 @@ func (s *Syncer) processDepositLeafMerged(eventName string, abiObject *abi.ABI, 
 	if err != nil {
 		panic(err)
 	}
-
+	params, err := s.DBInstance.GetParams()
+	if err != nil {
+		panic(err)
+	}
 	// if deposit subtree height = deposit finalisation height then
-	if newheight == config.GlobalCfg.DepositTreeFinalisationHeight {
+	if newheight == params.MaxDepositSubTreeHeight {
 		// send deposit finalisation transction to ethereum chain
 		go s.sendDepositFinalisationTx()
 	}

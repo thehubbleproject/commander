@@ -13,8 +13,10 @@ import (
 	"github.com/BOPR/listener"
 	"github.com/BOPR/poller"
 	"github.com/BOPR/rest"
+	"github.com/BOPR/types"
 	"github.com/BOPR/types/bazooka"
 	"github.com/gorilla/mux"
+	"github.com/jinzhu/gorm"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -23,46 +25,17 @@ import (
 func StartCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "start",
-		Short: "Starts BOPR daemon",
+		Short: "Starts hubble daemon",
 		Run: func(cmd *cobra.Command, args []string) {
-			// create viper object
-			viperObj := viper.New()
+			var err error
+			// populate global config object
+			ReadAndInitGlobalConfig()
 
-			// get current directory
-			dir, err := os.Getwd()
-			common.PanicIfError(err)
+			InitGlobalDBInstance()
 
-			// set config paths
-			viperObj.SetConfigName(ConfigFileName) // name of config file (without extension)
-			viperObj.AddConfigPath(dir)
+			InitGlobalBazooka()
 
-			// finally! read config
-			err = viperObj.ReadInConfig()
-			common.PanicIfError(err)
-
-			// unmarshall to the configration object
-			var cfg config.Configuration
-			if err = viperObj.UnmarshalExact(&cfg); err != nil {
-				common.PanicIfError(err)
-			}
-			//
-			// Init global config objects
-			//
-
-			// init global config
-			config.GlobalCfg = cfg
-			// TODO use a better way to handle priv keys post testnet
-			common.PanicIfError(config.SetOperatorKeys(config.GlobalCfg.OperatorKey))
-
-			// create db Instance
-			tempDB, err := db.NewDB()
-			common.PanicIfError(err)
-			// init global DB instance
-			db.DBInstance = tempDB
-
-			// create and init global config object
-			bazooka.LoadedBazooka, err = bazooka.NewPreLoadedBazooka()
-			common.PanicIfError(err)
+			logger := common.Logger.With("module", "bazooka")
 
 			//
 			// Create all the required services
@@ -74,62 +47,23 @@ func StartCmd() *cobra.Command {
 			// create the syncer service
 			syncer := listener.NewSyncer()
 
-			//
-			// init genesis state
-			//
+			// if no row is found then we are starting the node for the first time
+			syncStatus, err := db.DBInstance.GetSyncStatus()
+			if err != nil && gorm.IsRecordNotFoundError(err) {
+				// read genesis file
+				genesis, err := config.ReadGenesisFile()
+				common.PanicIfError(err)
 
-			// fetch number of batches submitted on-chain
-			batchCount, err := bazooka.LoadedBazooka.TotalBatches()
-			common.PanicIfError(err)
-
-			// if there are batches submitted already, start syncer
-			// syncer will figure out if we are synced or not and will proceed accordingly
-			if batchCount != 0 {
-				// If !0, start syncer to sync all the blocks
-				// TODO start syncer
-			} else {
-				// fetch 0 root from the contract
-				// root, err := types.ContractCallerObj.FetchBalanceTreeRoot()
-				// common.PanicIfError(err)
-
-				// // get the number of batches we have stored
-				// storedBatchCount, err := db.DBInstance.GetBatchCount()
-				// if err != nil {
-				// 	panic(err)
-				// }
-
-				// // figure out if we need to add adccounts
-				// if storedBatchCount == 0 {
-				// 	// persist batch info to DB
-				// 	err = db.DBInstance.InsertBatchInfo(root, uint64(batchCount))
-				// 	common.PanicIfError(err)
-				// }
-
-				storedAccCount, err := db.DBInstance.GetAccountCount()
-				if err != nil {
-					panic(err)
-				}
-
-				// if there are no accounts add genesis accounts else skip
-				if storedAccCount == 0 {
-					// read genesis file and populate all accounts
-					genAcc, err := config.ReadGenesisFile()
-					common.PanicIfError(err)
-					err = db.DBInstance.InsertGenAccounts(genAcc.Accounts)
-					common.PanicIfError(err)
-				}
+				// loads genesis data to the database
+				LoadGenesisData(genesis)
+			} else if err != nil && !gorm.IsRecordNotFoundError(err) {
+				logger.Error("Error connecting to database", "error", err)
+				common.PanicIfError(err)
 			}
 
-			// set last recorded block in DB for syncer
-			// llog, err := db.DBInstance.GetLastListenerLog()
-			// if err != nil && gorm.IsRecordNotFoundError(err) {
-			// 	// if no record is present so insert the record in config.toml
-			// 	err := db.DBInstance.StoreListenerLog(types.ListenerLog{LastRecordedBlock: cfg.LastRecordedBlock})
-			// 	common.PanicIfError(err)
-			// } else if err != nil && !gorm.IsRecordNotFoundError(err) {
-			// 	common.PanicIfError(err)
-			// }
-			//fmt.Println("Last recorded block for syncer present", llog.LastRecordedBlock)
+			logger.Info("Starting coordinator with sync and aggregator enabled", "lastSyncedEthBlock",
+				syncStatus.LastEthBlockBigInt().String(),
+				"lastSyncedBatch", syncStatus.LastBatchRecorded)
 
 			// go routine to catch signal
 			catchSignal := make(chan os.Signal, 1)
@@ -149,20 +83,79 @@ func StartCmd() *cobra.Command {
 			r := mux.NewRouter()
 			r.HandleFunc("/tx", rest.TxReceiverHandler).Methods("POST")
 			r.HandleFunc("/account", rest.GetAccountHandler).Methods("GET")
-
 			http.Handle("/", r)
-
-			if err := aggregator.Start(); err != nil {
-				log.Fatalln("Unable to start aggregator", "error", err)
-			}
 
 			if err := syncer.Start(); err != nil {
 				log.Fatalln("Unable to start syncer", "error")
 			}
 
+			if err := aggregator.Start(); err != nil {
+				log.Fatalln("Unable to start aggregator", "error", err)
+			}
 			// TODO replace this with port from config
 			http.ListenAndServe(":8080", r)
 			fmt.Println("Server started on port 8080 🎉")
 		},
 	}
+}
+
+func ReadAndInitGlobalConfig() {
+	// create viper object
+	viperObj := viper.New()
+
+	// get current directory
+	dir, err := os.Getwd()
+	common.PanicIfError(err)
+
+	// set config paths
+	viperObj.SetConfigName(ConfigFileName) // name of config file (without extension)
+	viperObj.AddConfigPath(dir)
+
+	// finally! read config
+	err = viperObj.ReadInConfig()
+	common.PanicIfError(err)
+
+	// unmarshall to the configration object
+	var cfg config.Configuration
+	if err = viperObj.UnmarshalExact(&cfg); err != nil {
+		common.PanicIfError(err)
+	}
+
+	// init global config
+	config.GlobalCfg = cfg
+	// TODO use a better way to handle priv keys post testnet
+	common.PanicIfError(config.SetOperatorKeys(config.GlobalCfg.OperatorKey))
+}
+
+func InitGlobalDBInstance() {
+	// create db Instance
+	tempDB, err := db.NewDB()
+	common.PanicIfError(err)
+
+	// init global DB instance
+	db.DBInstance = tempDB
+}
+
+func InitGlobalBazooka() {
+	var err error
+	// create and init global config object
+	bazooka.LoadedBazooka, err = bazooka.NewPreLoadedBazooka()
+	common.PanicIfError(err)
+}
+
+// LoadGenesisData helps load the genesis data into the DB
+func LoadGenesisData(genesis config.Genesis) {
+	// load accounts
+	err := db.DBInstance.InsertGenAccounts(genesis.GenesisAccounts.Accounts)
+	common.PanicIfError(err)
+
+	// load params
+	newParams := types.Params{StakeAmount: genesis.StakeAmount, MaxDepth: genesis.MaxTreeDepth, MaxDepositSubTreeHeight: genesis.MaxDepositSubTreeHeight}
+	db.DBInstance.UpdateStakeAmount(newParams.StakeAmount)
+	db.DBInstance.UpdateMaxDepth(newParams.MaxDepth)
+	db.DBInstance.UpdateDepositSubTreeHeight(newParams.MaxDepositSubTreeHeight)
+
+	// load sync status
+	db.DBInstance.UpdateSyncStatusWithBlockNumber(genesis.StartEthBlock)
+	db.DBInstance.UpdateSyncStatusWithBatchNumber(0)
 }

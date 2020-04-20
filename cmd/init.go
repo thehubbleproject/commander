@@ -22,7 +22,7 @@ func InitCmd() *cobra.Command {
 			common.PanicIfError(err)
 			defaultConfig.OperatorAddress = address.String()
 			config.WriteConfigFile("./config.toml", &defaultConfig)
-			gen := config.DefaultGenesisAccounts()
+			gen := config.DefaultGenesis()
 			if err := config.WriteGenesisFile(gen); err != nil {
 				panic(err)
 			}

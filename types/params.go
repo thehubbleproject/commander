@@ -10,16 +10,16 @@ type Params struct {
 	// Stake amount which coordinator needs to submit a new batch
 	// Updates when syncer receives a stake update event from the contract
 	// Used while sending new batch
-	StakeAmount uint `json:"stakeAmount"`
+	StakeAmount uint64 `json:"stakeAmount"`
 
 	// MaxDepth is the maximum depth of the balances tree possible
 	// If in case we want to increase it we will update the value on the contract
 	// And then this will be updated
-	MaxDepth uint `json:"maxDepth"`
+	MaxDepth uint64 `json:"maxDepth"`
 
 	// DepositSubTreeHeight is the maximum height of the deposit subtree that the coordinator wants to merge
 	// It is set on the contract and will be updated when that value changes
-	MaxDepositSubTreeHeight uint `json:"maxDepositSubTreeHeight"`
+	MaxDepositSubTreeHeight uint64 `json:"maxDepositSubTreeHeight"`
 }
 
 // Maintains sync information

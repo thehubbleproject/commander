@@ -16,15 +16,15 @@ clean:
 
 build: clean
 	mkdir -p build
-	go build -o build/bopr ./cmd
+	go build -o build/hubble ./cmd
 
 init:
-	./build/bopr init
+	./build/hubble init
 
 reset:
 	
 
 start:
-	./build/bopr start
+	./build/hubble start
 	 
 .PHONY: contracts dep build clean start
