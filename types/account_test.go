@@ -15,6 +15,7 @@ func TestEmptyAccount(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, ZERO_VALUE_LEAF.String(), common.Keccak256(acc).Hex()[2:], "The root leaves should match")
 }
+
 func ABIEncode() ([]byte, error) {
 	uint256Ty, err := abi.NewType("uint256", "uint256", nil)
 	if err != nil {

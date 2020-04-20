@@ -181,7 +181,6 @@ func (s *Syncer) processRegisteredToken(eventName string, abiObject *abi.ABI, vL
 }
 
 func (s *Syncer) sendDepositFinalisationTx() {
-
 	// fetch all the data from s.DBInstance.sendDepositFinalisationTx
 
 	// send transaction to ethereum chain

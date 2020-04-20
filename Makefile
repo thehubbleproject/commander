@@ -22,7 +22,8 @@ init:
 	./build/hubble init
 
 reset:
-	
+	./build/hubble migration down --all
+	./build/hubble migration up
 
 start:
 	./build/hubble start

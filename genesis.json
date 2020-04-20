@@ -1,5 +1,5 @@
 {
-  "startEthBlock": 100,
+  "startEthBlock": 0,
   "maxTreeDepth": 2,
   "maxDepositSubTreeHeight": 2,
   "stakeAmount": 32,
@@ -11,6 +11,7 @@
         "Balance": 0,
         "TokenType": 0,
         "Nonce": 0,
+        "Status": 1,
         "PublicKey": "0"
       }
     ]

@@ -24,16 +24,18 @@ type GenUserAccount struct {
 	Balance   uint64
 	TokenType uint64
 	Nonce     uint64
+	Status    uint64
 	PublicKey string
 }
 
-func NewGenUserAccount(id, path, balance, tokenType, nonce uint64, publicKey string) GenUserAccount {
+func NewGenUserAccount(id, path, balance, tokenType, nonce, status uint64, publicKey string) GenUserAccount {
 	return GenUserAccount{
 		ID:        id,
 		Path:      path,
 		Balance:   balance,
 		TokenType: tokenType,
 		Nonce:     nonce,
+		Status:    status,
 		PublicKey: publicKey,
 	}
 }
@@ -46,11 +48,15 @@ func NewGenesisAccounts(accounts []GenUserAccount) GenesisAccounts {
 	return GenesisAccounts{Accounts: accounts}
 }
 
+func EmptyGenesisAccount() GenUserAccount {
+	return NewGenUserAccount(0, 0, 0, 0, 0, 100, "")
+}
+
 func DefaultGenesisAccounts() GenesisAccounts {
 	var accounts []GenUserAccount
 
 	// add coordinator account
-	acc := NewGenUserAccount(common.COORDINATOR, common.COORDINATOR, common.COORDINATOR, common.COORDINATOR, common.COORDINATOR, common.COORDINATOR_PUBKEY)
+	acc := NewGenUserAccount(common.COORDINATOR, common.COORDINATOR, common.COORDINATOR, common.COORDINATOR, common.COORDINATOR, 1, common.COORDINATOR_PUBKEY)
 	accounts = append(accounts, acc)
 	return NewGenesisAccounts(accounts)
 }

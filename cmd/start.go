@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"os/signal"
@@ -145,6 +146,20 @@ func InitGlobalBazooka() {
 
 // LoadGenesisData helps load the genesis data into the DB
 func LoadGenesisData(genesis config.Genesis) {
+	diff := int(math.Exp2(float64(genesis.MaxTreeDepth))) - len(genesis.GenesisAccounts.Accounts)
+	if diff < 0 {
+		err := fmt.Errorf("Tree depth not enough to accomodate all geneiss account. Depth: %v NumberOfAccounts: %v", genesis.MaxTreeDepth, len(genesis.GenesisAccounts.Accounts))
+		common.PanicIfError(err)
+	}
+	// fill the tree with zero leaves
+	for diff > 0 {
+		lastGenAcc := genesis.GenesisAccounts.Accounts[len(genesis.GenesisAccounts.Accounts)-1]
+		newAcc := config.EmptyGenesisAccount()
+		newAcc.Path = lastGenAcc.Path + 1
+		genesis.GenesisAccounts.Accounts = append(genesis.GenesisAccounts.Accounts, newAcc)
+		diff--
+	}
+
 	// load accounts
 	err := db.DBInstance.InsertGenAccounts(genesis.GenesisAccounts.Accounts)
 	common.PanicIfError(err)

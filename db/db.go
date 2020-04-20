@@ -1,6 +1,9 @@
 package db
 
 import (
+	"github.com/tendermint/tendermint/libs/log"
+
+	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 	"github.com/BOPR/types"
 	"github.com/globalsign/mgo"
@@ -38,6 +41,7 @@ var DBInstance DB
 
 type DB struct {
 	Instance *gorm.DB
+	Logger   log.Logger
 }
 
 // NewDB creates a new DB instance
@@ -52,7 +56,9 @@ func NewDB() (DB, error) {
 		return DB{}, err
 	}
 	db.LogMode(config.GlobalCfg.DBLogMode)
-	return DB{Instance: db}, nil
+	// create logger
+	logger := common.Logger.With("module", "DB")
+	return DB{Instance: db, Logger: logger}, nil
 }
 
 func (db *DB) Close() {
