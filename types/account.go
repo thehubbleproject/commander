@@ -12,7 +12,7 @@ type UserAccount struct {
 	// DBModel
 	// ID is the path of the user account in the PDA Tree
 	// Cannot be changed once created
-	AccountID uint64
+	AccountID uint64 `gorm:"not null;index:AccountID"`
 	// Token type of the user account
 	// Cannot be changed once creation
 	TokenType uint64
@@ -23,11 +23,11 @@ type UserAccount struct {
 	Nonce uint64
 
 	// Public key for the user
-	PublicKey string
+	PublicKey string `gorm:"size:128"`
 
 	// Path from root to leaf
 	// NOTE: not a part of the leaf
-	Path uint64
+	Path uint64 `gorm:"not null;index:Path"`
 
 	// Pending = 0 means has deposit but not merged to balance tree
 	// Active = 1

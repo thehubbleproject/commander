@@ -2,6 +2,7 @@ package types
 
 import (
 	"bytes"
+	"fmt"
 
 	"github.com/cbergoon/merkletree"
 	merkle "github.com/cbergoon/merkletree"
@@ -11,7 +12,11 @@ import (
 type DepositTree struct {
 	Height           uint64
 	NumberOfDeposits uint64
-	Root             ByteArray
+	Root             string
+}
+
+func (t *DepositTree) String() string {
+	return fmt.Sprintf("DepositTree: H:%v Count:%v Root:%v", t.Height, t.NumberOfDeposits, t.Root)
 }
 
 type LeafData []byte

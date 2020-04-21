@@ -15,7 +15,7 @@ const (
 	COORDINATOR_PUBKEY = "0"
 
 	PrivKeyPath = "./privKey.json"
-	//
+
 	// CONTRACT_NAMES
 	ROLLUP_CONTRACT_KEY      = "rollup"
 	MERKLE_TREE_CONTRACT_KEY = "MTC"

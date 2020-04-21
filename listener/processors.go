@@ -1,6 +1,7 @@
 package listener
 
 import (
+	"encoding/hex"
 	"fmt"
 	"math/big"
 
@@ -37,7 +38,7 @@ func (s *Syncer) processDepositQueued(eventName string, abiObject *abi.ABI, vLog
 	)
 
 	// add new account in pending state to DB and
-	newAccount := types.NewPendingUserAccount(event.AccountID.Uint64(), event.Amount.Uint64(), event.Token.Uint64(), string(event.Pubkey))
+	newAccount := types.NewPendingUserAccount(event.AccountID.Uint64(), event.Amount.Uint64(), event.Token.Uint64(), hex.EncodeToString(event.Pubkey))
 	if err := s.DBInstance.InsertAccount(newAccount); err != nil {
 		panic(err)
 	}

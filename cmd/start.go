@@ -36,7 +36,9 @@ func StartCmd() *cobra.Command {
 
 			InitGlobalBazooka()
 
-			logger := common.Logger.With("module", "bazooka")
+			InitDepositTree()
+
+			logger := common.Logger.With("module", "hubble")
 
 			//
 			// Create all the required services
@@ -173,4 +175,11 @@ func LoadGenesisData(genesis config.Genesis) {
 	// load sync status
 	db.DBInstance.UpdateSyncStatusWithBlockNumber(genesis.StartEthBlock)
 	db.DBInstance.UpdateSyncStatusWithBatchNumber(0)
+}
+
+func InitDepositTree() {
+	err := db.DBInstance.InitEmptyDepositTree()
+	if err != nil {
+		common.PanicIfError(err)
+	}
 }
