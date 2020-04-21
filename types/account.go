@@ -27,7 +27,7 @@ type UserAccount struct {
 
 	// Path from root to leaf
 	// NOTE: not a part of the leaf
-	Path uint64 `gorm:"not null;index:Path"`
+	Path string `gorm:"not null;index:Path"`
 
 	// Pending = 0 means has deposit but not merged to balance tree
 	// Active = 1
@@ -36,7 +36,7 @@ type UserAccount struct {
 	Status int
 }
 
-func NewUserAccount(id, balance, tokenType, nonce, path uint64, status int, pubkey string) *UserAccount {
+func NewUserAccount(id, balance, tokenType, nonce uint64, path string, status int, pubkey string) *UserAccount {
 	return &UserAccount{
 		AccountID: id,
 		PublicKey: pubkey,
@@ -54,7 +54,7 @@ func NewPendingUserAccount(id, balance, tokenType uint64, _pubkey string) UserAc
 		TokenType: tokenType,
 		Balance:   balance,
 		Nonce:     0,
-		Path:      0,
+		Path:      "0",
 		Status:    0,
 		PublicKey: _pubkey,
 	}

@@ -182,6 +182,14 @@ func (s *Syncer) processRegisteredToken(eventName string, abiObject *abi.ABI, vL
 }
 
 func (s *Syncer) sendDepositFinalisationTx() {
+	// To send finalisation transaction we need path and siblings
+
+	// We would need to generate the accounts tree for sure to generate siblings
+
+	/*
+		I can know the path to leaves 0010 0011 0100 0101 0
+	*/
+
 	// fetch all the data from s.DBInstance.sendDepositFinalisationTx
 
 	// send transaction to ethereum chain

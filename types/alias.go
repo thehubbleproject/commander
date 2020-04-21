@@ -42,3 +42,9 @@ func UintToBigInt(a uint64) *big.Int {
 	temp.SetUint64(a)
 	return temp
 }
+
+func StringToBigInt(s string) *big.Int {
+	t := big.NewInt(0)
+	t.SetString(s, 10)
+	return t
+}

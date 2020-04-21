@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"math/big"
 	"net/http"
 	"os"
 	"os/signal"
@@ -157,7 +158,8 @@ func LoadGenesisData(genesis config.Genesis) {
 	for diff > 0 {
 		lastGenAcc := genesis.GenesisAccounts.Accounts[len(genesis.GenesisAccounts.Accounts)-1]
 		newAcc := config.EmptyGenesisAccount()
-		newAcc.Path = lastGenAcc.Path + 1
+		lastAccPath := types.StringToBigInt(lastGenAcc.Path)
+		newAcc.Path = lastAccPath.Add(big.NewInt(1), lastAccPath).String()
 		genesis.GenesisAccounts.Accounts = append(genesis.GenesisAccounts.Accounts, newAcc)
 		diff--
 	}
