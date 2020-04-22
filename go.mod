@@ -10,7 +10,7 @@ require (
 	github.com/aristanetworks/goarista v0.0.0-20191106175434-873d404c7f40 // indirect
 	github.com/btcsuite/btcd v0.20.1-beta // indirect
 	github.com/cbergoon/merkletree v0.2.0
-	github.com/cosmos/cosmos-sdk v0.37.4 // indirect
+	github.com/cosmos/cosmos-sdk v0.37.4
 	github.com/cosmos/ledger-cosmos-go v0.11.1 // indirect
 	github.com/deckarep/golang-set v1.7.1 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect

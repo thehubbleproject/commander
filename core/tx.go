@@ -198,3 +198,47 @@ func rlpHash(x interface{}) (h Hash) {
 	hw.Sum(h[:0])
 	return h
 }
+
+// Insert tx into the DB
+func (db *DB) InsertTx(t *Tx) error {
+	db.Instance.Create(t)
+	return nil
+}
+
+func (db *DB) PopTxs() (txs []Tx, err error) {
+	tx := db.Instance.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return txs, err
+	}
+	var pendingTxs []Tx
+
+	// select N number of transactions which are pending in mempool and
+	if err := tx.Limit(3).Where(&Tx{Status: 100}).Find(&pendingTxs).Error; err != nil {
+		fmt.Println("error while fetching pending transactions", err)
+		return txs, err
+	}
+
+	fmt.Println("found txs", pendingTxs)
+
+	var ids []string
+	for _, tx := range pendingTxs {
+		ids = append(ids, tx.ID)
+	}
+
+	// update the transactions from pending to processing
+	errs := tx.Table("txes").Where("id IN (?)", ids).Updates(map[string]interface{}{"status": "processing"}).GetErrors()
+	fmt.Println("errors while processing transactions", errs)
+
+	return pendingTxs, tx.Commit().Error
+}
+
+func (db *DB) GetTx() (tx []Tx) {
+	db.Instance.First(&tx)
+	return
+}

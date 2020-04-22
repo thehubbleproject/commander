@@ -1,6 +1,7 @@
 package types
 
 import (
+	"fmt"
 	"math/big"
 
 	"encoding/json"
@@ -88,4 +89,35 @@ func (b *BatchModel) Batch() (Batch, error) {
 		TransactionsIncluded: decodedTxs,
 	}
 	return newBatch, nil
+}
+
+func (db *DB) GetAllBatches() (batches []Batch, err error) {
+	errs := db.Instance.Find(&batches).GetErrors()
+	for _, err := range errs {
+		if err != nil {
+			return batches, GenericError("got error while fetch all batches")
+		}
+	}
+	return
+}
+
+func (db *DB) GetLatestBatch() (batch Batch, err error) {
+	if err := db.Instance.First(&batch).Error; err != nil {
+		return batch, ErrRecordNotFound(fmt.Sprintf("unable to find latest batch"))
+	}
+	return batch, nil
+}
+
+func (db *DB) GetBatchCount() (int, error) {
+	var count int
+	db.Instance.Table("batches").Count(&count)
+	return count, nil
+}
+
+func (db *DB) AddNewBatch(batch Batch) error {
+	batchModel, err := batch.DBModel()
+	if err != nil {
+		return err
+	}
+	return db.Instance.Create(batchModel).Error
 }

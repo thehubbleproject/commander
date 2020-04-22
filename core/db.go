@@ -1,11 +1,10 @@
-package db
+package types
 
 import (
 	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
-	"github.com/BOPR/types"
 	"github.com/globalsign/mgo"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -13,21 +12,21 @@ import (
 
 type IDB interface {
 	// Account related DB functions
-	// FetchSiblings(accID uint64) (accs []types.UserAccount, err error)
-	GetAllAccounts() (accs []types.UserAccount, err error)
-	GetAccount(accID uint64) (types.UserAccount, error)
-	InsertBulkAccounts(accounts []types.UserAccount) error
+	// FetchSiblings(accID uint64) (accs []UserAccount, err error)
+	GetAllAccounts() (accs []UserAccount, err error)
+	GetAccount(accID uint64) (UserAccount, error)
+	InsertBulkAccounts(accounts []UserAccount) error
 	InsertGenAccounts(genAccs []config.GenUserAccount) error
 	GetAccountCount() (int, error)
 
 	// Tx related functions
-	InsertTx(t *types.Tx) error
-	PopTxs() (txs []types.Tx, err error)
+	InsertTx(t *Tx) error
+	PopTxs() (txs []Tx, err error)
 
 	// Batch related functions
-	InsertBatchInfo(root types.ByteArray, index uint64) error
-	GetAllBatches() (batches []types.Batch, err error)
-	GetLatestBatch() (types.Batch, error)
+	InsertBatchInfo(root ByteArray, index uint64) error
+	GetAllBatches() (batches []Batch, err error)
+	GetLatestBatch() (Batch, error)
 	GetBatchCount() (int, error)
 
 	// common functions
