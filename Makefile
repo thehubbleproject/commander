@@ -18,6 +18,8 @@ build: clean
 	mkdir -p build
 	go build -o build/hubble ./cmd
 
+buidl: build
+
 init:
 	./build/hubble init
 
@@ -28,4 +30,4 @@ reset:
 start:
 	./build/hubble start
 	 
-.PHONY: contracts dep build clean start
+.PHONY: contracts dep build clean start buidl

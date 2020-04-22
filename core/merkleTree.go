@@ -68,7 +68,7 @@ func GetMerkleRoot(c []Content, numberOfElements int) (root ByteArray, err error
 	currentLevel := 0
 	nodes := make([]ByteArray, numberOfElements+1)
 	for i := 0; i < numberOfElements; i++ {
-		nodes[i] = Keccak256AndConvertToByteArray(c[i].data)
+		nodes[i] = common.Keccak256AndConvertToByteArray(c[i].data)
 	}
 	if numberOfElements == 1 {
 		return nodes[0], nil
@@ -129,9 +129,4 @@ func EncodeChildren(left, right ByteArray) (result []byte, err error) {
 	}
 
 	return bz, nil
-}
-
-func Keccak256AndConvertToByteArray(data []byte) ByteArray {
-	hash := common.Keccak256(data)
-	return BytesToByteArray(hash.Bytes())
 }

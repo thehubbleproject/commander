@@ -1,13 +1,9 @@
 package core
 
 import (
-	"errors"
-	"fmt"
-	"math"
 	"math/big"
 
 	"github.com/BOPR/common"
-	"github.com/BOPR/config"
 	"github.com/BOPR/contracts/rollup"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 )
@@ -145,232 +141,226 @@ func (acc *UserAccount) CreateAccountHash() {
 	acc.Hash = accountHash.String()
 }
 
-// func AccsToLeafHashes(accs []UserAccount) (result [][32]byte) {
-// 	for i, acc := range accs {
-// 		accEncoded, err := acc.ABIEncode()
-// 		if err != nil {
-// 			fmt.Println("Error while abi encoding accounts", err)
-// 			return
-// 		}
-// 		result[i] = BytesToByteArray(common.Hash(accEncoded))
-// 	}
-// 	return
-// }
-
-// GetAllAccounts fetches all accounts from the database
-func (db *DB) GetAllAccounts() (accs []UserAccount, err error) {
-	// TODO add limits here
-	errs := db.Instance.Find(&accs).GetErrors()
-	for _, err := range errs {
-		if err != nil {
-			return accs, GenericError("got error while fetch all accounts")
-		}
-	}
-	return accs, nil
-}
-
-// GetAccount gets the account of the given path from the DB
-func (db *DB) GetAccount(ID uint64) (UserAccount, error) {
-	var account UserAccount
-	if db.Instance.First(&account, ID).RecordNotFound() {
-		return account, ErrRecordNotFound(fmt.Sprintf("unable to find record for accountID: %d", ID))
-	}
-	return account, nil
-}
-
-func (db *DB) InsertAccount(account UserAccount) error {
-	return db.Instance.Create(account).Error
-}
-
-func (db *DB) InsertBulkAccounts(accounts []UserAccount) error {
-	for _, account := range accounts {
-		err := db.InsertAccount(account)
-		if err != nil {
-			return ErrUnableToCreateRecord(fmt.Sprintf("Unable to add account with ID:%v to DB. Error: %v", account.AccountID, err))
-		}
-	}
-	return nil
-}
-
-func (db *DB) InsertGenAccounts(genAccs []config.GenUserAccount) error {
-	var accLeafs []UserAccount
-	for _, acc := range genAccs {
-		newAccLeaf := NewUserAccount(acc.ID, acc.Balance, acc.TokenType, acc.Path, acc.Nonce, int(acc.Status), acc.PublicKey)
-		accLeafs = append(accLeafs, *newAccLeaf)
-	}
-	return db.InsertBulkAccounts(accLeafs)
-}
-
-func (db *DB) GetAccountCount() (int, error) {
-	var count int
-	db.Instance.Table("account_leafs").Count(&count)
-	return count, nil
-}
-
-// FetchSiblings retuns the siblings of an account leaf till root
-// TODO make this more performannt by using bulk account fetch or using groutines to fetch in parerell
-func FetchSiblings(accID uint64, db DB) (accs []UserAccount, err error) {
-	// For eg: for account ID 1111 => 1110, 110X, 10XX
-	var siblings []UserAccount
-
-	return siblings, nil
-}
-
 func (db *DB) InitEmptyDepositTree() error {
 	var depositTree DepositTree
 	depositTree.Root = ZERO_VALUE_LEAF.String()
 	return db.Instance.Create(&depositTree).Error
 }
 
-func (db *DB) OnDepositLeafMerge(left, right, newRoot ByteArray) (uint64, error) {
-	// get last deposit from deposit tree
-	var lastDeposit DepositTree
-	err := db.Instance.First(&lastDeposit).Error
-	if err != nil {
-		return 0, err
-	}
+// GetAllAccounts fetches all accounts from the database
+// func (db *DB) GetAllAccounts() (accs []UserAccount, err error) {
+// 	// TODO add limits here
+// 	errs := db.Instance.Find(&accs).GetErrors()
+// 	for _, err := range errs {
+// 		if err != nil {
+// 			return accs, GenericError("got error while fetch all accounts")
+// 		}
+// 	}
+// 	return accs, nil
+// }
 
-	// update the deposit tree stored
-	var updatedDepositTreeInfo DepositTree
-	updatedDepositTreeInfo.Height = lastDeposit.Height + 1
-	updatedDepositTreeInfo.NumberOfDeposits = lastDeposit.NumberOfDeposits + 2
-	updatedDepositTreeInfo.Root = newRoot.String()
+// // GetAccount gets the account of the given path from the DB
+// func (db *DB) GetAccount(ID uint64) (UserAccount, error) {
+// 	var account UserAccount
+// 	if db.Instance.First(&account, ID).RecordNotFound() {
+// 		return account, ErrRecordNotFound(fmt.Sprintf("unable to find record for accountID: %d", ID))
+// 	}
+// 	return account, nil
+// }
 
-	generatedRoot, err := GetParent(left, right)
-	if err != nil {
-		return 0, err
-	}
+// func (db *DB) InsertAccount(account UserAccount) error {
+// 	return db.Instance.Create(account).Error
+// }
 
-	if generatedRoot.String() != newRoot.String() {
-		return 0, errors.New("Unable to update deposit tree, deposit tree root doesnt match")
-	}
-	if err := db.Instance.Model(&lastDeposit).Update(&updatedDepositTreeInfo).Error; err != nil {
-		return 0, err
-	}
+// func (db *DB) InsertBulkAccounts(accounts []UserAccount) error {
+// 	for _, account := range accounts {
+// 		err := db.InsertAccount(account)
+// 		if err != nil {
+// 			return ErrUnableToCreateRecord(fmt.Sprintf("Unable to add account with ID:%v to DB. Error: %v", account.AccountID, err))
+// 		}
+// 	}
+// 	return nil
+// }
 
-	return updatedDepositTreeInfo.Height, nil
-}
+// func (db *DB) InsertGenAccounts(genAccs []config.GenUserAccount) error {
+// 	var accLeafs []UserAccount
+// 	for _, acc := range genAccs {
+// 		newAccLeaf := NewUserAccount(acc.ID, acc.Balance, acc.TokenType, acc.Path, acc.Nonce, int(acc.Status), acc.PublicKey)
+// 		accLeafs = append(accLeafs, *newAccLeaf)
+// 	}
+// 	return db.InsertBulkAccounts(accLeafs)
+// }
 
-func (db *DB) GetDepositTreeInfo() (dt DepositTree, err error) {
-	err = db.Instance.First(&dt).Error
-	if err != nil {
-		return
-	}
-	return
-}
+// func (db *DB) GetAccountCount() (int, error) {
+// 	var count int
+// 	db.Instance.Table("account_leafs").Count(&count)
+// 	return count, nil
+// }
 
-func (db *DB) GetPendingDeposits(numberOfAccs uint64) ([]UserAccount, error) {
-	var accounts []UserAccount
-	err := db.Instance.Limit(numberOfAccs).Where("status = ?", 0).Find(&accounts).Error
-	if err != nil {
-		return accounts, err
-	}
-	return accounts, nil
-}
+// // FetchSiblings retuns the siblings of an account leaf till root
+// // TODO make this more performannt by using bulk account fetch or using groutines to fetch in parerell
+// func FetchSiblings(accID uint64, db DB) (accs []UserAccount, err error) {
+// 	// For eg: for account ID 1111 => 1110, 110X, 10XX
+// 	var siblings []UserAccount
 
-func (db *DB) FinaliseDeposits(accountsRoot ByteArray, pathToDepositSubTree uint64, newBalanceRoot ByteArray) error {
-	db.Logger.Info("Finalising accounts", "accountRoot", accountsRoot, "NewBalanceRoot", newBalanceRoot, "pathToDepositSubTree", pathToDepositSubTree)
+// 	return siblings, nil
+// }
 
-	// get params
-	params, err := db.GetParams()
-	if err != nil {
-		return err
-	}
+// func (db *DB) InitEmptyDepositTree() error {
+// 	var depositTree DepositTree
+// 	depositTree.Root = ZERO_VALUE_LEAF.String()
+// 	return db.Instance.Create(&depositTree).Error
+// }
 
-	// number of new deposits = 2**MaxDepthOfDepositTree
-	depositCount := uint64(math.Exp2(float64(params.MaxDepositSubTreeHeight)))
+// func (db *DB) OnDepositLeafMerge(left, right, newRoot ByteArray) (uint64, error) {
+// 	// get last deposit from deposit tree
+// 	var lastDeposit DepositTree
+// 	err := db.Instance.First(&lastDeposit).Error
+// 	if err != nil {
+// 		return 0, err
+// 	}
 
-	// get all pending accounts
-	pendingAccs, err := db.GetPendingDeposits(depositCount)
-	if err != nil {
-		return err
-	}
-	db.Logger.Debug("Fetched pending deposits", "count", len(pendingAccs), "data", pendingAccs)
+// 	// update the deposit tree stored
+// 	var updatedDepositTreeInfo DepositTree
+// 	updatedDepositTreeInfo.Height = lastDeposit.Height + 1
+// 	updatedDepositTreeInfo.NumberOfDeposits = lastDeposit.NumberOfDeposits + 2
+// 	updatedDepositTreeInfo.Root = newRoot.String()
 
-	// update the empty leaves with new accounts
-	err = db.AddPendingDeposits(pendingAccs)
-	if err != nil {
-		return err
-	}
+// 	generatedRoot, err := GetParent(left, right)
+// 	if err != nil {
+// 		return 0, err
+// 	}
 
-	// TODO ensure the accounts are inserted at pathToDepositSubTree
+// 	if generatedRoot.String() != newRoot.String() {
+// 		return 0, errors.New("Unable to update deposit tree, deposit tree root doesnt match")
+// 	}
+// 	if err := db.Instance.Model(&lastDeposit).Update(&updatedDepositTreeInfo).Error; err != nil {
+// 		return 0, err
+// 	}
 
-	//TODO  make sure all the accounts root match to accountsRoot
+// 	return updatedDepositTreeInfo.Height, nil
+// }
 
-	return nil
-}
+// func (db *DB) GetDepositTreeInfo() (dt DepositTree, err error) {
+// 	err = db.Instance.First(&dt).Error
+// 	if err != nil {
+// 		return
+// 	}
+// 	return
+// }
 
-func (db *DB) AddPendingDeposits(pendingAccs []UserAccount) error {
-	var accounts []UserAccount
-	// fetch 2**DepositSubTree inactive accounts ordered by path
-	err := db.Instance.Limit(len(pendingAccs)).Order("path").Where("status = ?", 100).Find(&accounts).Error
-	if err != nil {
-		return err
-	}
-	// TODO add error for if no account found
+// func (db *DB) GetPendingDeposits(numberOfAccs uint64) ([]UserAccount, error) {
+// 	var accounts []UserAccount
+// 	err := db.Instance.Limit(numberOfAccs).Where("status = ?", 0).Find(&accounts).Error
+// 	if err != nil {
+// 		return accounts, err
+// 	}
+// 	return accounts, nil
+// }
 
-	// update the accounts
-	for i, acc := range accounts {
-		// acc.Balance = pendingAccs[i].Balance
-		// acc.TokenType = pendingAccs[i].TokenType
-		// acc.AccountID = pendingAccs[i].AccountID
-		// acc.PublicKey = pendingAccs[i].PublicKey
-		err := db.Instance.Model(&acc).Updates(UserAccount{Balance: pendingAccs[i].Balance,
-			TokenType: pendingAccs[i].TokenType,
-			AccountID: pendingAccs[i].AccountID,
-			PublicKey: pendingAccs[i].PublicKey,
-			Status:    1,
-		}).Error
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
+// func (db *DB) FinaliseDeposits(accountsRoot ByteArray, pathToDepositSubTree uint64, newBalanceRoot ByteArray) error {
+// 	db.Logger.Info("Finalising accounts", "accountRoot", accountsRoot, "NewBalanceRoot", newBalanceRoot, "pathToDepositSubTree", pathToDepositSubTree)
 
-// create merkle proof for finalisation of deposits
-// send transaction to etherum chain using contract caller
-func (db *DB) sendDepositFinalisationTx() {
+// 	// get params
+// 	params, err := db.GetParams()
+// 	if err != nil {
+// 		return err
+// 	}
 
-}
+// 	// number of new deposits = 2**MaxDepthOfDepositTree
+// 	depositCount := uint64(math.Exp2(float64(params.MaxDepositSubTreeHeight)))
 
-// GetDepositNodePath is supposed to get a set of uninitialised leaves
-// number of uninitialised nodes have to be == 2**MaxDepositSubTreeHeight
-// Then we return the path of this node
-func (db *DB) GetDepositNodePath() (path string, err error) {
-	// get first uninitialised leaf
-	firstLeaf, err := db.GetAccountByStatus(100)
-	if err != nil {
-		return
-	}
-	params, err := db.GetParams()
-	if err != nil {
-		return
-	}
-	numberOfLeaves := math.Exp2(float64(params.MaxDepositSubTreeHeight))
+// 	// get all pending accounts
+// 	pendingAccs, err := db.GetPendingDeposits(depositCount)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	db.Logger.Debug("Fetched pending deposits", "count", len(pendingAccs), "data", pendingAccs)
 
-	lastLeafPath := firstLeaf.Path + uint64(numberOfLeaves)
+// 	// update the empty leaves with new accounts
+// 	err = db.AddPendingDeposits(pendingAccs)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	var accounts []UserAccount
-	err = db.Instance.Where("path BETWEEN ? AND ? AND status==?", firstLeaf.Path, lastLeafPath, 100).Find(&accounts).Error
-	if err != nil {
-		return
-	}
+// 	// TODO ensure the accounts are inserted at pathToDepositSubTree
 
-	fmt.Println("found accounts", accounts)
-	pathToFirstLeafStr := UintToBigInt(firstLeaf.Path).String()
-	depth := params.MaxDepth - params.MaxDepositSubTreeHeight
-	return pathToFirstLeafStr[:depth], nil
-}
+// 	//TODO  make sure all the accounts root match to accountsRoot
 
-func (db *DB) GetAccountByStatus(status uint64) (UserAccount, error) {
-	var leaf UserAccount
-	err := db.Instance.Order("path").Where("status = ?", status).First(&leaf).Error
-	return leaf, err
-}
+// 	return nil
+// }
 
-func (db *DB) GetAccountLessThanPath(path uint64) ([]UserAccount, error) {
-	var accounts []UserAccount
-	err := db.Instance.Where("path BETWEEN ? AND ?", 0, path, 100).Find(&accounts).Error
-	return accounts, err
-}
+// func (db *DB) AddPendingDeposits(pendingAccs []UserAccount) error {
+// 	var accounts []UserAccount
+// 	// fetch 2**DepositSubTree inactive accounts ordered by path
+// 	err := db.Instance.Limit(len(pendingAccs)).Order("path").Where("status = ?", 100).Find(&accounts).Error
+// 	if err != nil {
+// 		return err
+// 	}
+// 	// TODO add error for if no account found
+
+// 	// update the accounts
+// 	for i, acc := range accounts {
+// 		// acc.Balance = pendingAccs[i].Balance
+// 		// acc.TokenType = pendingAccs[i].TokenType
+// 		// acc.AccountID = pendingAccs[i].AccountID
+// 		// acc.PublicKey = pendingAccs[i].PublicKey
+// 		err := db.Instance.Model(&acc).Updates(UserAccount{Balance: pendingAccs[i].Balance,
+// 			TokenType: pendingAccs[i].TokenType,
+// 			AccountID: pendingAccs[i].AccountID,
+// 			PublicKey: pendingAccs[i].PublicKey,
+// 			Status:    1,
+// 		}).Error
+// 		if err != nil {
+// 			return err
+// 		}
+// 	}
+// 	return nil
+// }
+
+// // create merkle proof for finalisation of deposits
+// // send transaction to etherum chain using contract caller
+// func (db *DB) sendDepositFinalisationTx() {
+
+// }
+
+// // GetDepositNodePath is supposed to get a set of uninitialised leaves
+// // number of uninitialised nodes have to be == 2**MaxDepositSubTreeHeight
+// // Then we return the path of this node
+// func (db *DB) GetDepositNodePath() (path string, err error) {
+// 	// get first uninitialised leaf
+// 	firstLeaf, err := db.GetAccountByStatus(100)
+// 	if err != nil {
+// 		return
+// 	}
+// 	params, err := db.GetParams()
+// 	if err != nil {
+// 		return
+// 	}
+// 	numberOfLeaves := math.Exp2(float64(params.MaxDepositSubTreeHeight))
+
+// 	lastLeafPath := firstLeaf.Path + uint64(numberOfLeaves)
+
+// 	var accounts []UserAccount
+// 	err = db.Instance.Where("path BETWEEN ? AND ? AND status==?", firstLeaf.Path, lastLeafPath, 100).Find(&accounts).Error
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	fmt.Println("found accounts", accounts)
+// 	pathToFirstLeafStr := UintToBigInt(firstLeaf.Path).String()
+// 	depth := params.MaxDepth - params.MaxDepositSubTreeHeight
+// 	return pathToFirstLeafStr[:depth], nil
+// }
+
+// func (db *DB) GetAccountByStatus(status uint64) (UserAccount, error) {
+// 	var leaf UserAccount
+// 	err := db.Instance.Order("path").Where("status = ?", status).First(&leaf).Error
+// 	return leaf, err
+// }
+
+// func (db *DB) GetAccountLessThanPath(path uint64) ([]UserAccount, error) {
+// 	var accounts []UserAccount
+// 	err := db.Instance.Where("path BETWEEN ? AND ?", 0, path, 100).Find(&accounts).Error
+// 	return accounts, err
+// }

@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"math"
 
+	"github.com/BOPR/core"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 )
@@ -61,4 +62,9 @@ func KeccakFromString(data string) (hash common.Hash, err error) {
 	}
 	return Keccak256(bz), nil
 
+}
+
+func Keccak256AndConvertToByteArray(data []byte) core.ByteArray {
+	hash := Keccak256(data)
+	return core.BytesToByteArray(hash.Bytes())
 }
