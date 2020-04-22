@@ -53,7 +53,7 @@ func (db *DB) InsertBulkAccounts(accounts []types.UserAccount) error {
 func (db *DB) InsertGenAccounts(genAccs []config.GenUserAccount) error {
 	var accLeafs []types.UserAccount
 	for _, acc := range genAccs {
-		newAccLeaf := types.NewUserAccount(acc.ID, acc.Balance, acc.TokenType, acc.Nonce, acc.Path, int(acc.Status), acc.PublicKey)
+		newAccLeaf := types.NewUserAccount(acc.ID, acc.Balance, acc.TokenType, acc.Path, acc.Nonce, int(acc.Status), acc.PublicKey)
 		accLeafs = append(accLeafs, *newAccLeaf)
 	}
 	return db.InsertBulkAccounts(accLeafs)
@@ -190,4 +190,45 @@ func (db *DB) AddPendingDeposits(pendingAccs []types.UserAccount) error {
 // send transaction to etherum chain using contract caller
 func (db *DB) sendDepositFinalisationTx() {
 
+}
+
+// GetDepositNodePath is supposed to get a set of uninitialised leaves
+// number of uninitialised nodes have to be == 2**MaxDepositSubTreeHeight
+// Then we return the path of this node
+func (db *DB) GetDepositNodePath() (path string, err error) {
+	// get first uninitialised leaf
+	firstLeaf, err := db.GetAccountByStatus(100)
+	if err != nil {
+		return
+	}
+	params, err := db.GetParams()
+	if err != nil {
+		return
+	}
+	numberOfLeaves := math.Exp2(float64(params.MaxDepositSubTreeHeight))
+
+	lastLeafPath := firstLeaf.Path + uint64(numberOfLeaves)
+
+	var accounts []types.UserAccount
+	err = db.Instance.Where("path BETWEEN ? AND ? AND status==?", firstLeaf.Path, lastLeafPath, 100).Find(&accounts).Error
+	if err != nil {
+		return
+	}
+
+	fmt.Println("found accounts", accounts)
+	pathToFirstLeafStr := types.UintToBigInt(firstLeaf.Path).String()
+	depth := params.MaxDepth - params.MaxDepositSubTreeHeight
+	return pathToFirstLeafStr[:depth], nil
+}
+
+func (db *DB) GetAccountByStatus(status uint64) (types.UserAccount, error) {
+	var leaf types.UserAccount
+	err := db.Instance.Order("path").Where("status = ?", status).First(&leaf).Error
+	return leaf, err
+}
+
+func (db *DB) GetAccountLessThanPath(path uint64) ([]types.UserAccount, error) {
+	var accounts []types.UserAccount
+	err := db.Instance.Where("path BETWEEN ? AND ?", 0, path, 100).Find(&accounts).Error
+	return accounts, err
 }

@@ -20,7 +20,7 @@ type Genesis struct {
 // and to allow storing more data about the account than the data in UserAccount
 type GenUserAccount struct {
 	ID        uint64 `json:"ID"`
-	Path      string
+	Path      uint64
 	Balance   uint64
 	TokenType uint64
 	Nonce     uint64
@@ -28,7 +28,7 @@ type GenUserAccount struct {
 	PublicKey string
 }
 
-func NewGenUserAccount(id, balance, tokenType, nonce, status uint64, publicKey, path string) GenUserAccount {
+func NewGenUserAccount(id, balance, tokenType, nonce, status, path uint64, publicKey string) GenUserAccount {
 	return GenUserAccount{
 		ID:        id,
 		Path:      path,
@@ -49,14 +49,14 @@ func NewGenesisAccounts(accounts []GenUserAccount) GenesisAccounts {
 }
 
 func EmptyGenesisAccount() GenUserAccount {
-	return NewGenUserAccount(0, 0, 0, 0, 0, "100", "")
+	return NewGenUserAccount(0, 0, 0, 0, 0, 100, "")
 }
 
 func DefaultGenesisAccounts() GenesisAccounts {
 	var accounts []GenUserAccount
 
 	// add coordinator account
-	acc := NewGenUserAccount(common.COORDINATOR, common.COORDINATOR, common.COORDINATOR, common.COORDINATOR, 1, common.COORDINATOR_PUBKEY, "0")
+	acc := NewGenUserAccount(common.COORDINATOR, common.COORDINATOR, common.COORDINATOR, common.COORDINATOR, common.COORDINATOR, 1, "0")
 	accounts = append(accounts, acc)
 	return NewGenesisAccounts(accounts)
 }

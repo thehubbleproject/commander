@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math/big"
 	"testing"
+
+	"github.com/BOPR/types"
 )
 
 func TestPathConversion(t *testing.T) {
@@ -15,5 +17,15 @@ func TestPathConversion(t *testing.T) {
 	expectedPathBig := big.NewInt(0)
 	expectedPathBig.SetString(expectedSubPath, 2)
 	fmt.Println("path", expectedPathBig.String())
-	expectedPathBig.
+	// testing bitwise add with big ints
+	fmt.Println(expectedPathBig.Bit(2))
+}
+
+func TestStringToUint(t *testing.T) {
+	data, err := types.StringToUint("101")
+	fmt.Println("error", data, err)
+}
+
+func TestFlipBitInString(t *testing.T) {
+	fmt.Println(types.FlipBitInInt("101", 1))
 }

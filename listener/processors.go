@@ -182,15 +182,27 @@ func (s *Syncer) processRegisteredToken(eventName string, abiObject *abi.ABI, vL
 }
 
 func (s *Syncer) sendDepositFinalisationTx() {
-	// To send finalisation transaction we need path and siblings
+	// get all 2**MaxDepositTreeHeight uninitialised accounts and find paths
+	pathToNode, err := s.DBInstance.GetDepositNodePath()
+	if err != nil {
+		panic(err)
+	}
 
-	// We would need to generate the accounts tree for sure to generate siblings
+	numberOfSiblings := len(pathToNode)
+	var siblingsPath []string
+	fmt.Println("data", numberOfSiblings, siblingsPath)
+	i := numberOfSiblings
+	for i > 0 {
+		path := types.FlipBitInString(pathToNode, i-1)
+		siblingsPath = append(siblingsPath, path)
+		i--
+	}
+	fmt.Println("pathsneeded", siblingsPath)
 
 	/*
-		I can know the path to leaves 0010 0011 0100 0101 0
+		*** Optimise sibling nodes creation ***
+		// we will need to find parent of only leaves behind the selected leaf node(where the deposit rooot is going to be)
+		// for all the others we can find out the root using the default hashes
 	*/
 
-	// fetch all the data from s.DBInstance.sendDepositFinalisationTx
-
-	// send transaction to ethereum chain
 }
