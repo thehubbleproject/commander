@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	db "github.com/BOPR/db"
+	db "github.com/BOPR/core"
 	"github.com/BOPR/migrations"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/libs/common"

@@ -6,7 +6,7 @@ import (
 	"math/big"
 
 	"github.com/BOPR/common"
-	"github.com/BOPR/types"
+	"github.com/BOPR/core"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 
@@ -38,7 +38,7 @@ func (s *Syncer) processDepositQueued(eventName string, abiObject *abi.ABI, vLog
 	)
 
 	// add new account in pending state to DB and
-	newAccount := types.NewPendingUserAccount(event.AccountID.Uint64(), event.Amount.Uint64(), event.Token.Uint64(), hex.EncodeToString(event.Pubkey))
+	newAccount := core.NewPendingUserAccount(event.AccountID.Uint64(), event.Amount.Uint64(), event.Token.Uint64(), hex.EncodeToString(event.Pubkey))
 	if err := s.DBInstance.InsertAccount(newAccount); err != nil {
 		panic(err)
 	}
@@ -56,9 +56,9 @@ func (s *Syncer) processDepositLeafMerged(eventName string, abiObject *abi.ABI, 
 		panic(err)
 	}
 
-	leftLeaf := types.ByteArray(event.Left)
-	rightLeaf := types.ByteArray(event.Right)
-	newRoot := types.ByteArray(event.NewRoot)
+	leftLeaf := core.ByteArray(event.Left)
+	rightLeaf := core.ByteArray(event.Right)
+	newRoot := core.ByteArray(event.NewRoot)
 
 	s.Logger.Info(
 		"⬜ New event found",
@@ -96,9 +96,9 @@ func (s *Syncer) processDepositFinalised(eventName string, abiObject *abi.ABI, v
 		fmt.Println("Unable to unpack log:", err)
 		panic(err)
 	}
-	accountsRoot := types.ByteArray(event.DepositSubTreeRoot)
+	accountsRoot := core.ByteArray(event.DepositSubTreeRoot)
 	pathToDepositSubTree := event.PathToSubTree
-	newBalanceRoot := types.ByteArray(event.NewBalanceRoot)
+	newBalanceRoot := core.ByteArray(event.NewBalanceRoot)
 
 	s.Logger.Info(
 		"⬜ New event found",
@@ -127,8 +127,8 @@ func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *eth
 		"⬜ New event found",
 		"event", eventName,
 		"BatchNumber", event.Index.String(),
-		"TxRoot", types.ByteArray(event.Txroot).String(),
-		"NewStateRoot", types.ByteArray(event.UpdatedRoot).String(),
+		"TxRoot", core.ByteArray(event.Txroot).String(),
+		"NewStateRoot", core.ByteArray(event.UpdatedRoot).String(),
 		"Committer", event.Committer.String(),
 	)
 
@@ -143,10 +143,10 @@ func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *eth
 		panic(err)
 	}
 
-	newBatch := types.Batch{
+	newBatch := core.Batch{
 		Index:                event.Index.Uint64(),
-		StateRoot:            types.ByteArray(event.UpdatedRoot),
-		TxRoot:               types.ByteArray(event.Txroot),
+		StateRoot:            core.ByteArray(event.UpdatedRoot),
+		TxRoot:               core.ByteArray(event.Txroot),
 		TransactionsIncluded: txs,
 		Committer:            event.Committer.String(),
 		StakeAmount:          32,
@@ -175,7 +175,7 @@ func (s *Syncer) processRegisteredToken(eventName string, abiObject *abi.ABI, vL
 		"TokenAddress", event.TokenContract.String(),
 		"TokenID", event.TokenType,
 	)
-	newToken := types.Token{TokenID: event.TokenType.Uint64(), Address: types.Address(event.TokenContract)}
+	newToken := core.Token{TokenID: event.TokenType.Uint64(), Address: core.Address(event.TokenContract)}
 	if err := s.DBInstance.AddToken(newToken); err != nil {
 		panic(err)
 	}
@@ -193,7 +193,7 @@ func (s *Syncer) sendDepositFinalisationTx() {
 	fmt.Println("data", numberOfSiblings, siblingsPath)
 	i := numberOfSiblings
 	for i > 0 {
-		path := types.FlipBitInString(pathToNode, i-1)
+		path := core.FlipBitInString(pathToNode, i-1)
 		siblingsPath = append(siblingsPath, path)
 		i--
 	}

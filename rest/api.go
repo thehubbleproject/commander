@@ -6,8 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	db "github.com/BOPR/db"
-	"github.com/BOPR/types"
+	"github.com/BOPR/core"
 )
 
 type (
@@ -31,7 +30,7 @@ func GetAccountHandler(w http.ResponseWriter, r *http.Request) {
 		WriteErrorResponse(w, http.StatusBadRequest, "Invalid ID")
 	}
 
-	account, err := db.DBInstance.GetAccount(ID)
+	account, err := core.DBInstance.GetAccount(ID)
 	if err != nil {
 		WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("Account with ID %v not found", ID))
 	}
@@ -52,7 +51,7 @@ func TxReceiverHandler(w http.ResponseWriter, r *http.Request) {
 		WriteErrorResponse(w, http.StatusBadRequest, "Cannot read request")
 	}
 	// create a new pending transaction
-	userTx := types.NewPendingTx(tx.To, tx.From, tx.Amount, tx.Nonce, tx.Signature, tx.TokenID)
+	userTx := core.NewPendingTx(tx.To, tx.From, tx.Amount, tx.Nonce, tx.Signature, tx.TokenID)
 
 	// do basic input validations
 	err := userTx.ValidateBasic()
@@ -64,7 +63,7 @@ func TxReceiverHandler(w http.ResponseWriter, r *http.Request) {
 	userTx.AssignHash()
 
 	// add the transaction to pool
-	db.DBInstance.InsertTx(&userTx)
+	core.DBInstance.InsertTx(&userTx)
 
 	output, err := json.Marshal(userTx)
 	if err != nil {

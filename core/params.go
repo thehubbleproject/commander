@@ -1,4 +1,4 @@
-package types
+package core
 
 import "math/big"
 
@@ -39,7 +39,7 @@ func (ss *SyncStatus) LastEthBlockBigInt() *big.Int {
 }
 
 func (db *DB) UpdateSyncStatusWithBatchNumber(batchIndex uint64) error {
-	var updatedSyncStatus .SyncStatus
+	var updatedSyncStatus SyncStatus
 	updatedSyncStatus.LastBatchRecorded = batchIndex
 	if err := db.Instance.Table("sync_statuses").Assign(SyncStatus{LastBatchRecorded: batchIndex}).FirstOrCreate(&updatedSyncStatus).Error; err != nil {
 		return err

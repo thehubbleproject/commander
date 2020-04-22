@@ -1,4 +1,4 @@
-package types
+package core
 
 import (
 	"github.com/BOPR/contracts/rollup"

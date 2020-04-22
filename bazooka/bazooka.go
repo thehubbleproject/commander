@@ -19,7 +19,7 @@ import (
 
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 
-	"github.com/BOPR/types"
+	"github.com/BOPR/core"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	ethCmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -131,10 +131,10 @@ func (b *Bazooka) TotalBatches() (uint64, error) {
 // 	return NewBatch(crudeBatch.StateRoot, Address(crudeBatch.Committer), crudeBatch.TxRoot), nil
 // }
 
-func (b *Bazooka) FetchBalanceTreeRoot() (types.ByteArray, error) {
+func (b *Bazooka) FetchBalanceTreeRoot() (core.ByteArray, error) {
 	root, err := b.RollupContract.GetBalanceTreeRoot(nil)
 	if err != nil {
-		return types.ByteArray{}, err
+		return core.ByteArray{}, err
 	}
 	return root, nil
 }
@@ -168,7 +168,7 @@ func (b *Bazooka) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, err err
 }
 
 // ABIEncodeTx encodes a transaction account to abi.encode parameter in solidity
-// func (c *ContractCaller) ABIEncodeTx(tx *types.Transaction) []byte {
+// func (c *ContractCaller) ABIEncodeTx(tx *core.Transaction) []byte {
 
 // }
 
@@ -202,7 +202,7 @@ func GenerateAuthObj(client *ethclient.Client, callMsg ethereum.CallMsg) (auth *
 
 // ProcessTx calls the ProcessTx function on the contract to verify the tx
 // returns the updated accounts and the new balance root
-func (b *Bazooka) ProcessTx(balanceTreeRoot types.ByteArray, tx types.Tx, fromMerkleProof, toMerkleProof types.MerkleProof) (newBalanceRoot types.ByteArray, from, to types.UserAccount, err error) {
+func (b *Bazooka) ProcessTx(balanceTreeRoot core.ByteArray, tx core.Tx, fromMerkleProof, toMerkleProof core.MerkleProof) (newBalanceRoot core.ByteArray, from, to core.UserAccount, err error) {
 	// txReceipt, err := c.RollupContract.ProcessTxUpdate(nil, balanceTreeRoot,
 	// 	tx.ToABIVersion(fromMerkleProof.Account.ToABIAccount(), toMerkleProof.Account.ToABIAccount()),
 	// 	fromMerkleProof.ToABIVersion(),

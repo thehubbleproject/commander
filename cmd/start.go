@@ -10,12 +10,12 @@ import (
 
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
-	db "github.com/BOPR/db"
+
+	"github.com/BOPR/bazooka"
+	"github.com/BOPR/core"
 	"github.com/BOPR/listener"
 	"github.com/BOPR/poller"
 	"github.com/BOPR/rest"
-	"github.com/BOPR/types"
-	"github.com/BOPR/types/bazooka"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/cobra"
@@ -45,13 +45,13 @@ func StartCmd() *cobra.Command {
 			//
 
 			// create aggregator service
-			aggregator := poller.NewAggregator(db.DBInstance)
+			aggregator := poller.NewAggregator(core.DBInstance)
 
 			// create the syncer service
 			syncer := listener.NewSyncer()
 
 			// if no row is found then we are starting the node for the first time
-			syncStatus, err := db.DBInstance.GetSyncStatus()
+			syncStatus, err := core.DBInstance.GetSyncStatus()
 			if err != nil && gorm.IsRecordNotFoundError(err) {
 				// read genesis file
 				genesis, err := config.ReadGenesisFile()
@@ -76,7 +76,7 @@ func StartCmd() *cobra.Command {
 				for range catchSignal {
 					aggregator.Stop()
 					syncer.Stop()
-					db.DBInstance.Close()
+					core.DBInstance.Close()
 
 					// exit
 					os.Exit(1)
@@ -132,11 +132,11 @@ func ReadAndInitGlobalConfig() {
 
 func InitGlobalDBInstance() {
 	// create db Instance
-	tempDB, err := db.NewDB()
+	tempDB, err := core.NewDB()
 	common.PanicIfError(err)
 
 	// init global DB instance
-	db.DBInstance = tempDB
+	core.DBInstance = tempDB
 }
 
 func InitGlobalBazooka() {
@@ -164,22 +164,22 @@ func LoadGenesisData(genesis config.Genesis) {
 	}
 
 	// load accounts
-	err := db.DBInstance.InsertGenAccounts(genesis.GenesisAccounts.Accounts)
+	err := core.DBInstance.InsertGenAccounts(genesis.GenesisAccounts.Accounts)
 	common.PanicIfError(err)
 
 	// load params
-	newParams := types.Params{StakeAmount: genesis.StakeAmount, MaxDepth: genesis.MaxTreeDepth, MaxDepositSubTreeHeight: genesis.MaxDepositSubTreeHeight}
-	db.DBInstance.UpdateStakeAmount(newParams.StakeAmount)
-	db.DBInstance.UpdateMaxDepth(newParams.MaxDepth)
-	db.DBInstance.UpdateDepositSubTreeHeight(newParams.MaxDepositSubTreeHeight)
+	newParams := core.Params{StakeAmount: genesis.StakeAmount, MaxDepth: genesis.MaxTreeDepth, MaxDepositSubTreeHeight: genesis.MaxDepositSubTreeHeight}
+	core.DBInstance.UpdateStakeAmount(newParams.StakeAmount)
+	core.DBInstance.UpdateMaxDepth(newParams.MaxDepth)
+	core.DBInstance.UpdateDepositSubTreeHeight(newParams.MaxDepositSubTreeHeight)
 
 	// load sync status
-	db.DBInstance.UpdateSyncStatusWithBlockNumber(genesis.StartEthBlock)
-	db.DBInstance.UpdateSyncStatusWithBatchNumber(0)
+	core.DBInstance.UpdateSyncStatusWithBlockNumber(genesis.StartEthBlock)
+	core.DBInstance.UpdateSyncStatusWithBatchNumber(0)
 }
 
 func InitDepositTree() {
-	err := db.DBInstance.InitEmptyDepositTree()
+	err := core.DBInstance.InitEmptyDepositTree()
 	if err != nil {
 		common.PanicIfError(err)
 	}

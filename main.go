@@ -17,9 +17,9 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 
 	"github.com/BOPR/config"
+	"github.com/BOPR/bazooka"
 	"github.com/BOPR/contracts/trial"
 	"github.com/BOPR/listener"
-	"github.com/BOPR/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gorilla/mux"
 )
@@ -64,7 +64,7 @@ func TestABIEncodeAndDecode() {
 		Data: data,
 	}
 
-	auth, err := types.GenerateAuthObj(client, callMsg)
+	auth, err := bazooka.GenerateAuthObj(client, callMsg)
 	fmt.Println("auth generated", auth, err)
 
 	tx, err := instance.ABIEncodeTransaction(auth, txData)

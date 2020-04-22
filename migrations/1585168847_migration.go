@@ -1,7 +1,7 @@
 package migrations
 
 import (
-	"github.com/BOPR/types"
+	types "github.com/BOPR/core"
 	"github.com/jinzhu/gorm"
 )
 
