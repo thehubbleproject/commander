@@ -2,9 +2,6 @@ package core
 
 import (
 	"encoding/hex"
-
-	"github.com/BOPR/common"
-	"github.com/ethereum/go-ethereum/accounts/abi"
 )
 
 var defaultHashes []ByteArray
@@ -68,7 +65,7 @@ func GetMerkleRoot(c []Content, numberOfElements int) (root ByteArray, err error
 	currentLevel := 0
 	nodes := make([]ByteArray, numberOfElements+1)
 	for i := 0; i < numberOfElements; i++ {
-		nodes[i] = common.Keccak256AndConvertToByteArray(c[i].data)
+		nodes[i] = Keccak256AndConvertToByteArray(c[i].data)
 	}
 	if numberOfElements == 1 {
 		return nodes[0], nil
@@ -95,38 +92,4 @@ func GetMerkleRoot(c []Content, numberOfElements int) (root ByteArray, err error
 		}
 	}
 	return nodes[0], nil
-}
-
-func GetParent(left, right ByteArray) (parent ByteArray, err error) {
-	data, err := EncodeChildren(left, right)
-	if err != nil {
-		return parent, err
-	}
-	leaf := common.Keccak256(data)
-	return BytesToByteArray(leaf.Bytes()), nil
-}
-
-func EncodeChildren(left, right ByteArray) (result []byte, err error) {
-	bytes32Type, err := abi.NewType("bytes32", "bytes32", nil)
-	if err != nil {
-		return
-	}
-
-	arguments := abi.Arguments{
-		{
-			Type: bytes32Type,
-		},
-		{
-			Type: bytes32Type,
-		},
-	}
-	bz, err := arguments.Pack(
-		[32]byte(left),
-		[32]byte(right),
-	)
-	if err != nil {
-		return
-	}
-
-	return bz, nil
 }

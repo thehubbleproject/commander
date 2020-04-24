@@ -92,6 +92,27 @@ func (acc *UserAccount) ToABIAccount() rollup.DataTypesUserAccount {
 	}
 }
 
+func (acc *UserAccount) HashToByteArray() ByteArray {
+	ba, _ := HexToByteArray(acc.Hash)
+	return ba
+}
+
+func (acc *UserAccount) IsCoordinator() bool {
+	if acc.Path != "" {
+		return false
+	}
+
+	if acc.Status != 1 {
+		return false
+	}
+
+	if acc.Type != 0 {
+		return false
+	}
+
+	return true
+}
+
 func (acc *UserAccount) AccountInclusionProof(path int64) rollup.DataTypesAccountInclusionProof {
 	return rollup.DataTypesAccountInclusionProof{
 		PathToAccount: big.NewInt(path),
@@ -141,10 +162,92 @@ func (acc *UserAccount) CreateAccountHash() {
 	acc.Hash = accountHash.String()
 }
 
-func (db *DB) InitEmptyDepositTree() error {
-	var depositTree DepositTree
-	depositTree.Root = ZERO_VALUE_LEAF.String()
-	return db.Instance.Create(&depositTree).Error
+// InitBalancesTree initialises the balances tree
+func (db *DB) InitBalancesTree(depth uint64, coordinatorAccount UserAccount) {
+
+}
+
+func (db *DB) StoreLeaf(account UserAccount, path string, siblings []UserAccount) {
+	var err error
+	computedNode := account
+	for i := 0; i < len(siblings); i++ {
+		var parentHash ByteArray
+		sibling := siblings[i]
+		isComputedRightSibling := GetNthBitFromRight(
+			path,
+			i,
+		)
+
+		if isComputedRightSibling == 0 {
+			parentHash, err = GetParent(computedNode.HashToByteArray(), sibling.HashToByteArray())
+			if err != nil {
+				return
+			}
+
+			// Store the node!
+			err = db.StoreNode(parentHash, computedNode, sibling)
+			if err != nil {
+				return
+			}
+		} else {
+			parentHash, err = GetParent(sibling.HashToByteArray(), computedNode.HashToByteArray())
+			if err != nil {
+				return
+			}
+			// Store the node!
+			err = db.StoreNode(parentHash, sibling, computedNode)
+			if err != nil {
+				return
+			}
+		}
+
+		computedNode.Hash = parentHash.String()
+	}
+
+	// Store the new root
+	err = db.UpdateRootNode(computedNode.HashToByteArray())
+	if err != nil {
+		return
+	}
+}
+
+// StoreNode updates the nodes given the parent hash
+func (db *DB) StoreNode(parentHash ByteArray, leftNode UserAccount, rightNode UserAccount) (err error) {
+	// update left account
+	err = db.updateAccount(leftNode, leftNode.Path)
+	if err != nil {
+		return err
+
+	}
+
+	// update right account
+	err = db.updateAccount(rightNode, rightNode.Path)
+	if err != nil {
+		return err
+	}
+
+	// update the parent with the new hash
+	return db.UpdateParentWithHash(GetParentPath(leftNode.Path), parentHash)
+}
+
+func (db *DB) UpdateParentWithHash(pathToParent string, newHash ByteArray) error {
+	// Update the root hash
+	var tempAccount UserAccount
+	tempAccount.Path = pathToParent
+	tempAccount.Hash = newHash.String()
+	return db.updateAccount(tempAccount, pathToParent)
+}
+
+func (db *DB) UpdateRootNode(newRoot ByteArray) error {
+	var tempAccount UserAccount
+	tempAccount.Path = ""
+	tempAccount.Hash = newRoot.String()
+	return db.updateAccount(tempAccount, tempAccount.Path)
+}
+
+// updateAccount will simply replace all the changed fields
+func (db *DB) updateAccount(newAcc UserAccount, path string) error {
+	return db.Instance.Model(&newAcc).Where("path = ?", path).Update(newAcc).Error
 }
 
 // GetAllAccounts fetches all accounts from the database
