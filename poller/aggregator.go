@@ -78,7 +78,7 @@ func (a *Aggregator) startAggregating(ctx context.Context, interval time.Duratio
 }
 
 func (a *Aggregator) pickBatch() {
-	txs, err := a.core.PopTxs()
+	txs, err := a.DB.PopTxs()
 	if err != nil {
 		fmt.Println("Error while popping txs from mempool", "Error", err)
 	}

@@ -29,11 +29,12 @@ func GetAccountHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		WriteErrorResponse(w, http.StatusBadRequest, "Invalid ID")
 	}
-
-	account, err := core.DBInstance.GetAccount(ID)
-	if err != nil {
-		WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("Account with ID %v not found", ID))
-	}
+	fmt.Println(ID)
+	var account core.UserAccount
+	// account, err := core.DBInstance.GetAccount(ID)
+	// if err != nil {
+	// 	WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("Account with ID %v not found", ID))
+	// }
 	output, err := json.Marshal(account)
 	if err != nil {
 		WriteErrorResponse(w, http.StatusBadRequest, "Unable to marshall account")

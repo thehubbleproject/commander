@@ -8,6 +8,7 @@ import (
 	"github.com/BOPR/config"
 
 	bazooka "github.com/BOPR/bazooka"
+	"github.com/BOPR/core"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	ethCmn "github.com/ethereum/go-ethereum/common"

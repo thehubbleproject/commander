@@ -164,18 +164,18 @@ func LoadGenesisData(genesis config.Genesis) {
 	}
 
 	// load accounts
-	err := core.DBInstance.InsertGenAccounts(genesis.GenesisAccounts.Accounts)
-	common.PanicIfError(err)
+	// err := core.DBInstance.InsertGenAccounts(genesis.GenesisAccounts.Accounts)
+	// common.PanicIfError(err)
 
-	// load params
-	newParams := core.Params{StakeAmount: genesis.StakeAmount, MaxDepth: genesis.MaxTreeDepth, MaxDepositSubTreeHeight: genesis.MaxDepositSubTreeHeight}
-	core.DBInstance.UpdateStakeAmount(newParams.StakeAmount)
-	core.DBInstance.UpdateMaxDepth(newParams.MaxDepth)
-	core.DBInstance.UpdateDepositSubTreeHeight(newParams.MaxDepositSubTreeHeight)
+	// // load params
+	// newParams := core.Params{StakeAmount: genesis.StakeAmount, MaxDepth: genesis.MaxTreeDepth, MaxDepositSubTreeHeight: genesis.MaxDepositSubTreeHeight}
+	// core.DBInstance.UpdateStakeAmount(newParams.StakeAmount)
+	// core.DBInstance.UpdateMaxDepth(newParams.MaxDepth)
+	// core.DBInstance.UpdateDepositSubTreeHeight(newParams.MaxDepositSubTreeHeight)
 
-	// load sync status
-	core.DBInstance.UpdateSyncStatusWithBlockNumber(genesis.StartEthBlock)
-	core.DBInstance.UpdateSyncStatusWithBatchNumber(0)
+	// // load sync status
+	// core.DBInstance.UpdateSyncStatusWithBlockNumber(genesis.StartEthBlock)
+	// core.DBInstance.UpdateSyncStatusWithBatchNumber(0)
 }
 
 func InitDepositTree() {

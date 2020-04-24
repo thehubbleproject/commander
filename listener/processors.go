@@ -1,7 +1,6 @@
 package listener
 
 import (
-	"encoding/hex"
 	"fmt"
 	"math/big"
 
@@ -38,10 +37,10 @@ func (s *Syncer) processDepositQueued(eventName string, abiObject *abi.ABI, vLog
 	)
 
 	// add new account in pending state to DB and
-	newAccount := core.NewPendingUserAccount(event.AccountID.Uint64(), event.Amount.Uint64(), event.Token.Uint64(), hex.EncodeToString(event.Pubkey))
-	if err := s.DBInstance.InsertAccount(newAccount); err != nil {
-		panic(err)
-	}
+	// newAccount := core.NewPendingUserAccount(event.AccountID.Uint64(), event.Amount.Uint64(), event.Token.Uint64(), hex.EncodeToString(event.Pubkey))
+	// if err := s.DBInstance.InsertAccount(newAccount); err != nil {
+	// 	panic(err)
+	// }
 }
 
 func (s *Syncer) processDepositLeafMerged(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
@@ -69,19 +68,19 @@ func (s *Syncer) processDepositLeafMerged(eventName string, abiObject *abi.ABI, 
 	)
 
 	// update deposit sub tree root
-	newheight, err := s.DBInstance.OnDepositLeafMerge(leftLeaf, rightLeaf, newRoot)
-	if err != nil {
-		panic(err)
-	}
-	params, err := s.DBInstance.GetParams()
-	if err != nil {
-		panic(err)
-	}
-	// if deposit subtree height = deposit finalisation height then
-	if newheight == params.MaxDepositSubTreeHeight {
-		// send deposit finalisation transction to ethereum chain
-		go s.sendDepositFinalisationTx()
-	}
+	// newheight, err := s.DBInstance.OnDepositLeafMerge(leftLeaf, rightLeaf, newRoot)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// params, err := s.DBInstance.GetParams()
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// // if deposit subtree height = deposit finalisation height then
+	// if newheight == params.MaxDepositSubTreeHeight {
+	// 	// send deposit finalisation transction to ethereum chain
+	// 	go s.sendDepositFinalisationTx()
+	// }
 }
 
 func (s *Syncer) processDepositFinalised(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
@@ -109,7 +108,7 @@ func (s *Syncer) processDepositFinalised(eventName string, abiObject *abi.ABI, v
 	)
 
 	// TODO handle error
-	s.DBInstance.FinaliseDeposits(accountsRoot, pathToDepositSubTree.Uint64(), newBalanceRoot)
+	// s.DBInstance.FinaliseDeposits(accountsRoot, pathToDepositSubTree.Uint64(), newBalanceRoot)
 }
 
 func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
@@ -183,21 +182,21 @@ func (s *Syncer) processRegisteredToken(eventName string, abiObject *abi.ABI, vL
 
 func (s *Syncer) sendDepositFinalisationTx() {
 	// get all 2**MaxDepositTreeHeight uninitialised accounts and find paths
-	pathToNode, err := s.DBInstance.GetDepositNodePath()
-	if err != nil {
-		panic(err)
-	}
+	// pathToNode, err := s.DBInstance.GetDepositNodePath()
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	numberOfSiblings := len(pathToNode)
-	var siblingsPath []string
-	fmt.Println("data", numberOfSiblings, siblingsPath)
-	i := numberOfSiblings
-	for i > 0 {
-		path := core.FlipBitInString(pathToNode, i-1)
-		siblingsPath = append(siblingsPath, path)
-		i--
-	}
-	fmt.Println("pathsneeded", siblingsPath)
+	// numberOfSiblings := len(pathToNode)
+	// var siblingsPath []string
+	// fmt.Println("data", numberOfSiblings, siblingsPath)
+	// i := numberOfSiblings
+	// for i > 0 {
+	// 	path := core.FlipBitInString(pathToNode, i-1)
+	// 	siblingsPath = append(siblingsPath, path)
+	// 	i--
+	// }
+	// fmt.Println("pathsneeded", siblingsPath)
 
 	/*
 		*** Optimise sibling nodes creation ***
