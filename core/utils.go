@@ -117,6 +117,10 @@ func FlipBitInString(s string, i int) string {
 	return string(dataRune)
 }
 
+func GetOtherChild(path string) string {
+	return FlipBitInString(path, len(path)-1)
+}
+
 func TrimPathToParentPath(s string) string {
 	r, size := utf8.DecodeLastRuneInString(s)
 	if r == utf8.RuneError && (size == 0 || size == 1) {

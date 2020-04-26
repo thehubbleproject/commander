@@ -18,7 +18,7 @@ func init() {
 	}
 
 	// TODO change and pick from global config
-	defaultHashes, err = GenDefaultHashes(10)
+	defaultHashes, err = GenDefaultHashes(100)
 	if err != nil {
 		panic(err)
 	}

@@ -69,19 +69,19 @@ func (s *Syncer) processDepositLeafMerged(eventName string, abiObject *abi.ABI, 
 	)
 
 	// update deposit sub tree root
-	// newheight, err := s.DBInstance.OnDepositLeafMerge(leftLeaf, rightLeaf, newRoot)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// params, err := s.DBInstance.GetParams()
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// // if deposit subtree height = deposit finalisation height then
-	// if newheight == params.MaxDepositSubTreeHeight {
-	// 	// send deposit finalisation transction to ethereum chain
-	// 	go s.sendDepositFinalisationTx()
-	// }
+	newheight, err := s.DBInstance.OnDepositLeafMerge(leftLeaf, rightLeaf, newRoot)
+	if err != nil {
+		panic(err)
+	}
+	params, err := s.DBInstance.GetParams()
+	if err != nil {
+		panic(err)
+	}
+	// if deposit subtree height = deposit finalisation height then
+	if newheight == params.MaxDepositSubTreeHeight {
+		// send deposit finalisation transction to ethereum chain
+		go s.sendDepositFinalisationTx()
+	}
 }
 
 func (s *Syncer) processDepositFinalised(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
@@ -182,27 +182,11 @@ func (s *Syncer) processRegisteredToken(eventName string, abiObject *abi.ABI, vL
 }
 
 func (s *Syncer) sendDepositFinalisationTx() {
-	// get all 2**MaxDepositTreeHeight uninitialised accounts and find paths
-	// pathToNode, err := s.DBInstance.GetDepositNodePath()
-	// if err != nil {
-	// 	panic(err)
-	// }
+	nodeToBeReplaced, siblings, err := s.DBInstance.GetDepositNodeAndSiblings()
+	if err != nil {
+		return
+	}
 
-	// numberOfSiblings := len(pathToNode)
-	// var siblingsPath []string
-	// fmt.Println("data", numberOfSiblings, siblingsPath)
-	// i := numberOfSiblings
-	// for i > 0 {
-	// 	path := core.FlipBitInString(pathToNode, i-1)
-	// 	siblingsPath = append(siblingsPath, path)
-	// 	i--
-	// }
-	// fmt.Println("pathsneeded", siblingsPath)
-
-	/*
-		*** Optimise sibling nodes creation ***
-		// we will need to find parent of only leaves behind the selected leaf node(where the deposit rooot is going to be)
-		// for all the others we can find out the root using the default hashes
-	*/
+	s.loadedBazooka.FireDepositFinalisation()
 
 }

@@ -383,6 +383,21 @@ func (db *DB) CreateAccount(acc UserAccount) error {
 	return db.Instance.Create(&acc).Error
 }
 
+func (db *DB) GetSiblings(path string) ([]UserAccount, error) {
+	var relativePath = path
+	var siblings []UserAccount
+	for i := len(path); i > 0; i-- {
+		otherChild := GetOtherChild(relativePath)
+		otherNode, err := db.GetAccountByPath(otherChild)
+		if err != nil {
+			return siblings, err
+		}
+		siblings = append(siblings, otherNode)
+		relativePath = GetParentPath(relativePath)
+	}
+	return siblings, nil
+}
+
 // GetAllAccounts fetches all accounts from the database
 // func (db *DB) GetAllAccounts() (accs []UserAccount, err error) {
 // 	// TODO add limits here
@@ -395,14 +410,22 @@ func (db *DB) CreateAccount(acc UserAccount) error {
 // 	return accs, nil
 // }
 
-// // GetAccount gets the account of the given path from the DB
-// func (db *DB) GetAccount(ID uint64) (UserAccount, error) {
-// 	var account UserAccount
-// 	if db.Instance.First(&account, ID).RecordNotFound() {
-// 		return account, ErrRecordNotFound(fmt.Sprintf("unable to find record for accountID: %d", ID))
-// 	}
-// 	return account, nil
-// }
+// GetAccount gets the account of the given path from the DB
+func (db *DB) GetAccountByPath(path string) (UserAccount, error) {
+	var account UserAccount
+	if db.Instance.First(&account, path).RecordNotFound() {
+		return account, ErrRecordNotFound(fmt.Sprintf("unable to find record for path: %v", path))
+	}
+	return account, nil
+}
+
+func (db *DB) GetAccountByHash(hash string) (UserAccount, error) {
+	var account UserAccount
+	if db.Instance.First(&account, hash).RecordNotFound() {
+		return account, ErrRecordNotFound(fmt.Sprintf("unable to find record for hash: %v", hash))
+	}
+	return account, nil
+}
 
 // func (db *DB) InsertAccount(account UserAccount) error {
 // 	return db.Instance.Create(account).Error
@@ -446,35 +469,6 @@ func (db *DB) CreateAccount(acc UserAccount) error {
 // 	var depositTree DepositTree
 // 	depositTree.Root = ZERO_VALUE_LEAF.String()
 // 	return db.Instance.Create(&depositTree).Error
-// }
-
-// func (db *DB) OnDepositLeafMerge(left, right, newRoot ByteArray) (uint64, error) {
-// 	// get last deposit from deposit tree
-// 	var lastDeposit DepositTree
-// 	err := db.Instance.First(&lastDeposit).Error
-// 	if err != nil {
-// 		return 0, err
-// 	}
-
-// 	// update the deposit tree stored
-// 	var updatedDepositTreeInfo DepositTree
-// 	updatedDepositTreeInfo.Height = lastDeposit.Height + 1
-// 	updatedDepositTreeInfo.NumberOfDeposits = lastDeposit.NumberOfDeposits + 2
-// 	updatedDepositTreeInfo.Root = newRoot.String()
-
-// 	generatedRoot, err := GetParent(left, right)
-// 	if err != nil {
-// 		return 0, err
-// 	}
-
-// 	if generatedRoot.String() != newRoot.String() {
-// 		return 0, errors.New("Unable to update deposit tree, deposit tree root doesnt match")
-// 	}
-// 	if err := db.Instance.Model(&lastDeposit).Update(&updatedDepositTreeInfo).Error; err != nil {
-// 		return 0, err
-// 	}
-
-// 	return updatedDepositTreeInfo.Height, nil
 // }
 
 // func (db *DB) GetDepositTreeInfo() (dt DepositTree, err error) {
