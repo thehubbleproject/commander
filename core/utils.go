@@ -1,12 +1,14 @@
 package core
 
 import (
+	"fmt"
 	"math/big"
 	"strconv"
 	"unicode/utf8"
 
 	"github.com/BOPR/common"
 	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/willf/pad"
 )
 
 func GetParent(left, right ByteArray) (parent ByteArray, err error) {
@@ -74,11 +76,15 @@ func GetBit(a uint64, index int) uint {
 }
 
 func StringToUint(s string) (uint64, error) {
-	i, err := strconv.ParseInt(s, 2, 64)
+	i, err := strconv.ParseUint(s, 2, 64)
 	if err != nil {
 		return 0, err
 	}
-	return uint64(i), nil
+	return i, nil
+}
+
+func UintToString(a uint64) string {
+	return strconv.FormatUint(a, 2)
 }
 
 func isRight(path string) bool {
@@ -119,7 +125,24 @@ func TrimPathToParentPath(s string) string {
 	return s[:len(s)-size]
 }
 
-// // GetChildrenPaths returns all the children leaf nodes
-// func GetChildrenPaths(path string, maxDepth int) []string {
+func GenCoordinatorPath(depth uint64) string {
+	var path []rune
+	for i := uint64(0); i < depth; i++ {
+		path = append(path, 48)
+	}
+	return string(path)
+}
 
-// }
+func GetAdjacentNodePath(path string) (string, error) {
+	nodePath, err := StringToUint(path)
+	if err != nil {
+		return "", err
+	}
+	adjacentNodePath := nodePath + 1
+
+	return pad.Left(UintToString(adjacentNodePath), len(path), "0"), nil
+}
+
+func padNumberWithZero(value string, depth uint64) string {
+	return fmt.Sprintf("%03v", value)
+}

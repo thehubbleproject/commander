@@ -49,12 +49,14 @@ require (
 	github.com/spf13/viper v1.6.2
 	github.com/status-im/keycard-go v0.0.0-20191119114148-6dd40a46baa0 // indirect
 	github.com/stretchr/testify v1.5.1
+	github.com/t-tiger/gorm-bulk-insert v1.3.0
 	github.com/tendermint/crypto v0.0.0-20191022145703-50d29ede1e15 // indirect
 	github.com/tendermint/go-amino v0.15.1 // indirect
 	github.com/tendermint/tendermint v0.32.7
 	github.com/tendermint/tm-db v0.5.0 // indirect
 	github.com/tinylib/msgp v1.1.1 // indirect
 	github.com/tyler-smith/go-bip39 v1.0.2 // indirect
+	github.com/willf/pad v0.0.0-20200313202418-172aa767f2a4
 	github.com/xsleonard/go-merkle v1.1.0 // indirect
 	golang.org/x/crypto v0.0.0-20200115085410-6d4e4cb37c7d
 	golang.org/x/net v0.0.0-20191126235420-ef20fe5d7933 // indirect

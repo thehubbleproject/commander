@@ -25,14 +25,26 @@ func TestUserAccountUpdate() {
 	// originalAccountPath := "100"
 	newAcc.Status = 100
 	newAcc.AccountID = 100
+	newAcc.Path = "000"
+	var nomalAccount = core.EmptyAccount()
+	// nomalAccount := *core.NewUserAccount(acc.ID, acc.Balance, acc.TokenType, "", acc.Nonce, int(acc.Status), acc.PublicKey)
 	fmt.Println("new accout", newAcc)
-	err = db.Instance.Create(&newAcc).Error
-	if err != nil {
-		panic(err)
+	var accounts []core.UserAccount
+	accounts = append(accounts, newAcc)
+	i := 7
+	for i > 0 {
+		accounts = append(accounts, nomalAccount)
+		i--
 	}
-	var user core.UserAccount
-	err = db.Instance.Where("path = ?", "").First(&user).Error
-	fmt.Println("user", user, err)
+	err = db.InitBalancesTree(3, accounts)
+	fmt.Println("err", err)
+	// err = db.Instance.Model(core.UserAccount).Updates().Error
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// var user core.UserAccount
+	// err = db.Instance.Where("path = ?", "").First(&user).Error
+	// fmt.Println("user", user, err)
 
 	// newAcc.AccountID = 1001
 	// newAcc.Path = "10101"

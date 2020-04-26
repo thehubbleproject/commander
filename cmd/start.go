@@ -148,34 +148,50 @@ func InitGlobalBazooka() {
 
 // LoadGenesisData helps load the genesis data into the DB
 func LoadGenesisData(genesis config.Genesis) {
-	diff := int(math.Exp2(float64(genesis.MaxTreeDepth))) - len(genesis.GenesisAccounts.Accounts)
-	if diff < 0 {
-		err := fmt.Errorf("Tree depth not enough to accomodate all geneiss account. Depth: %v NumberOfAccounts: %v", genesis.MaxTreeDepth, len(genesis.GenesisAccounts.Accounts))
+	err := genesis.Validate()
+	if err != nil {
 		common.PanicIfError(err)
 	}
+
+	diff := int(math.Exp2(float64(genesis.MaxTreeDepth))) - len(genesis.GenesisAccounts.Accounts)
+	var allAccounts []core.UserAccount
+
+	// convert genesis accounts to user accounts
+	for _, account := range genesis.GenesisAccounts.Accounts {
+		allAccounts = append(
+			allAccounts,
+			core.UserAccount{
+				AccountID: account.ID,
+				Balance:   account.Balance,
+				TokenType: account.TokenType,
+				Nonce:     account.Nonce,
+				Status:    account.Status,
+				PublicKey: account.PublicKey,
+			},
+		)
+	}
+
 	// fill the tree with zero leaves
 	for diff > 0 {
-		lastGenAcc := genesis.GenesisAccounts.Accounts[len(genesis.GenesisAccounts.Accounts)-1]
-		newAcc := config.EmptyGenesisAccount()
-
-		newAcc.Path = lastGenAcc.Path + 1
-		genesis.GenesisAccounts.Accounts = append(genesis.GenesisAccounts.Accounts, newAcc)
+		newAcc := core.EmptyAccount()
+		newAcc.Hash = core.ZERO_VALUE_LEAF.String()
+		allAccounts = append(allAccounts, newAcc)
 		diff--
 	}
 
 	// load accounts
-	// err := core.DBInstance.InsertGenAccounts(genesis.GenesisAccounts.Accounts)
-	// common.PanicIfError(err)
+	err = core.DBInstance.InitBalancesTree(genesis.MaxTreeDepth, allAccounts)
+	common.PanicIfError(err)
 
 	// // load params
-	// newParams := core.Params{StakeAmount: genesis.StakeAmount, MaxDepth: genesis.MaxTreeDepth, MaxDepositSubTreeHeight: genesis.MaxDepositSubTreeHeight}
-	// core.DBInstance.UpdateStakeAmount(newParams.StakeAmount)
-	// core.DBInstance.UpdateMaxDepth(newParams.MaxDepth)
-	// core.DBInstance.UpdateDepositSubTreeHeight(newParams.MaxDepositSubTreeHeight)
+	newParams := core.Params{StakeAmount: genesis.StakeAmount, MaxDepth: genesis.MaxTreeDepth, MaxDepositSubTreeHeight: genesis.MaxDepositSubTreeHeight}
+	core.DBInstance.UpdateStakeAmount(newParams.StakeAmount)
+	core.DBInstance.UpdateMaxDepth(newParams.MaxDepth)
+	core.DBInstance.UpdateDepositSubTreeHeight(newParams.MaxDepositSubTreeHeight)
 
 	// // load sync status
-	// core.DBInstance.UpdateSyncStatusWithBlockNumber(genesis.StartEthBlock)
-	// core.DBInstance.UpdateSyncStatusWithBatchNumber(0)
+	core.DBInstance.UpdateSyncStatusWithBlockNumber(genesis.StartEthBlock)
+	core.DBInstance.UpdateSyncStatusWithBatchNumber(0)
 }
 
 func InitDepositTree() {

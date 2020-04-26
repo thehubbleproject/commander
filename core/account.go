@@ -1,11 +1,15 @@
 package core
 
 import (
+	"errors"
+	"fmt"
+	"math"
 	"math/big"
 
 	"github.com/BOPR/common"
 	"github.com/BOPR/contracts/rollup"
 	"github.com/ethereum/go-ethereum/accounts/abi"
+	gormbulk "github.com/t-tiger/gorm-bulk-insert"
 )
 
 // UserAccount is the user data stored on the node per user
@@ -40,9 +44,6 @@ type UserAccount struct {
 	// NonInitialised = 100
 	Status uint64 `gorm:"not null;index:Status"`
 
-	// level at which this node is stored in the balance tree
-	// Level uint64 `gorm:"not null;index:Level"`
-
 	// Type of nodes
 	// 1 => terminal
 	// 0 => root
@@ -51,9 +52,11 @@ type UserAccount struct {
 
 	// keccak hash of the node
 	Hash string `gorm:"not null;index:Hash"`
+
+	Level uint64 `gorm:"not null;index:Level"`
 }
 
-func NewUserAccount(id, balance, tokenType, nonce, status, level, nodeType uint64, pubkey, path string) *UserAccount {
+func NewUserAccount(id, balance, tokenType, nonce, status uint64, pubkey, path string) *UserAccount {
 	newAcccount := &UserAccount{
 		AccountID: id,
 		PublicKey: pubkey,
@@ -64,6 +67,7 @@ func NewUserAccount(id, balance, tokenType, nonce, status, level, nodeType uint6
 		Status:    status,
 		Type:      1,
 	}
+	newAcccount.UpdatePath(newAcccount.Path)
 	newAcccount.CreateAccountHash()
 	return newAcccount
 }
@@ -79,8 +83,38 @@ func NewPendingUserAccount(id, balance, tokenType uint64, _pubkey string) *UserA
 		PublicKey: _pubkey,
 		Type:      1,
 	}
+	newAcccount.UpdatePath(newAcccount.Path)
 	newAcccount.CreateAccountHash()
 	return newAcccount
+}
+
+func NewAccountNode(path, hash string) *UserAccount {
+	newAcccount := &UserAccount{
+		AccountID: 0,
+		PublicKey: "",
+		Balance:   0,
+		TokenType: 0,
+		Nonce:     0,
+		Path:      path,
+		Status:    1,
+		Type:      2,
+	}
+	newAcccount.UpdatePath(newAcccount.Path)
+	newAcccount.Hash = hash
+	return newAcccount
+}
+
+func (acc *UserAccount) UpdatePath(path string) {
+	acc.Path = path
+	acc.Level = uint64(len(path))
+}
+
+func EmptyAccount() UserAccount {
+	return *NewUserAccount(0, 0, 0, 0, 1, "", "")
+}
+
+func (acc *UserAccount) String() string {
+	return fmt.Sprintf("ID: %d Bal: %d Path: %v Nonce: %v TokenType:%v NodeType: %d %v", acc.AccountID, acc.Balance, acc.Path, acc.Nonce, acc.TokenType, acc.Type, acc.Hash)
 }
 
 func (acc *UserAccount) ToABIAccount() rollup.DataTypesUserAccount {
@@ -163,8 +197,103 @@ func (acc *UserAccount) CreateAccountHash() {
 }
 
 // InitBalancesTree initialises the balances tree
-func (db *DB) InitBalancesTree(depth uint64, coordinatorAccount UserAccount) {
+func (db *DB) InitBalancesTree(depth uint64, genesisAccounts []UserAccount) error {
+	// calculate total number of leaves
+	totalLeaves := math.Exp2(float64(depth))
+	if int(totalLeaves) != len(genesisAccounts) {
+		return errors.New("Depth and number of leaves do not match")
+	}
+	db.Logger.Debug("Attempting to init balance tree", "totalAccounts", totalLeaves)
+	genesisAccounts[0].UpdatePath(GenCoordinatorPath(depth))
+	genesisAccounts[0].CreateAccountHash()
+	genesisAccounts[0].Type = 1
+	fmt.Println("coor", genesisAccounts[0].Path)
+	var insertRecords []interface{}
+	prevNodePath := genesisAccounts[0].Path
+	var err error
 
+	// insert coodinator leaf
+	err = db.createAccount(genesisAccounts[0])
+	if err != nil {
+		db.Logger.Error("Unable to insert coodinator account", "err", err)
+		return err
+	}
+
+	for i := 1; i < len(genesisAccounts); i++ {
+		pathToAdjacentNode, err := GetAdjacentNodePath(prevNodePath)
+		if err != nil {
+			return err
+		}
+		db.Logger.Debug("Obtained adjacent node path", "adjacentNodePath", pathToAdjacentNode, "currentNodePath", prevNodePath)
+		genesisAccounts[i].UpdatePath(pathToAdjacentNode)
+		fmt.Printf("path for index: %d is %v /n", i, genesisAccounts[i].Path)
+		// TODO set type and other node level data as well
+		insertRecords = append(insertRecords, genesisAccounts[i])
+		prevNodePath = genesisAccounts[i].Path
+	}
+
+	db.Logger.Info("Inserting all accounts to DB", "count", len(insertRecords))
+	err = gormbulk.BulkInsert(db.Instance, insertRecords, len(insertRecords))
+	if err != nil {
+		db.Logger.Error("Unable to insert accounts to DB", "err", err)
+		return errors.New("Unable to insert accounts")
+	}
+
+	// merkelise
+	// 1. Pick all leaves at level depth
+	// 2. Iterate 2 of them and create parents and store
+	// 3. Persist all parents to database
+	// 4. Start with next round
+	for i := depth; i > 0; i-- {
+		// get all leaves at depth N
+		accs, err := db.GetAccountsAtDepth(i)
+		if err != nil {
+			return err
+		}
+		db.Logger.Info("Fetched nodes from DB", "depth", i, "count", len(accs))
+
+		var nextLevelAccounts []interface{}
+
+		// iterate over 2 at a time and create next level
+		for i := 0; i < len(accs); i += 2 {
+			db.Logger.Debug("Creating parent node", "leftAccount", accs[i].String(), "rightAccount", accs[i+1].String())
+			fmt.Println("hash", accs[i].Hash)
+			left, err := HexToByteArray(accs[i].Hash[2:])
+			if err != nil {
+				return err
+			}
+			right, err := HexToByteArray(accs[i+1].Hash[2:])
+			if err != nil {
+				return err
+			}
+			parentHash, err := GetParent(left, right)
+			if err != nil {
+				return err
+			}
+			parentPath := GetParentPath(accs[i].Path)
+			db.Logger.Debug("adding parent with path", "obtainedParentPath", parentPath, "child", accs[i].Path)
+			newAccNode := *NewAccountNode(parentPath, parentHash.String())
+			nextLevelAccounts = append(nextLevelAccounts, newAccNode)
+		}
+
+		err = gormbulk.BulkInsert(db.Instance, nextLevelAccounts, len(nextLevelAccounts))
+		if err != nil {
+			db.Logger.Error("Unable to insert accounts to DB", "err", err)
+			return errors.New("Unable to insert accounts")
+		}
+	}
+
+	// mark the root node type correctly
+	return nil
+}
+
+func (db *DB) GetAccountsAtDepth(depth uint64) ([]UserAccount, error) {
+	var accs []UserAccount
+	err := db.Instance.Where("level = ?", depth).Find(&accs).Error
+	if err != nil {
+		return accs, err
+	}
+	return accs, nil
 }
 
 func (db *DB) StoreLeaf(account UserAccount, path string, siblings []UserAccount) {
@@ -248,6 +377,10 @@ func (db *DB) UpdateRootNode(newRoot ByteArray) error {
 // updateAccount will simply replace all the changed fields
 func (db *DB) updateAccount(newAcc UserAccount, path string) error {
 	return db.Instance.Model(&newAcc).Where("path = ?", path).Update(newAcc).Error
+}
+
+func (db *DB) createAccount(acc UserAccount) error {
+	return db.Instance.Create(&acc).Error
 }
 
 // GetAllAccounts fetches all accounts from the database

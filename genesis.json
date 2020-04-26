@@ -7,7 +7,6 @@
     "gen_accounts": [
       {
         "ID": 0,
-        "Path": 0,
         "Balance": 0,
         "TokenType": 0,
         "Nonce": 0,

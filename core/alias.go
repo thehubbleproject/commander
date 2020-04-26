@@ -12,7 +12,11 @@ type Address ethCmn.Address
 type ByteArray [32]byte
 
 func (b ByteArray) String() string {
-	return hex.EncodeToString(b[:])
+	bz := b[:]
+	enc := make([]byte, len(bz)*2+2)
+	copy(enc, "0x")
+	hex.Encode(enc[2:], bz)
+	return string(enc)
 }
 
 func HexToByteArray(a string) (b ByteArray, err error) {

@@ -5,6 +5,9 @@ import (
 	"io/ioutil"
 	"os"
 
+	"errors"
+	"math"
+
 	"github.com/BOPR/common"
 )
 
@@ -16,11 +19,27 @@ type Genesis struct {
 	GenesisAccounts         GenesisAccounts `json:"genesisAccounts"`
 }
 
-//  GenUserAccount exists to allow remove circular dependency with types
+// Validate validates the genesis file and checks for basic things
+func (g Genesis) Validate() error {
+	if int(math.Exp2(float64(g.MaxTreeDepth)))-len(g.GenesisAccounts.Accounts) < 0 {
+		return errors.New("More accounts submitted than can be accomodated")
+	}
+
+	if len(g.GenesisAccounts.Accounts) < 1 {
+		return errors.New("Genesis file must contain atleast coordinator leaf")
+	}
+
+	if !g.GenesisAccounts.Accounts[0].IsCoordinator() {
+		return errors.New("First account in the genesis file should be the coordinator")
+	}
+
+	return nil
+}
+
+// GenUserAccount exists to allow remove circular dependency with types
 // and to allow storing more data about the account than the data in UserAccount
 type GenUserAccount struct {
 	ID        uint64 `json:"ID"`
-	Path      uint64
 	Balance   uint64
 	TokenType uint64
 	Nonce     uint64
@@ -28,10 +47,16 @@ type GenUserAccount struct {
 	PublicKey string
 }
 
-func NewGenUserAccount(id, balance, tokenType, nonce, status, path uint64, publicKey string) GenUserAccount {
+func (acc *GenUserAccount) IsCoordinator() bool {
+	if acc.ID != 0 || acc.Balance != 0 || acc.TokenType != 0 || acc.Nonce != 0 || acc.Status != 1 {
+		return false
+	}
+	return true
+}
+
+func NewGenUserAccount(id, balance, tokenType, nonce, status uint64, publicKey string) GenUserAccount {
 	return GenUserAccount{
 		ID:        id,
-		Path:      path,
 		Balance:   balance,
 		TokenType: tokenType,
 		Nonce:     nonce,
@@ -49,15 +74,16 @@ func NewGenesisAccounts(accounts []GenUserAccount) GenesisAccounts {
 }
 
 func EmptyGenesisAccount() GenUserAccount {
-	return NewGenUserAccount(0, 0, 0, 0, 0, 100, "")
+	return NewGenUserAccount(0, 0, 0, 0, 100, "")
 }
 
 func DefaultGenesisAccounts() GenesisAccounts {
 	var accounts []GenUserAccount
 
 	// add coordinator account
-	acc := NewGenUserAccount(common.COORDINATOR, common.COORDINATOR, common.COORDINATOR, common.COORDINATOR, common.COORDINATOR, 1, "0")
+	acc := NewGenUserAccount(common.COORDINATOR, common.COORDINATOR, common.COORDINATOR, common.COORDINATOR, 1, "0")
 	accounts = append(accounts, acc)
+
 	return NewGenesisAccounts(accounts)
 }
 
