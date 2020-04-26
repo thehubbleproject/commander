@@ -213,7 +213,7 @@ func (db *DB) InitBalancesTree(depth uint64, genesisAccounts []UserAccount) erro
 	var err error
 
 	// insert coodinator leaf
-	err = db.createAccount(genesisAccounts[0])
+	err = db.CreateAccount(genesisAccounts[0])
 	if err != nil {
 		db.Logger.Error("Unable to insert coodinator account", "err", err)
 		return err
@@ -379,7 +379,7 @@ func (db *DB) updateAccount(newAcc UserAccount, path string) error {
 	return db.Instance.Model(&newAcc).Where("path = ?", path).Update(newAcc).Error
 }
 
-func (db *DB) createAccount(acc UserAccount) error {
+func (db *DB) CreateAccount(acc UserAccount) error {
 	return db.Instance.Create(&acc).Error
 }
 
