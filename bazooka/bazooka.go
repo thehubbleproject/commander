@@ -55,14 +55,21 @@ type Bazooka struct {
 // NOTE: Reads configration from the config.toml file
 func NewPreLoadedBazooka() (bazooka Bazooka, err error) {
 	// TODO remove
-	config.SetOperatorKeys(config.GlobalCfg.OperatorKey)
-	config.ParseAndInitGlobalConfig()
+	err = config.SetOperatorKeys(config.GlobalCfg.OperatorKey)
+	if err != nil {
+		return
+	}
+	err = config.ParseAndInitGlobalConfig()
+	if err != nil {
+		return
+	}
 
 	if RPCClient, err := rpc.Dial(config.GlobalCfg.EthRPC); err != nil {
 		return bazooka, err
 	} else {
 		bazooka.EthClient = ethclient.NewClient(RPCClient)
 	}
+
 	bazooka.ContractABI = make(map[string]abi.ABI)
 	// initialise all variables for rollup contract
 	rollupContractAddress := ethCmn.HexToAddress(config.GlobalCfg.RollupAddress)
@@ -235,4 +242,8 @@ func (b *Bazooka) ProcessTx(balanceTreeRoot core.ByteArray, tx core.Tx, fromMerk
 
 func GetTxsFromInput(input map[string]interface{}) (txs [][]byte) {
 	return input["_txs"].([][]byte)
+}
+
+func (b *Bazooka) FireDepositFinalisation(TBreplaced core.UserAccount, siblings []core.UserAccount, subTreeDepth uint64) {
+
 }

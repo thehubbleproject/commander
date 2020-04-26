@@ -182,11 +182,14 @@ func (s *Syncer) processRegisteredToken(eventName string, abiObject *abi.ABI, vL
 }
 
 func (s *Syncer) sendDepositFinalisationTx() {
+	params, err := s.DBInstance.GetParams()
+	if err != nil {
+		return
+	}
 	nodeToBeReplaced, siblings, err := s.DBInstance.GetDepositNodeAndSiblings()
 	if err != nil {
 		return
 	}
 
-	s.loadedBazooka.FireDepositFinalisation()
-
+	s.loadedBazooka.FireDepositFinalisation(nodeToBeReplaced, siblings, params.MaxDepositSubTreeHeight)
 }
