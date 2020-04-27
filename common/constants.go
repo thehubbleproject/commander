@@ -24,4 +24,5 @@ const (
 	MERKLE_TREE_LIB_KEY      = "mktlibk"
 	TOKEN_REGISTRY_KEY       = "tkk"
 	LOGGER_KEY               = "logger"
+	DEPOSIT_MANAGER          = "depositmanager"
 )

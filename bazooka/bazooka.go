@@ -17,6 +17,8 @@ import (
 	"github.com/BOPR/contracts/merkleTree"
 	"github.com/BOPR/contracts/rollup"
 
+	"github.com/BOPR/contracts/depositmanager"
+
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 
 	"github.com/BOPR/core"
@@ -49,6 +51,7 @@ type Bazooka struct {
 	RollupContract *rollup.Rollup
 	BalanceTree    *merkleTree.MerkleTree
 	EventLogger    *logger.Logger
+	DepositManager *depositmanager.Depositmanager
 }
 
 // NewContractCaller contract caller
@@ -95,6 +98,14 @@ func NewPreLoadedBazooka() (bazooka Bazooka, err error) {
 		return bazooka, err
 	}
 	if bazooka.ContractABI[common.LOGGER_KEY], err = abi.JSON(strings.NewReader(logger.LoggerABI)); err != nil {
+		return bazooka, err
+	}
+
+	depositAddress := ethCmn.HexToAddress(config.GlobalCfg.DepositManagerAddress)
+	if bazooka.DepositManager, err = depositmanager.NewDepositmanager(depositAddress, bazooka.EthClient); err != nil {
+		return bazooka, err
+	}
+	if bazooka.ContractABI[common.DEPOSIT_MANAGER], err = abi.JSON(strings.NewReader(depositmanager.DepositmanagerABI)); err != nil {
 		return bazooka, err
 	}
 
@@ -174,12 +185,7 @@ func (b *Bazooka) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, err err
 	return GetTxsFromInput(inputDataMap), nil
 }
 
-// ABIEncodeTx encodes a transaction account to abi.encode parameter in solidity
-// func (c *ContractCaller) ABIEncodeTx(tx *core.Transaction) []byte {
-
-// }
-
-func GenerateAuthObj(client *ethclient.Client, callMsg ethereum.CallMsg) (auth *bind.TransactOpts, err error) {
+func (b *Bazooka) GenerateAuthObj(client *ethclient.Client, callMsg ethereum.CallMsg) (auth *bind.TransactOpts, err error) {
 	// from address
 	fromAddress := config.OperatorAddress()
 
@@ -245,5 +251,39 @@ func GetTxsFromInput(input map[string]interface{}) (txs [][]byte) {
 }
 
 func (b *Bazooka) FireDepositFinalisation(TBreplaced core.UserAccount, siblings []core.UserAccount, subTreeDepth uint64) {
+	depositSubTreeHeight := big.NewInt(0)
+	depositSubTreeHeight.SetUint64(subTreeDepth)
+	var siblingData [][32]byte
+	for _, sibling := range siblings {
+		data, err := core.HexToByteArray(sibling.Hash)
+		if err != nil {
+			return
+		}
+		siblingData = append(siblingData, data)
+	}
 
+	accountProof := depositmanager.TypesAccountMerkleProof{}
+	accountProof.AccountIP.PathToAccount = core.StringToBigInt(TBreplaced.Path)
+	accountProof.Siblings = siblingData
+
+	data, err := b.ContractABI[common.DEPOSIT_MANAGER].Pack("finaliseDeposits", depositSubTreeHeight, accountProof)
+	if err != nil {
+		return
+	}
+	depositManagerAddress := ethCmn.HexToAddress(config.GlobalCfg.DepositManagerAddress)
+	// generate call msg
+	callMsg := ethereum.CallMsg{
+		To:   &depositManagerAddress,
+		Data: data,
+	}
+	auth, err := b.GenerateAuthObj(b.EthClient, callMsg)
+	if err != nil {
+		return
+	}
+	tx, err := b.DepositManager.FinaliseDeposits(auth, depositSubTreeHeight, accountProof)
+	if err != nil {
+		return
+	}
+	b.Logger.Info("Deposits successfully finalized!", "TxHash", tx.Hash())
+	return
 }
