@@ -41,7 +41,7 @@ var LoadedBazooka Bazooka
 // ContractCaller satisfies the IContractCaller interface and contains all the variables required to interact
 // With the ethereum chain along with contract addresses and ABI's
 type Bazooka struct {
-	Logger log.Logger
+	log log.Logger
 
 	EthClient *ethclient.Client
 
@@ -160,13 +160,13 @@ func (b *Bazooka) FetchBalanceTreeRoot() (core.ByteArray, error) {
 func (b *Bazooka) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, err error) {
 	tx, isPending, err := b.EthClient.TransactionByHash(context.Background(), txHash)
 	if err != nil {
-		b.Logger.Error("Cannot fetch transaction from hash", "Error", err)
+		b.log.Error("Cannot fetch transaction from hash", "Error", err)
 		return
 	}
 
 	if isPending {
 		err := errors.New("Transaction is pending")
-		b.Logger.Error("Transaction is still pending, cannot process", "Error", err)
+		b.log.Error("Transaction is still pending, cannot process", "Error", err)
 		return txs, err
 	}
 
@@ -177,10 +177,10 @@ func (b *Bazooka) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, err err
 	method := b.ContractABI[common.ROLLUP_CONTRACT_KEY].Methods["submitBatch"]
 	err = method.Inputs.UnpackIntoMap(inputDataMap, decodedPayload)
 	if err != nil {
-		b.Logger.Error("Error unpacking payload", "Error", err)
+		b.log.Error("Error unpacking payload", "Error", err)
 		return
 	}
-	b.Logger.Debug("Created input data map", "InputData", inputDataMap)
+	b.log.Debug("Created input data map", "InputData", inputDataMap)
 
 	return GetTxsFromInput(inputDataMap), nil
 }
@@ -250,14 +250,24 @@ func GetTxsFromInput(input map[string]interface{}) (txs [][]byte) {
 	return input["_txs"].([][]byte)
 }
 
-func (b *Bazooka) FireDepositFinalisation(TBreplaced core.UserAccount, siblings []core.UserAccount, subTreeDepth uint64) {
+func (b *Bazooka) FireDepositFinalisation(TBreplaced core.UserAccount, siblings []core.UserAccount, subTreeDepth uint64) error {
+	b.log.Info(
+		"Attempting to finalise deposits",
+		"NodeToBeReplaced",
+		TBreplaced.String(),
+		"NumberOfSiblings",
+		len(siblings),
+		"atDepth",
+		subTreeDepth,
+	)
 	depositSubTreeHeight := big.NewInt(0)
 	depositSubTreeHeight.SetUint64(subTreeDepth)
 	var siblingData [][32]byte
 	for _, sibling := range siblings {
+		b.log.Debug("Appending sibling", "hash", sibling.Hash)
 		data, err := core.HexToByteArray(sibling.Hash)
 		if err != nil {
-			return
+			return err
 		}
 		siblingData = append(siblingData, data)
 	}
@@ -265,10 +275,10 @@ func (b *Bazooka) FireDepositFinalisation(TBreplaced core.UserAccount, siblings 
 	accountProof := depositmanager.TypesAccountMerkleProof{}
 	accountProof.AccountIP.PathToAccount = core.StringToBigInt(TBreplaced.Path)
 	accountProof.Siblings = siblingData
-
+	b.log.Debug("Account proof created", "accountProof", accountProof)
 	data, err := b.ContractABI[common.DEPOSIT_MANAGER].Pack("finaliseDeposits", depositSubTreeHeight, accountProof)
 	if err != nil {
-		return
+		return err
 	}
 	depositManagerAddress := ethCmn.HexToAddress(config.GlobalCfg.DepositManagerAddress)
 	// generate call msg
@@ -278,12 +288,13 @@ func (b *Bazooka) FireDepositFinalisation(TBreplaced core.UserAccount, siblings 
 	}
 	auth, err := b.GenerateAuthObj(b.EthClient, callMsg)
 	if err != nil {
-		return
+		return err
 	}
+	b.log.Info("Broadcasting deposit finalisation transaction", "auth", auth)
 	tx, err := b.DepositManager.FinaliseDeposits(auth, depositSubTreeHeight, accountProof)
 	if err != nil {
-		return
+		return err
 	}
-	b.Logger.Info("Deposits successfully finalized!", "TxHash", tx.Hash())
-	return
+	b.log.Info("Deposits successfully finalized!", "TxHash", tx.Hash())
+	return nil
 }
