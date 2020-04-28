@@ -11,10 +11,10 @@ import (
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 
+	agg "github.com/BOPR/aggregator"
 	"github.com/BOPR/bazooka"
 	"github.com/BOPR/core"
 	"github.com/BOPR/listener"
-	"github.com/BOPR/poller"
 	"github.com/BOPR/rest"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
@@ -45,7 +45,7 @@ func StartCmd() *cobra.Command {
 			//
 
 			// create aggregator service
-			aggregator := poller.NewAggregator(core.DBInstance)
+			aggregator := agg.NewAggregator(core.DBInstance)
 
 			// create the syncer service
 			syncer := listener.NewSyncer()
@@ -137,6 +137,7 @@ func InitGlobalDBInstance() {
 
 	// init global DB instance
 	core.DBInstance = tempDB
+	fmt.Println("db instance populated", core.DBInstance)
 }
 
 func InitGlobalBazooka() {

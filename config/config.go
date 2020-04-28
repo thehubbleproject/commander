@@ -42,6 +42,7 @@ type Configuration struct {
 
 	EthRPC             string        `mapstructure:"eth_RPC_URL"`
 	PollingInterval    time.Duration `mapstructure:"polling_interval"`
+	TxsPerBatch        uint64        `mapstructure:"txs_per_batch"`
 	ServerPort         string        `mapstructure:"server_port"`
 	ConfirmationBlocks uint64        `mapstructure:"confirmation_blocks"` // Number of blocks for confirmation
 
@@ -66,6 +67,7 @@ func GetDefaultConfig() Configuration {
 		Trace:                 false,
 		DBLogMode:             true,
 		EthRPC:                DefaultEthRPC,
+		TxsPerBatch:           2,
 		PollingInterval:       DefaultPollingInterval,
 		ServerPort:            DefaultSeverPort,
 		ConfirmationBlocks:    DefaultConfirmationBlocks,

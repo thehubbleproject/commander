@@ -44,6 +44,8 @@ func main() {
 	rootCmd.AddCommand(StartCmd())
 	rootCmd.AddCommand(ResetCmd())
 	rootCmd.AddCommand(AddGenesisAcccountsCmd())
+
+	rootCmd.AddCommand(SendTransferTx())
 	rootCmd.AddCommand(migrationCmd)
 
 	executor := Executor{rootCmd, os.Exit}

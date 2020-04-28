@@ -7,7 +7,13 @@ import (
 )
 
 func main() {
-	TestUserAccountUpdate()
+	TestTxHash()
+}
+func TestTxHash() {
+	tx := core.NewPendingTx(1, 1, 1, 1, "1", 1)
+	tx.AssignHash()
+	fmt.Println("tx hash:", tx.TxHash)
+
 }
 
 func TestTrim() {

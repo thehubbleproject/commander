@@ -191,5 +191,5 @@ func (s *Syncer) sendDepositFinalisationTx() {
 		return
 	}
 
-	s.loadedBazooka.FireDepositFinalisation(nodeToBeReplaced, siblings, params.MaxDepositSubTreeHeight)
+	err = s.loadedBazooka.FireDepositFinalisation(nodeToBeReplaced, siblings, params.MaxDepositSubTreeHeight)
 }

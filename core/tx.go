@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/BOPR/config"
 	"github.com/BOPR/contracts/rollup"
 	ethCmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -19,8 +20,8 @@ type Tx struct {
 	Amount    uint64 `json:"amount"`
 	Nonce     uint64 `json:"nonce"`
 	TokenID   uint64 `json:"tokenID"`
-	Signature string `json:"sig"`
-	TxHash    Hash   `json:"hash"`
+	Signature string `json:"sig" gorm:"unique;not null"`
+	TxHash    string `json:"hash" gorm:"unique;not null"`
 	// 100 Pending
 	// 200 Processing
 	// 300 Processed
@@ -41,12 +42,12 @@ func NewTx(to uint64, from uint64, amount uint64, nonce uint64, sig string, toke
 }
 
 // NewTx creates a new transaction
-func (t *Tx) AssignHash() Hash {
-	if ethCmn.Hash(t.TxHash).String() != "" {
-		return t.TxHash
+func (t *Tx) AssignHash() {
+	if t.TxHash != "" {
+		return
 	}
-
-	return rlpHash(t)
+	hash := rlpHash(t)
+	t.TxHash = hash.String()
 }
 
 // NewPendingTx creates a new transaction
@@ -99,26 +100,8 @@ func (t *Tx) ValidateBasic() error {
 }
 
 func (t *Tx) String() string {
-	return fmt.Sprintf("To: %v From: %v Amount: %v Nonce: %v Type:%v Status:%v", t.To, t.From, t.Amount, t.Nonce, t.TokenID, t.Status)
+	return fmt.Sprintf("To: %v From: %v Amount: %v Nonce: %v Type:%v Status:%v Hash: %v", t.To, t.From, t.Amount, t.Nonce, t.TokenID, t.Status, t.TxHash)
 }
-
-// MinimalTx constructs minimal tx from normal tx
-// func (t *Tx) MinimalTx() (tx MinimalTx, err error) {
-// 	sig, err := hex.DecodeString(t.Signature)
-// 	if err != nil {
-// 		return tx, err
-// 	}
-// 	var trimmedSig [64]byte
-// 	copy(trimmedSig[:], sig)
-// 	return NewMinimalTx(
-// 		uint32(t.To),
-// 		uint32(t.From),
-// 		uint32(t.Amount),
-// 		uint32(t.Nonce),
-// 		common.UintTo2Byte(uint32(t.TxType)),
-// 		trimmedSig,
-// 	), nil
-// }
 
 // ToABIVersion converts a standard tx to the the DataTypesTransaction struct on the contract
 func (t *Tx) ToABIVersion(from, to rollup.DataTypesUserAccount) rollup.DataTypesTransaction {
@@ -129,6 +112,62 @@ func (t *Tx) ToABIVersion(from, to rollup.DataTypesUserAccount) rollup.DataTypes
 		TokenType: from.TokenType,
 		Signature: []byte(t.Signature),
 	}
+}
+
+// Insert tx into the DB
+func (db *DB) InsertTx(t *Tx) error {
+	return db.Instance.Create(t).Error
+}
+
+func (db *DB) PopTxs() (txs []Tx, err error) {
+	tx := db.Instance.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return txs, err
+	}
+	var pendingTxs []Tx
+
+	// select N number of transactions which are pending in mempool and
+	if err := tx.Limit(config.GlobalCfg.TxsPerBatch).Where(&Tx{Status: 100}).Find(&pendingTxs).Error; err != nil {
+		db.Logger.Error("error while fetching pending transactions", err)
+		return txs, err
+	}
+
+	db.Logger.Info("found txs", "pendingTxs", pendingTxs)
+
+	var ids []string
+	for _, tx := range pendingTxs {
+		ids = append(ids, tx.ID)
+	}
+
+	// update the transactions from pending to processing
+	errs := tx.Table("txes").Where("id IN (?)", ids).Updates(map[string]interface{}{"status": 200}).GetErrors()
+	if err != nil {
+		db.Logger.Error("errors while processing transactions", errs)
+		return
+	}
+
+	return pendingTxs, tx.Commit().Error
+}
+
+func (db *DB) GetTx() (tx []Tx, err error) {
+	err = db.Instance.First(&tx).Error
+	if err != nil {
+		return tx, err
+	}
+	return
+}
+
+func rlpHash(x interface{}) (h ethCmn.Hash) {
+	hw := sha3.NewLegacyKeccak256()
+	rlp.Encode(hw, x)
+	hw.Sum(h[:0])
+	return h
 }
 
 // // MinimalTx is the transaction that needs to be pushed on-chain
@@ -191,54 +230,20 @@ func (t *Tx) ToABIVersion(from, to rollup.DataTypesUserAccount) rollup.DataTypes
 // func (t *MinimalTx) String() string {
 // 	return fmt.Sprintf("To: %v From: %v Amount: %v Nonce: %v Type:%v Sig:%v", t.To, t.From, t.Amount, t.Nonce, t.TxType, t.Signature)
 // }
-
-func rlpHash(x interface{}) (h Hash) {
-	hw := sha3.NewLegacyKeccak256()
-	rlp.Encode(hw, x)
-	hw.Sum(h[:0])
-	return h
-}
-
-// Insert tx into the DB
-func (db *DB) InsertTx(t *Tx) error {
-	db.Instance.Create(t)
-	return nil
-}
-
-func (db *DB) PopTxs() (txs []Tx, err error) {
-	tx := db.Instance.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-
-	if err := tx.Error; err != nil {
-		return txs, err
-	}
-	var pendingTxs []Tx
-
-	// select N number of transactions which are pending in mempool and
-	if err := tx.Limit(3).Where(&Tx{Status: 100}).Find(&pendingTxs).Error; err != nil {
-		fmt.Println("error while fetching pending transactions", err)
-		return txs, err
-	}
-
-	fmt.Println("found txs", pendingTxs)
-
-	var ids []string
-	for _, tx := range pendingTxs {
-		ids = append(ids, tx.ID)
-	}
-
-	// update the transactions from pending to processing
-	errs := tx.Table("txes").Where("id IN (?)", ids).Updates(map[string]interface{}{"status": "processing"}).GetErrors()
-	fmt.Println("errors while processing transactions", errs)
-
-	return pendingTxs, tx.Commit().Error
-}
-
-func (db *DB) GetTx() (tx []Tx) {
-	db.Instance.First(&tx)
-	return
-}
+// MinimalTx constructs minimal tx from normal tx
+// func (t *Tx) MinimalTx() (tx MinimalTx, err error) {
+// 	sig, err := hex.DecodeString(t.Signature)
+// 	if err != nil {
+// 		return tx, err
+// 	}
+// 	var trimmedSig [64]byte
+// 	copy(trimmedSig[:], sig)
+// 	return NewMinimalTx(
+// 		uint32(t.To),
+// 		uint32(t.From),
+// 		uint32(t.Amount),
+// 		uint32(t.Nonce),
+// 		common.UintTo2Byte(uint32(t.TxType)),
+// 		trimmedSig,
+// 	), nil
+// }

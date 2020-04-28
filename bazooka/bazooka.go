@@ -109,7 +109,8 @@ func NewPreLoadedBazooka() (bazooka Bazooka, err error) {
 		return bazooka, err
 	}
 
-	bazooka.Logger = common.Logger.With("module", "bazooka")
+	bazooka.log = common.Logger.With("module", "bazooka")
+
 	return bazooka, nil
 }
 
