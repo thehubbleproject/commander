@@ -46,13 +46,14 @@ type Configuration struct {
 	ServerPort         string        `mapstructure:"server_port"`
 	ConfirmationBlocks uint64        `mapstructure:"confirmation_blocks"` // Number of blocks for confirmation
 
-	RollupAddress         string `mapstructure:"rollup_address"`
-	BalanceTreeAddress    string `mapstructure:"balance_tree_address"`
-	AccountTreeAddress    string `mapstructure:"account_tree_address"`
-	MerkleTreeLibAddress  string `mapstructure:"merkle_lib_address"`
-	TokenRegistryAddress  string `mapstructure:"token_registry_address"`
-	DepositManagerAddress string `mapstructure:"deposit_manager_address"`
-	LoggerAddress         string `mapstructure:"logger_address"`
+	RollupAddress           string `mapstructure:"rollup_address"`
+	BalanceTreeAddress      string `mapstructure:"balance_tree_address"`
+	AccountTreeAddress      string `mapstructure:"account_tree_address"`
+	MerkleTreeLibAddress    string `mapstructure:"merkle_lib_address"`
+	TokenRegistryAddress    string `mapstructure:"token_registry_address"`
+	DepositManagerAddress   string `mapstructure:"deposit_manager_address"`
+	LoggerAddress           string `mapstructure:"logger_address"`
+	CoordinatorProxyAddress string `mapstructure:"coordinator_proxy_address"`
 
 	OperatorKey       string `mapstructure:"operator_key"`
 	OperatorAddress   string `mapstructure:"operator_address"`
@@ -62,25 +63,26 @@ type Configuration struct {
 // GetDefaultConfig returns the default configration options
 func GetDefaultConfig() Configuration {
 	return Configuration{
-		DB:                    DefaultDB,
-		DBURL:                 GetDBURL(),
-		Trace:                 false,
-		DBLogMode:             true,
-		EthRPC:                DefaultEthRPC,
-		TxsPerBatch:           2,
-		PollingInterval:       DefaultPollingInterval,
-		ServerPort:            DefaultSeverPort,
-		ConfirmationBlocks:    DefaultConfirmationBlocks,
-		RollupAddress:         ethCmn.Address{}.String(),
-		DepositManagerAddress: ethCmn.Address{}.String(),
-		BalanceTreeAddress:    ethCmn.Address{}.String(),
-		AccountTreeAddress:    ethCmn.Address{}.String(),
-		MerkleTreeLibAddress:  ethCmn.Address{}.String(),
-		TokenRegistryAddress:  ethCmn.Address{}.String(),
-		LoggerAddress:         ethCmn.Address{}.String(),
-		OperatorKey:           "",
-		OperatorAddress:       "",
-		LastRecordedBlock:     "0",
+		DB:                      DefaultDB,
+		DBURL:                   GetDBURL(),
+		Trace:                   false,
+		DBLogMode:               true,
+		EthRPC:                  DefaultEthRPC,
+		TxsPerBatch:             2,
+		PollingInterval:         DefaultPollingInterval,
+		ServerPort:              DefaultSeverPort,
+		ConfirmationBlocks:      DefaultConfirmationBlocks,
+		RollupAddress:           ethCmn.Address{}.String(),
+		DepositManagerAddress:   ethCmn.Address{}.String(),
+		BalanceTreeAddress:      ethCmn.Address{}.String(),
+		AccountTreeAddress:      ethCmn.Address{}.String(),
+		MerkleTreeLibAddress:    ethCmn.Address{}.String(),
+		TokenRegistryAddress:    ethCmn.Address{}.String(),
+		LoggerAddress:           ethCmn.Address{}.String(),
+		CoordinatorProxyAddress: ethCmn.Address{}.String(),
+		OperatorKey:             "",
+		OperatorAddress:         "",
+		LastRecordedBlock:       "0",
 	}
 }
 

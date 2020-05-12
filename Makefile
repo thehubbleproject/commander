@@ -10,6 +10,7 @@ contracts:
 	abigen --abi=contracts/trial/trial.abi --pkg=trial --out=contracts/trial/trial.go
 	abigen --abi=contracts/logger/logger.abi --pkg=logger --out=contracts/logger/logger.go
 	abigen --abi=contracts/depositmanager/depositmanager.abi --pkg=depositmanager --out=contracts/depositmanager/depositmanager.go
+	abigen --abi=contracts/coordinatorproxy/coordinatorproxy.abi --pkg=coordinatorproxy --out=contracts/coordinatorproxy/coordinatorproxy.go
 
 clean:
 	rm -rf build

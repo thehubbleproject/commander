@@ -191,7 +191,7 @@ func (_Trial *TrialTransactorRaw) Transact(opts *bind.TransactOpts, method strin
 
 // ABIDecodeTransaction is a free data retrieval call binding the contract method 0x33384958.
 //
-// Solidity: function ABIDecodeTransaction() constant returns(uint256)
+// Solidity: function ABIDecodeTransaction() view returns(uint256)
 func (_Trial *TrialCaller) ABIDecodeTransaction(opts *bind.CallOpts) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
@@ -203,21 +203,21 @@ func (_Trial *TrialCaller) ABIDecodeTransaction(opts *bind.CallOpts) (*big.Int, 
 
 // ABIDecodeTransaction is a free data retrieval call binding the contract method 0x33384958.
 //
-// Solidity: function ABIDecodeTransaction() constant returns(uint256)
+// Solidity: function ABIDecodeTransaction() view returns(uint256)
 func (_Trial *TrialSession) ABIDecodeTransaction() (*big.Int, error) {
 	return _Trial.Contract.ABIDecodeTransaction(&_Trial.CallOpts)
 }
 
 // ABIDecodeTransaction is a free data retrieval call binding the contract method 0x33384958.
 //
-// Solidity: function ABIDecodeTransaction() constant returns(uint256)
+// Solidity: function ABIDecodeTransaction() view returns(uint256)
 func (_Trial *TrialCallerSession) ABIDecodeTransaction() (*big.Int, error) {
 	return _Trial.Contract.ABIDecodeTransaction(&_Trial.CallOpts)
 }
 
 // Data is a free data retrieval call binding the contract method 0x73d4a13a.
 //
-// Solidity: function data() constant returns(bytes)
+// Solidity: function data() view returns(bytes)
 func (_Trial *TrialCaller) Data(opts *bind.CallOpts) ([]byte, error) {
 	var (
 		ret0 = new([]byte)
@@ -229,14 +229,14 @@ func (_Trial *TrialCaller) Data(opts *bind.CallOpts) ([]byte, error) {
 
 // Data is a free data retrieval call binding the contract method 0x73d4a13a.
 //
-// Solidity: function data() constant returns(bytes)
+// Solidity: function data() view returns(bytes)
 func (_Trial *TrialSession) Data() ([]byte, error) {
 	return _Trial.Contract.Data(&_Trial.CallOpts)
 }
 
 // Data is a free data retrieval call binding the contract method 0x73d4a13a.
 //
-// Solidity: function data() constant returns(bytes)
+// Solidity: function data() view returns(bytes)
 func (_Trial *TrialCallerSession) Data() ([]byte, error) {
 	return _Trial.Contract.Data(&_Trial.CallOpts)
 }

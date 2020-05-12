@@ -127,7 +127,10 @@ func (acc *UserAccount) ToABIAccount() rollup.DataTypesUserAccount {
 }
 
 func (acc *UserAccount) HashToByteArray() ByteArray {
-	ba, _ := HexToByteArray(acc.Hash)
+	ba, err := HexToByteArray(acc.Hash)
+	if err != nil {
+		panic(err)
+	}
 	return ba
 }
 
@@ -258,11 +261,11 @@ func (db *DB) InitBalancesTree(depth uint64, genesisAccounts []UserAccount) erro
 		for i := 0; i < len(accs); i += 2 {
 			db.Logger.Debug("Creating parent node", "leftAccount", accs[i].String(), "rightAccount", accs[i+1].String())
 			fmt.Println("hash", accs[i].Hash)
-			left, err := HexToByteArray(accs[i].Hash[2:])
+			left, err := HexToByteArray(accs[i].Hash)
 			if err != nil {
 				return err
 			}
-			right, err := HexToByteArray(accs[i+1].Hash[2:])
+			right, err := HexToByteArray(accs[i+1].Hash)
 			if err != nil {
 				return err
 			}
@@ -296,7 +299,7 @@ func (db *DB) GetAccountsAtDepth(depth uint64) ([]UserAccount, error) {
 	return accs, nil
 }
 
-func (db *DB) StoreLeaf(account UserAccount, path string, siblings []UserAccount) {
+func (db *DB) StoreLeaf(account UserAccount, path string, siblings []UserAccount) error {
 	var err error
 	computedNode := account
 	for i := 0; i < len(siblings); i++ {
@@ -306,38 +309,45 @@ func (db *DB) StoreLeaf(account UserAccount, path string, siblings []UserAccount
 			path,
 			i,
 		)
-
+		fmt.Println("isComputed result", isComputedRightSibling)
 		if isComputedRightSibling == 0 {
 			parentHash, err = GetParent(computedNode.HashToByteArray(), sibling.HashToByteArray())
 			if err != nil {
-				return
+				return err
 			}
 
+			fmt.Println("storing children and parent", parentHash.String(), "children", computedNode.HashToByteArray().String(), sibling.HashToByteArray().String())
 			// Store the node!
 			err = db.StoreNode(parentHash, computedNode, sibling)
 			if err != nil {
-				return
+				return err
 			}
 		} else {
 			parentHash, err = GetParent(sibling.HashToByteArray(), computedNode.HashToByteArray())
 			if err != nil {
-				return
+				return err
 			}
+			fmt.Println("storing children and parent", parentHash.String(), "children", computedNode.HashToByteArray().String(), sibling.HashToByteArray().String())
+
 			// Store the node!
 			err = db.StoreNode(parentHash, sibling, computedNode)
 			if err != nil {
-				return
+				return err
 			}
 		}
 
+		fmt.Println("parent", parentHash.String())
 		computedNode.Hash = parentHash.String()
+		count, err := db.GetAccountCount()
+		fmt.Println("count", count, err)
 	}
 
 	// Store the new root
 	err = db.UpdateRootNode(computedNode.HashToByteArray())
 	if err != nil {
-		return
+		return err
 	}
+	return nil
 }
 
 // StoreNode updates the nodes given the parent hash
@@ -388,7 +398,9 @@ func (db *DB) GetSiblings(path string) ([]UserAccount, error) {
 	var siblings []UserAccount
 	for i := len(path); i > 0; i-- {
 		otherChild := GetOtherChild(relativePath)
+		fmt.Println("otherChild = ", otherChild)
 		otherNode, err := db.GetAccountByPath(otherChild)
+		fmt.Println("otherNode = ", otherNode.Path)
 		if err != nil {
 			return siblings, err
 		}
@@ -398,23 +410,15 @@ func (db *DB) GetSiblings(path string) ([]UserAccount, error) {
 	return siblings, nil
 }
 
-// GetAllAccounts fetches all accounts from the database
-// func (db *DB) GetAllAccounts() (accs []UserAccount, err error) {
-// 	// TODO add limits here
-// 	errs := db.Instance.Find(&accs).GetErrors()
-// 	for _, err := range errs {
-// 		if err != nil {
-// 			return accs, GenericError("got error while fetch all accounts")
-// 		}
-// 	}
-// 	return accs, nil
-// }
-
 // GetAccount gets the account of the given path from the DB
 func (db *DB) GetAccountByPath(path string) (UserAccount, error) {
 	var account UserAccount
-	if db.Instance.First(&account, path).RecordNotFound() {
-		return account, ErrRecordNotFound(fmt.Sprintf("unable to find record for path: %v", path))
+	// err := db.Instance.Model(&account).Where("path = ?", path).GetErrors()
+	err := db.Instance.Where("path = ?", path).Find(&account).GetErrors()
+
+	fmt.Println("errors while getting account", err)
+	if len(err) != 0 {
+		return account, ErrRecordNotFound(fmt.Sprintf("unable to find record for path: %v err:%v", path, err))
 	}
 	return account, nil
 }
@@ -425,6 +429,18 @@ func (db *DB) GetAccountByHash(hash string) (UserAccount, error) {
 		return account, ErrRecordNotFound(fmt.Sprintf("unable to find record for hash: %v", hash))
 	}
 	return account, nil
+}
+
+func (db *DB) FinaliseAccount(account UserAccount) error {
+	// change status of account to 1
+	// err := db.Instance.Model(&acc).Updates(UserAccount{Balance: pendingAccs[i].Balance,
+	// 	TokenType: account.TokenType,
+	// 	AccountID: account.AccountID,
+	// 	PublicKey: account.PublicKey,
+	// 	Status:    1,
+	// }).Error
+	// update all siblings to root
+	return nil
 }
 
 // func (db *DB) InsertAccount(account UserAccount) error {
@@ -450,11 +466,11 @@ func (db *DB) GetAccountByHash(hash string) (UserAccount, error) {
 // 	return db.InsertBulkAccounts(accLeafs)
 // }
 
-// func (db *DB) GetAccountCount() (int, error) {
-// 	var count int
-// 	db.Instance.Table("account_leafs").Count(&count)
-// 	return count, nil
-// }
+func (db *DB) GetAccountCount() (int, error) {
+	var count int
+	db.Instance.Table("user_accounts").Count(&count)
+	return count, nil
+}
 
 // // FetchSiblings retuns the siblings of an account leaf till root
 // // TODO make this more performannt by using bulk account fetch or using groutines to fetch in parerell
@@ -477,81 +493,6 @@ func (db *DB) GetAccountByHash(hash string) (UserAccount, error) {
 // 		return
 // 	}
 // 	return
-// }
-
-// func (db *DB) GetPendingDeposits(numberOfAccs uint64) ([]UserAccount, error) {
-// 	var accounts []UserAccount
-// 	err := db.Instance.Limit(numberOfAccs).Where("status = ?", 0).Find(&accounts).Error
-// 	if err != nil {
-// 		return accounts, err
-// 	}
-// 	return accounts, nil
-// }
-
-// func (db *DB) FinaliseDeposits(accountsRoot ByteArray, pathToDepositSubTree uint64, newBalanceRoot ByteArray) error {
-// 	db.Logger.Info("Finalising accounts", "accountRoot", accountsRoot, "NewBalanceRoot", newBalanceRoot, "pathToDepositSubTree", pathToDepositSubTree)
-
-// 	// get params
-// 	params, err := db.GetParams()
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	// number of new deposits = 2**MaxDepthOfDepositTree
-// 	depositCount := uint64(math.Exp2(float64(params.MaxDepositSubTreeHeight)))
-
-// 	// get all pending accounts
-// 	pendingAccs, err := db.GetPendingDeposits(depositCount)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	db.Logger.Debug("Fetched pending deposits", "count", len(pendingAccs), "data", pendingAccs)
-
-// 	// update the empty leaves with new accounts
-// 	err = db.AddPendingDeposits(pendingAccs)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	// TODO ensure the accounts are inserted at pathToDepositSubTree
-
-// 	//TODO  make sure all the accounts root match to accountsRoot
-
-// 	return nil
-// }
-
-// func (db *DB) AddPendingDeposits(pendingAccs []UserAccount) error {
-// 	var accounts []UserAccount
-// 	// fetch 2**DepositSubTree inactive accounts ordered by path
-// 	err := db.Instance.Limit(len(pendingAccs)).Order("path").Where("status = ?", 100).Find(&accounts).Error
-// 	if err != nil {
-// 		return err
-// 	}
-// 	// TODO add error for if no account found
-
-// 	// update the accounts
-// 	for i, acc := range accounts {
-// 		// acc.Balance = pendingAccs[i].Balance
-// 		// acc.TokenType = pendingAccs[i].TokenType
-// 		// acc.AccountID = pendingAccs[i].AccountID
-// 		// acc.PublicKey = pendingAccs[i].PublicKey
-// 		err := db.Instance.Model(&acc).Updates(UserAccount{Balance: pendingAccs[i].Balance,
-// 			TokenType: pendingAccs[i].TokenType,
-// 			AccountID: pendingAccs[i].AccountID,
-// 			PublicKey: pendingAccs[i].PublicKey,
-// 			Status:    1,
-// 		}).Error
-// 		if err != nil {
-// 			return err
-// 		}
-// 	}
-// 	return nil
-// }
-
-// // create merkle proof for finalisation of deposits
-// // send transaction to etherum chain using contract caller
-// func (db *DB) sendDepositFinalisationTx() {
-
 // }
 
 // // GetDepositNodePath is supposed to get a set of uninitialised leaves

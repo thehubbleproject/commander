@@ -96,7 +96,10 @@ func StartCmd() *cobra.Command {
 				log.Fatalln("Unable to start aggregator", "error", err)
 			}
 			// TODO replace this with port from config
-			http.ListenAndServe(":8080", r)
+			err = http.ListenAndServe(":3000", r)
+			if err != nil {
+				panic(err)
+			}
 			fmt.Println("Server started on port 8080 🎉")
 		},
 	}
@@ -184,13 +187,13 @@ func LoadGenesisData(genesis config.Genesis) {
 	err = core.DBInstance.InitBalancesTree(genesis.MaxTreeDepth, allAccounts)
 	common.PanicIfError(err)
 
-	// // load params
+	// load params
 	newParams := core.Params{StakeAmount: genesis.StakeAmount, MaxDepth: genesis.MaxTreeDepth, MaxDepositSubTreeHeight: genesis.MaxDepositSubTreeHeight}
 	core.DBInstance.UpdateStakeAmount(newParams.StakeAmount)
 	core.DBInstance.UpdateMaxDepth(newParams.MaxDepth)
 	core.DBInstance.UpdateDepositSubTreeHeight(newParams.MaxDepositSubTreeHeight)
 
-	// // load sync status
+	// load sync status
 	core.DBInstance.UpdateSyncStatusWithBlockNumber(genesis.StartEthBlock)
 	core.DBInstance.UpdateSyncStatusWithBatchNumber(0)
 }

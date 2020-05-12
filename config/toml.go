@@ -39,6 +39,7 @@ merkle_lib_address = "{{ .MerkleTreeLibAddress }}"
 token_registry_address = "{{ .TokenRegistryAddress }}"
 logger_address = "{{ .LoggerAddress }}"
 deposit_manager_address = "{{ .DepositManagerAddress }}"
+coordinator_proxy_address = "{{ .CoordinatorProxyAddress }}"
 `
 
 var configTemplate *template.Template

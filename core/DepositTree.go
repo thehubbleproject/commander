@@ -1,8 +1,8 @@
 package core
 
 import (
-	"errors"
 	"fmt"
+	"math"
 )
 
 type DepositTree struct {
@@ -35,14 +35,6 @@ func (db *DB) OnDepositLeafMerge(left, right, newRoot ByteArray) (uint64, error)
 	updatedDepositTreeInfo.NumberOfDeposits = lastDeposit.NumberOfDeposits + 2
 	updatedDepositTreeInfo.Root = newRoot.String()
 
-	generatedRoot, err := GetParent(left, right)
-	if err != nil {
-		return 0, err
-	}
-
-	if generatedRoot.String() != newRoot.String() {
-		return 0, errors.New("Unable to update deposit tree, deposit tree root doesnt match")
-	}
 	if err := db.Instance.Model(&lastDeposit).Update(&updatedDepositTreeInfo).Error; err != nil {
 		return 0, err
 	}
@@ -73,4 +65,77 @@ func (db *DB) GetDepositNodeAndSiblings() (NodeToBeReplaced UserAccount, sibling
 	}
 
 	return
+}
+
+func (db *DB) FinaliseDepositsAndAddBatch(accountsRoot ByteArray, pathToDepositSubTree uint64, newBalanceRoot ByteArray) error {
+	db.Logger.Info("Finalising accounts", "accountRoot", accountsRoot, "NewBalanceRoot", newBalanceRoot, "pathToDepositSubTree", pathToDepositSubTree)
+
+	// get params
+	params, err := db.GetParams()
+	if err != nil {
+		return err
+	}
+
+	// number of new deposits = 2**MaxDepthOfDepositTree
+	depositCount := uint64(math.Exp2(float64(params.MaxDepositSubTreeHeight)))
+
+	// get all pending accounts
+	pendingAccs, err := db.GetPendingDeposits(depositCount)
+	if err != nil {
+		return err
+	}
+
+	db.Logger.Debug("Fetched pending deposits", "count", len(pendingAccs), "data", pendingAccs)
+
+	// update the empty leaves with new accounts
+	err = db.AddPendingDeposits(pendingAccs)
+	if err != nil {
+		return err
+	}
+
+	// TODO ensure the accounts are inserted at pathToDepositSubTree
+
+	//TODO  make sure all the accounts root match to accountsRoot
+
+	return nil
+}
+
+func (db *DB) AddPendingDeposits(pendingAccs []UserAccount) error {
+	var accounts []UserAccount
+
+	// fetch 2**DepositSubTree inactive accounts ordered by path
+	err := db.Instance.Limit(len(pendingAccs)).Order("path").Where("status = ?", 100).Find(&accounts).Error
+	if err != nil {
+		return err
+	}
+	// TODO add error for if no account found
+
+	// update the accounts
+	for i, acc := range accounts {
+		err := db.Instance.Model(&acc).Updates(UserAccount{Balance: pendingAccs[i].Balance,
+			TokenType: pendingAccs[i].TokenType,
+			AccountID: pendingAccs[i].AccountID,
+			PublicKey: pendingAccs[i].PublicKey,
+			Status:    1,
+		}).Error
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// create merkle proof for finalisation of deposits
+// send transaction to etherum chain using contract caller
+func (db *DB) sendDepositFinalisationTx() {
+
+}
+
+func (db *DB) GetPendingDeposits(numberOfAccs uint64) ([]UserAccount, error) {
+	var accounts []UserAccount
+	err := db.Instance.Limit(numberOfAccs).Where("status = ?", 0).Find(&accounts).Error
+	if err != nil {
+		return accounts, err
+	}
+	return accounts, nil
 }

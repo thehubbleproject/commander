@@ -77,6 +77,7 @@ func (s *Syncer) processDepositLeafMerged(eventName string, abiObject *abi.ABI, 
 	if err != nil {
 		panic(err)
 	}
+
 	// if deposit subtree height = deposit finalisation height then
 	if newheight == params.MaxDepositSubTreeHeight {
 		// send deposit finalisation transction to ethereum chain
@@ -109,7 +110,7 @@ func (s *Syncer) processDepositFinalised(eventName string, abiObject *abi.ABI, v
 	)
 
 	// TODO handle error
-	// s.DBInstance.FinaliseDeposits(accountsRoot, pathToDepositSubTree.Uint64(), newBalanceRoot)
+	s.DBInstance.FinaliseDepositsAndAddBatch(accountsRoot, pathToDepositSubTree.Uint64(), newBalanceRoot)
 }
 
 func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {

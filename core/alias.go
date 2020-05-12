@@ -19,8 +19,9 @@ func (b ByteArray) String() string {
 	return string(enc)
 }
 
+// String has to be prefixed with 0x
 func HexToByteArray(a string) (b ByteArray, err error) {
-	bz, err := hex.DecodeString(a)
+	bz, err := hex.DecodeString(a[2:])
 	if err != nil {
 		return b, err
 	}

@@ -2,12 +2,110 @@ package main
 
 import (
 	"fmt"
+	"math"
 
+	"github.com/BOPR/common"
+	"github.com/BOPR/config"
 	"github.com/BOPR/core"
 )
 
 func main() {
-	TestTxHash()
+	TestStoreNode()
+}
+
+func TestStoreNode() {
+	db, err := core.NewDB()
+	if err != nil {
+		fmt.Println("error creating database")
+		panic(err)
+	}
+	core.DBInstance = db
+	// read genesis file
+	genesis, err := config.ReadGenesisFile()
+	common.PanicIfError(err)
+
+	// loads genesis data to the database
+	LoadGenesisData(genesis)
+	pathToUpdate := "0000"
+	// pathsThatWillBeUpdated:=string["000","00","0"]
+	fmt.Println("--------------------------------")
+	var newAccount = core.EmptyAccount()
+	newAccount.Path = pathToUpdate
+	newAccount.TokenType = 1
+	newAccount.CreateAccountHash()
+	defaultHashse, err := core.GenDefaultHashes(4)
+	if err != nil {
+		panic(err)
+	}
+	newAccountHash, err := core.HexToByteArray(newAccount.Hash)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("using", newAccountHash.String(), defaultHashse[0].String())
+	parent, err := core.GetParent(newAccountHash, defaultHashse[0])
+	fmt.Println("000 should be", parent.String())
+	siblings, err := db.GetSiblings(pathToUpdate)
+	if err != nil {
+		panic(err)
+	}
+
+	// account, err := db.GetAccountByPath("0001")
+	// fmt.Println("account here", account, "path", account.Path)
+	fmt.Println("siblings", siblings)
+
+	err = db.StoreLeaf(newAccount, pathToUpdate, siblings)
+	if err != nil {
+		panic(err)
+	}
+
+}
+
+// LoadGenesisData helps load the genesis data into the DB
+func LoadGenesisData(genesis config.Genesis) {
+	err := genesis.Validate()
+	if err != nil {
+		common.PanicIfError(err)
+	}
+
+	diff := int(math.Exp2(float64(genesis.MaxTreeDepth))) - len(genesis.GenesisAccounts.Accounts)
+	var allAccounts []core.UserAccount
+
+	// convert genesis accounts to user accounts
+	for _, account := range genesis.GenesisAccounts.Accounts {
+		allAccounts = append(
+			allAccounts,
+			core.UserAccount{
+				AccountID: account.ID,
+				Balance:   account.Balance,
+				TokenType: account.TokenType,
+				Nonce:     account.Nonce,
+				Status:    account.Status,
+				PublicKey: account.PublicKey,
+			},
+		)
+	}
+
+	// fill the tree with zero leaves
+	for diff > 0 {
+		newAcc := core.EmptyAccount()
+		newAcc.Hash = core.ZERO_VALUE_LEAF.String()
+		allAccounts = append(allAccounts, newAcc)
+		diff--
+	}
+
+	// load accounts
+	err = core.DBInstance.InitBalancesTree(genesis.MaxTreeDepth, allAccounts)
+	common.PanicIfError(err)
+
+	// load params
+	newParams := core.Params{StakeAmount: genesis.StakeAmount, MaxDepth: genesis.MaxTreeDepth, MaxDepositSubTreeHeight: genesis.MaxDepositSubTreeHeight}
+	core.DBInstance.UpdateStakeAmount(newParams.StakeAmount)
+	core.DBInstance.UpdateMaxDepth(newParams.MaxDepth)
+	core.DBInstance.UpdateDepositSubTreeHeight(newParams.MaxDepositSubTreeHeight)
+
+	// load sync status
+	core.DBInstance.UpdateSyncStatusWithBlockNumber(genesis.StartEthBlock)
+	core.DBInstance.UpdateSyncStatusWithBatchNumber(0)
 }
 func TestTxHash() {
 	tx := core.NewPendingTx(1, 1, 1, 1, "1", 1)

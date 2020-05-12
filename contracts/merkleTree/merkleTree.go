@@ -174,7 +174,7 @@ func (_MerkleTree *MerkleTreeTransactorRaw) Transact(opts *bind.TransactOpts, me
 
 // GetChildren is a free data retrieval call binding the contract method 0xd37684ff.
 //
-// Solidity: function getChildren(bytes32 _parent) constant returns(bytes32, bytes32)
+// Solidity: function getChildren(bytes32 _parent) view returns(bytes32, bytes32)
 func (_MerkleTree *MerkleTreeCaller) GetChildren(opts *bind.CallOpts, _parent [32]byte) ([32]byte, [32]byte, error) {
 	var (
 		ret0 = new([32]byte)
@@ -190,21 +190,21 @@ func (_MerkleTree *MerkleTreeCaller) GetChildren(opts *bind.CallOpts, _parent [3
 
 // GetChildren is a free data retrieval call binding the contract method 0xd37684ff.
 //
-// Solidity: function getChildren(bytes32 _parent) constant returns(bytes32, bytes32)
+// Solidity: function getChildren(bytes32 _parent) view returns(bytes32, bytes32)
 func (_MerkleTree *MerkleTreeSession) GetChildren(_parent [32]byte) ([32]byte, [32]byte, error) {
 	return _MerkleTree.Contract.GetChildren(&_MerkleTree.CallOpts, _parent)
 }
 
 // GetChildren is a free data retrieval call binding the contract method 0xd37684ff.
 //
-// Solidity: function getChildren(bytes32 _parent) constant returns(bytes32, bytes32)
+// Solidity: function getChildren(bytes32 _parent) view returns(bytes32, bytes32)
 func (_MerkleTree *MerkleTreeCallerSession) GetChildren(_parent [32]byte) ([32]byte, [32]byte, error) {
 	return _MerkleTree.Contract.GetChildren(&_MerkleTree.CallOpts, _parent)
 }
 
 // GetRoot is a free data retrieval call binding the contract method 0x5ca1e165.
 //
-// Solidity: function getRoot() constant returns(bytes32)
+// Solidity: function getRoot() view returns(bytes32)
 func (_MerkleTree *MerkleTreeCaller) GetRoot(opts *bind.CallOpts) ([32]byte, error) {
 	var (
 		ret0 = new([32]byte)
@@ -216,21 +216,21 @@ func (_MerkleTree *MerkleTreeCaller) GetRoot(opts *bind.CallOpts) ([32]byte, err
 
 // GetRoot is a free data retrieval call binding the contract method 0x5ca1e165.
 //
-// Solidity: function getRoot() constant returns(bytes32)
+// Solidity: function getRoot() view returns(bytes32)
 func (_MerkleTree *MerkleTreeSession) GetRoot() ([32]byte, error) {
 	return _MerkleTree.Contract.GetRoot(&_MerkleTree.CallOpts)
 }
 
 // GetRoot is a free data retrieval call binding the contract method 0x5ca1e165.
 //
-// Solidity: function getRoot() constant returns(bytes32)
+// Solidity: function getRoot() view returns(bytes32)
 func (_MerkleTree *MerkleTreeCallerSession) GetRoot() ([32]byte, error) {
 	return _MerkleTree.Contract.GetRoot(&_MerkleTree.CallOpts)
 }
 
 // GetSiblings is a free data retrieval call binding the contract method 0x101b166c.
 //
-// Solidity: function getSiblings(uint256 _path) constant returns(bytes32[])
+// Solidity: function getSiblings(uint256 _path) view returns(bytes32[])
 func (_MerkleTree *MerkleTreeCaller) GetSiblings(opts *bind.CallOpts, _path *big.Int) ([][32]byte, error) {
 	var (
 		ret0 = new([][32]byte)
@@ -242,21 +242,21 @@ func (_MerkleTree *MerkleTreeCaller) GetSiblings(opts *bind.CallOpts, _path *big
 
 // GetSiblings is a free data retrieval call binding the contract method 0x101b166c.
 //
-// Solidity: function getSiblings(uint256 _path) constant returns(bytes32[])
+// Solidity: function getSiblings(uint256 _path) view returns(bytes32[])
 func (_MerkleTree *MerkleTreeSession) GetSiblings(_path *big.Int) ([][32]byte, error) {
 	return _MerkleTree.Contract.GetSiblings(&_MerkleTree.CallOpts, _path)
 }
 
 // GetSiblings is a free data retrieval call binding the contract method 0x101b166c.
 //
-// Solidity: function getSiblings(uint256 _path) constant returns(bytes32[])
+// Solidity: function getSiblings(uint256 _path) view returns(bytes32[])
 func (_MerkleTree *MerkleTreeCallerSession) GetSiblings(_path *big.Int) ([][32]byte, error) {
 	return _MerkleTree.Contract.GetSiblings(&_MerkleTree.CallOpts, _path)
 }
 
 // Tree is a free data retrieval call binding the contract method 0xfd54b228.
 //
-// Solidity: function tree() constant returns(bytes32 root, uint256 height)
+// Solidity: function tree() view returns(bytes32 root, uint256 height)
 func (_MerkleTree *MerkleTreeCaller) Tree(opts *bind.CallOpts) (struct {
 	Root   [32]byte
 	Height *big.Int
@@ -272,7 +272,7 @@ func (_MerkleTree *MerkleTreeCaller) Tree(opts *bind.CallOpts) (struct {
 
 // Tree is a free data retrieval call binding the contract method 0xfd54b228.
 //
-// Solidity: function tree() constant returns(bytes32 root, uint256 height)
+// Solidity: function tree() view returns(bytes32 root, uint256 height)
 func (_MerkleTree *MerkleTreeSession) Tree() (struct {
 	Root   [32]byte
 	Height *big.Int
@@ -282,7 +282,7 @@ func (_MerkleTree *MerkleTreeSession) Tree() (struct {
 
 // Tree is a free data retrieval call binding the contract method 0xfd54b228.
 //
-// Solidity: function tree() constant returns(bytes32 root, uint256 height)
+// Solidity: function tree() view returns(bytes32 root, uint256 height)
 func (_MerkleTree *MerkleTreeCallerSession) Tree() (struct {
 	Root   [32]byte
 	Height *big.Int

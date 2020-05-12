@@ -203,7 +203,7 @@ func (_Rollup *RollupTransactorRaw) Transact(opts *bind.TransactOpts, method str
 
 // BalanceFromAccount is a free data retrieval call binding the contract method 0x0f9b2cb2.
 //
-// Solidity: function BalanceFromAccount(DataTypesUserAccount account) constant returns(uint256)
+// Solidity: function BalanceFromAccount(DataTypesUserAccount account) view returns(uint256)
 func (_Rollup *RollupCaller) BalanceFromAccount(opts *bind.CallOpts, account DataTypesUserAccount) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
@@ -215,21 +215,21 @@ func (_Rollup *RollupCaller) BalanceFromAccount(opts *bind.CallOpts, account Dat
 
 // BalanceFromAccount is a free data retrieval call binding the contract method 0x0f9b2cb2.
 //
-// Solidity: function BalanceFromAccount(DataTypesUserAccount account) constant returns(uint256)
+// Solidity: function BalanceFromAccount(DataTypesUserAccount account) view returns(uint256)
 func (_Rollup *RollupSession) BalanceFromAccount(account DataTypesUserAccount) (*big.Int, error) {
 	return _Rollup.Contract.BalanceFromAccount(&_Rollup.CallOpts, account)
 }
 
 // BalanceFromAccount is a free data retrieval call binding the contract method 0x0f9b2cb2.
 //
-// Solidity: function BalanceFromAccount(DataTypesUserAccount account) constant returns(uint256)
+// Solidity: function BalanceFromAccount(DataTypesUserAccount account) view returns(uint256)
 func (_Rollup *RollupCallerSession) BalanceFromAccount(account DataTypesUserAccount) (*big.Int, error) {
 	return _Rollup.Contract.BalanceFromAccount(&_Rollup.CallOpts, account)
 }
 
 // BytesFromAccount is a free data retrieval call binding the contract method 0x3035226f.
 //
-// Solidity: function BytesFromAccount(DataTypesUserAccount account) constant returns(bytes)
+// Solidity: function BytesFromAccount(DataTypesUserAccount account) view returns(bytes)
 func (_Rollup *RollupCaller) BytesFromAccount(opts *bind.CallOpts, account DataTypesUserAccount) ([]byte, error) {
 	var (
 		ret0 = new([]byte)
@@ -241,21 +241,21 @@ func (_Rollup *RollupCaller) BytesFromAccount(opts *bind.CallOpts, account DataT
 
 // BytesFromAccount is a free data retrieval call binding the contract method 0x3035226f.
 //
-// Solidity: function BytesFromAccount(DataTypesUserAccount account) constant returns(bytes)
+// Solidity: function BytesFromAccount(DataTypesUserAccount account) view returns(bytes)
 func (_Rollup *RollupSession) BytesFromAccount(account DataTypesUserAccount) ([]byte, error) {
 	return _Rollup.Contract.BytesFromAccount(&_Rollup.CallOpts, account)
 }
 
 // BytesFromAccount is a free data retrieval call binding the contract method 0x3035226f.
 //
-// Solidity: function BytesFromAccount(DataTypesUserAccount account) constant returns(bytes)
+// Solidity: function BytesFromAccount(DataTypesUserAccount account) view returns(bytes)
 func (_Rollup *RollupCallerSession) BytesFromAccount(account DataTypesUserAccount) ([]byte, error) {
 	return _Rollup.Contract.BytesFromAccount(&_Rollup.CallOpts, account)
 }
 
 // BytesFromTx is a free data retrieval call binding the contract method 0x95f70e7c.
 //
-// Solidity: function BytesFromTx(DataTypesTransaction _tx) constant returns(bytes)
+// Solidity: function BytesFromTx(DataTypesTransaction _tx) view returns(bytes)
 func (_Rollup *RollupCaller) BytesFromTx(opts *bind.CallOpts, _tx DataTypesTransaction) ([]byte, error) {
 	var (
 		ret0 = new([]byte)
@@ -267,21 +267,21 @@ func (_Rollup *RollupCaller) BytesFromTx(opts *bind.CallOpts, _tx DataTypesTrans
 
 // BytesFromTx is a free data retrieval call binding the contract method 0x95f70e7c.
 //
-// Solidity: function BytesFromTx(DataTypesTransaction _tx) constant returns(bytes)
+// Solidity: function BytesFromTx(DataTypesTransaction _tx) view returns(bytes)
 func (_Rollup *RollupSession) BytesFromTx(_tx DataTypesTransaction) ([]byte, error) {
 	return _Rollup.Contract.BytesFromTx(&_Rollup.CallOpts, _tx)
 }
 
 // BytesFromTx is a free data retrieval call binding the contract method 0x95f70e7c.
 //
-// Solidity: function BytesFromTx(DataTypesTransaction _tx) constant returns(bytes)
+// Solidity: function BytesFromTx(DataTypesTransaction _tx) view returns(bytes)
 func (_Rollup *RollupCallerSession) BytesFromTx(_tx DataTypesTransaction) ([]byte, error) {
 	return _Rollup.Contract.BytesFromTx(&_Rollup.CallOpts, _tx)
 }
 
 // HashFromAccount is a free data retrieval call binding the contract method 0xcadbd919.
 //
-// Solidity: function HashFromAccount(DataTypesUserAccount account) constant returns(bytes32)
+// Solidity: function HashFromAccount(DataTypesUserAccount account) view returns(bytes32)
 func (_Rollup *RollupCaller) HashFromAccount(opts *bind.CallOpts, account DataTypesUserAccount) ([32]byte, error) {
 	var (
 		ret0 = new([32]byte)
@@ -293,21 +293,21 @@ func (_Rollup *RollupCaller) HashFromAccount(opts *bind.CallOpts, account DataTy
 
 // HashFromAccount is a free data retrieval call binding the contract method 0xcadbd919.
 //
-// Solidity: function HashFromAccount(DataTypesUserAccount account) constant returns(bytes32)
+// Solidity: function HashFromAccount(DataTypesUserAccount account) view returns(bytes32)
 func (_Rollup *RollupSession) HashFromAccount(account DataTypesUserAccount) ([32]byte, error) {
 	return _Rollup.Contract.HashFromAccount(&_Rollup.CallOpts, account)
 }
 
 // HashFromAccount is a free data retrieval call binding the contract method 0xcadbd919.
 //
-// Solidity: function HashFromAccount(DataTypesUserAccount account) constant returns(bytes32)
+// Solidity: function HashFromAccount(DataTypesUserAccount account) view returns(bytes32)
 func (_Rollup *RollupCallerSession) HashFromAccount(account DataTypesUserAccount) ([32]byte, error) {
 	return _Rollup.Contract.HashFromAccount(&_Rollup.CallOpts, account)
 }
 
 // HashFromTx is a free data retrieval call binding the contract method 0x690ac0ec.
 //
-// Solidity: function HashFromTx(DataTypesTransaction _tx) constant returns(bytes32)
+// Solidity: function HashFromTx(DataTypesTransaction _tx) view returns(bytes32)
 func (_Rollup *RollupCaller) HashFromTx(opts *bind.CallOpts, _tx DataTypesTransaction) ([32]byte, error) {
 	var (
 		ret0 = new([32]byte)
@@ -319,21 +319,21 @@ func (_Rollup *RollupCaller) HashFromTx(opts *bind.CallOpts, _tx DataTypesTransa
 
 // HashFromTx is a free data retrieval call binding the contract method 0x690ac0ec.
 //
-// Solidity: function HashFromTx(DataTypesTransaction _tx) constant returns(bytes32)
+// Solidity: function HashFromTx(DataTypesTransaction _tx) view returns(bytes32)
 func (_Rollup *RollupSession) HashFromTx(_tx DataTypesTransaction) ([32]byte, error) {
 	return _Rollup.Contract.HashFromTx(&_Rollup.CallOpts, _tx)
 }
 
 // HashFromTx is a free data retrieval call binding the contract method 0x690ac0ec.
 //
-// Solidity: function HashFromTx(DataTypesTransaction _tx) constant returns(bytes32)
+// Solidity: function HashFromTx(DataTypesTransaction _tx) view returns(bytes32)
 func (_Rollup *RollupCallerSession) HashFromTx(_tx DataTypesTransaction) ([32]byte, error) {
 	return _Rollup.Contract.HashFromTx(&_Rollup.CallOpts, _tx)
 }
 
 // ZEROBYTES32 is a free data retrieval call binding the contract method 0x069321b0.
 //
-// Solidity: function ZERO_BYTES32() constant returns(bytes32)
+// Solidity: function ZERO_BYTES32() view returns(bytes32)
 func (_Rollup *RollupCaller) ZEROBYTES32(opts *bind.CallOpts) ([32]byte, error) {
 	var (
 		ret0 = new([32]byte)
@@ -345,21 +345,21 @@ func (_Rollup *RollupCaller) ZEROBYTES32(opts *bind.CallOpts) ([32]byte, error) 
 
 // ZEROBYTES32 is a free data retrieval call binding the contract method 0x069321b0.
 //
-// Solidity: function ZERO_BYTES32() constant returns(bytes32)
+// Solidity: function ZERO_BYTES32() view returns(bytes32)
 func (_Rollup *RollupSession) ZEROBYTES32() ([32]byte, error) {
 	return _Rollup.Contract.ZEROBYTES32(&_Rollup.CallOpts)
 }
 
 // ZEROBYTES32 is a free data retrieval call binding the contract method 0x069321b0.
 //
-// Solidity: function ZERO_BYTES32() constant returns(bytes32)
+// Solidity: function ZERO_BYTES32() view returns(bytes32)
 func (_Rollup *RollupCallerSession) ZEROBYTES32() ([32]byte, error) {
 	return _Rollup.Contract.ZEROBYTES32(&_Rollup.CallOpts)
 }
 
 // AccountsTree is a free data retrieval call binding the contract method 0xae2926d4.
 //
-// Solidity: function accountsTree() constant returns(address)
+// Solidity: function accountsTree() view returns(address)
 func (_Rollup *RollupCaller) AccountsTree(opts *bind.CallOpts) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
@@ -371,21 +371,21 @@ func (_Rollup *RollupCaller) AccountsTree(opts *bind.CallOpts) (common.Address, 
 
 // AccountsTree is a free data retrieval call binding the contract method 0xae2926d4.
 //
-// Solidity: function accountsTree() constant returns(address)
+// Solidity: function accountsTree() view returns(address)
 func (_Rollup *RollupSession) AccountsTree() (common.Address, error) {
 	return _Rollup.Contract.AccountsTree(&_Rollup.CallOpts)
 }
 
 // AccountsTree is a free data retrieval call binding the contract method 0xae2926d4.
 //
-// Solidity: function accountsTree() constant returns(address)
+// Solidity: function accountsTree() view returns(address)
 func (_Rollup *RollupCallerSession) AccountsTree() (common.Address, error) {
 	return _Rollup.Contract.AccountsTree(&_Rollup.CallOpts)
 }
 
 // BalancesTree is a free data retrieval call binding the contract method 0xb2692d77.
 //
-// Solidity: function balancesTree() constant returns(address)
+// Solidity: function balancesTree() view returns(address)
 func (_Rollup *RollupCaller) BalancesTree(opts *bind.CallOpts) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
@@ -397,21 +397,21 @@ func (_Rollup *RollupCaller) BalancesTree(opts *bind.CallOpts) (common.Address, 
 
 // BalancesTree is a free data retrieval call binding the contract method 0xb2692d77.
 //
-// Solidity: function balancesTree() constant returns(address)
+// Solidity: function balancesTree() view returns(address)
 func (_Rollup *RollupSession) BalancesTree() (common.Address, error) {
 	return _Rollup.Contract.BalancesTree(&_Rollup.CallOpts)
 }
 
 // BalancesTree is a free data retrieval call binding the contract method 0xb2692d77.
 //
-// Solidity: function balancesTree() constant returns(address)
+// Solidity: function balancesTree() view returns(address)
 func (_Rollup *RollupCallerSession) BalancesTree() (common.Address, error) {
 	return _Rollup.Contract.BalancesTree(&_Rollup.CallOpts)
 }
 
 // Batches is a free data retrieval call binding the contract method 0xb32c4d8d.
 //
-// Solidity: function batches(uint256 ) constant returns(bytes32 stateRoot, address committer, bytes32 txRoot, uint256 stakeCommitted, uint256 finalisesOn, uint256 timestamp)
+// Solidity: function batches(uint256 ) view returns(bytes32 stateRoot, address committer, bytes32 txRoot, uint256 stakeCommitted, uint256 finalisesOn, uint256 timestamp)
 func (_Rollup *RollupCaller) Batches(opts *bind.CallOpts, arg0 *big.Int) (struct {
 	StateRoot      [32]byte
 	Committer      common.Address
@@ -435,7 +435,7 @@ func (_Rollup *RollupCaller) Batches(opts *bind.CallOpts, arg0 *big.Int) (struct
 
 // Batches is a free data retrieval call binding the contract method 0xb32c4d8d.
 //
-// Solidity: function batches(uint256 ) constant returns(bytes32 stateRoot, address committer, bytes32 txRoot, uint256 stakeCommitted, uint256 finalisesOn, uint256 timestamp)
+// Solidity: function batches(uint256 ) view returns(bytes32 stateRoot, address committer, bytes32 txRoot, uint256 stakeCommitted, uint256 finalisesOn, uint256 timestamp)
 func (_Rollup *RollupSession) Batches(arg0 *big.Int) (struct {
 	StateRoot      [32]byte
 	Committer      common.Address
@@ -449,7 +449,7 @@ func (_Rollup *RollupSession) Batches(arg0 *big.Int) (struct {
 
 // Batches is a free data retrieval call binding the contract method 0xb32c4d8d.
 //
-// Solidity: function batches(uint256 ) constant returns(bytes32 stateRoot, address committer, bytes32 txRoot, uint256 stakeCommitted, uint256 finalisesOn, uint256 timestamp)
+// Solidity: function batches(uint256 ) view returns(bytes32 stateRoot, address committer, bytes32 txRoot, uint256 stakeCommitted, uint256 finalisesOn, uint256 timestamp)
 func (_Rollup *RollupCallerSession) Batches(arg0 *big.Int) (struct {
 	StateRoot      [32]byte
 	Committer      common.Address
@@ -463,7 +463,7 @@ func (_Rollup *RollupCallerSession) Batches(arg0 *big.Int) (struct {
 
 // CalculateAddress is a free data retrieval call binding the contract method 0xe8a4c04e.
 //
-// Solidity: function calculateAddress(bytes pub) constant returns(address addr)
+// Solidity: function calculateAddress(bytes pub) pure returns(address addr)
 func (_Rollup *RollupCaller) CalculateAddress(opts *bind.CallOpts, pub []byte) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
@@ -475,21 +475,21 @@ func (_Rollup *RollupCaller) CalculateAddress(opts *bind.CallOpts, pub []byte) (
 
 // CalculateAddress is a free data retrieval call binding the contract method 0xe8a4c04e.
 //
-// Solidity: function calculateAddress(bytes pub) constant returns(address addr)
+// Solidity: function calculateAddress(bytes pub) pure returns(address addr)
 func (_Rollup *RollupSession) CalculateAddress(pub []byte) (common.Address, error) {
 	return _Rollup.Contract.CalculateAddress(&_Rollup.CallOpts, pub)
 }
 
 // CalculateAddress is a free data retrieval call binding the contract method 0xe8a4c04e.
 //
-// Solidity: function calculateAddress(bytes pub) constant returns(address addr)
+// Solidity: function calculateAddress(bytes pub) pure returns(address addr)
 func (_Rollup *RollupCallerSession) CalculateAddress(pub []byte) (common.Address, error) {
 	return _Rollup.Contract.CalculateAddress(&_Rollup.CallOpts, pub)
 }
 
 // DepositSubtreeHeight is a free data retrieval call binding the contract method 0x2882dd98.
 //
-// Solidity: function depositSubtreeHeight() constant returns(uint256)
+// Solidity: function depositSubtreeHeight() view returns(uint256)
 func (_Rollup *RollupCaller) DepositSubtreeHeight(opts *bind.CallOpts) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
@@ -501,21 +501,21 @@ func (_Rollup *RollupCaller) DepositSubtreeHeight(opts *bind.CallOpts) (*big.Int
 
 // DepositSubtreeHeight is a free data retrieval call binding the contract method 0x2882dd98.
 //
-// Solidity: function depositSubtreeHeight() constant returns(uint256)
+// Solidity: function depositSubtreeHeight() view returns(uint256)
 func (_Rollup *RollupSession) DepositSubtreeHeight() (*big.Int, error) {
 	return _Rollup.Contract.DepositSubtreeHeight(&_Rollup.CallOpts)
 }
 
 // DepositSubtreeHeight is a free data retrieval call binding the contract method 0x2882dd98.
 //
-// Solidity: function depositSubtreeHeight() constant returns(uint256)
+// Solidity: function depositSubtreeHeight() view returns(uint256)
 func (_Rollup *RollupCallerSession) DepositSubtreeHeight() (*big.Int, error) {
 	return _Rollup.Contract.DepositSubtreeHeight(&_Rollup.CallOpts)
 }
 
 // GetBalanceTreeRoot is a free data retrieval call binding the contract method 0x652eb691.
 //
-// Solidity: function getBalanceTreeRoot() constant returns(bytes32)
+// Solidity: function getBalanceTreeRoot() view returns(bytes32)
 func (_Rollup *RollupCaller) GetBalanceTreeRoot(opts *bind.CallOpts) ([32]byte, error) {
 	var (
 		ret0 = new([32]byte)
@@ -527,21 +527,21 @@ func (_Rollup *RollupCaller) GetBalanceTreeRoot(opts *bind.CallOpts) ([32]byte, 
 
 // GetBalanceTreeRoot is a free data retrieval call binding the contract method 0x652eb691.
 //
-// Solidity: function getBalanceTreeRoot() constant returns(bytes32)
+// Solidity: function getBalanceTreeRoot() view returns(bytes32)
 func (_Rollup *RollupSession) GetBalanceTreeRoot() ([32]byte, error) {
 	return _Rollup.Contract.GetBalanceTreeRoot(&_Rollup.CallOpts)
 }
 
 // GetBalanceTreeRoot is a free data retrieval call binding the contract method 0x652eb691.
 //
-// Solidity: function getBalanceTreeRoot() constant returns(bytes32)
+// Solidity: function getBalanceTreeRoot() view returns(bytes32)
 func (_Rollup *RollupCallerSession) GetBalanceTreeRoot() ([32]byte, error) {
 	return _Rollup.Contract.GetBalanceTreeRoot(&_Rollup.CallOpts)
 }
 
 // MerkleTreeLib is a free data retrieval call binding the contract method 0x78ad68c6.
 //
-// Solidity: function merkleTreeLib() constant returns(address)
+// Solidity: function merkleTreeLib() view returns(address)
 func (_Rollup *RollupCaller) MerkleTreeLib(opts *bind.CallOpts) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
@@ -553,21 +553,21 @@ func (_Rollup *RollupCaller) MerkleTreeLib(opts *bind.CallOpts) (common.Address,
 
 // MerkleTreeLib is a free data retrieval call binding the contract method 0x78ad68c6.
 //
-// Solidity: function merkleTreeLib() constant returns(address)
+// Solidity: function merkleTreeLib() view returns(address)
 func (_Rollup *RollupSession) MerkleTreeLib() (common.Address, error) {
 	return _Rollup.Contract.MerkleTreeLib(&_Rollup.CallOpts)
 }
 
 // MerkleTreeLib is a free data retrieval call binding the contract method 0x78ad68c6.
 //
-// Solidity: function merkleTreeLib() constant returns(address)
+// Solidity: function merkleTreeLib() view returns(address)
 func (_Rollup *RollupCallerSession) MerkleTreeLib() (common.Address, error) {
 	return _Rollup.Contract.MerkleTreeLib(&_Rollup.CallOpts)
 }
 
 // NumberOfBatches is a free data retrieval call binding the contract method 0x88c46fb8.
 //
-// Solidity: function numberOfBatches() constant returns(uint256)
+// Solidity: function numberOfBatches() view returns(uint256)
 func (_Rollup *RollupCaller) NumberOfBatches(opts *bind.CallOpts) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
@@ -579,21 +579,21 @@ func (_Rollup *RollupCaller) NumberOfBatches(opts *bind.CallOpts) (*big.Int, err
 
 // NumberOfBatches is a free data retrieval call binding the contract method 0x88c46fb8.
 //
-// Solidity: function numberOfBatches() constant returns(uint256)
+// Solidity: function numberOfBatches() view returns(uint256)
 func (_Rollup *RollupSession) NumberOfBatches() (*big.Int, error) {
 	return _Rollup.Contract.NumberOfBatches(&_Rollup.CallOpts)
 }
 
 // NumberOfBatches is a free data retrieval call binding the contract method 0x88c46fb8.
 //
-// Solidity: function numberOfBatches() constant returns(uint256)
+// Solidity: function numberOfBatches() view returns(uint256)
 func (_Rollup *RollupCallerSession) NumberOfBatches() (*big.Int, error) {
 	return _Rollup.Contract.NumberOfBatches(&_Rollup.CallOpts)
 }
 
 // PendingDeposits is a free data retrieval call binding the contract method 0xa7932794.
 //
-// Solidity: function pendingDeposits(uint256 ) constant returns(bytes32)
+// Solidity: function pendingDeposits(uint256 ) view returns(bytes32)
 func (_Rollup *RollupCaller) PendingDeposits(opts *bind.CallOpts, arg0 *big.Int) ([32]byte, error) {
 	var (
 		ret0 = new([32]byte)
@@ -605,21 +605,21 @@ func (_Rollup *RollupCaller) PendingDeposits(opts *bind.CallOpts, arg0 *big.Int)
 
 // PendingDeposits is a free data retrieval call binding the contract method 0xa7932794.
 //
-// Solidity: function pendingDeposits(uint256 ) constant returns(bytes32)
+// Solidity: function pendingDeposits(uint256 ) view returns(bytes32)
 func (_Rollup *RollupSession) PendingDeposits(arg0 *big.Int) ([32]byte, error) {
 	return _Rollup.Contract.PendingDeposits(&_Rollup.CallOpts, arg0)
 }
 
 // PendingDeposits is a free data retrieval call binding the contract method 0xa7932794.
 //
-// Solidity: function pendingDeposits(uint256 ) constant returns(bytes32)
+// Solidity: function pendingDeposits(uint256 ) view returns(bytes32)
 func (_Rollup *RollupCallerSession) PendingDeposits(arg0 *big.Int) ([32]byte, error) {
 	return _Rollup.Contract.PendingDeposits(&_Rollup.CallOpts, arg0)
 }
 
 // QueueNumber is a free data retrieval call binding the contract method 0x2fa6779a.
 //
-// Solidity: function queueNumber() constant returns(uint256)
+// Solidity: function queueNumber() view returns(uint256)
 func (_Rollup *RollupCaller) QueueNumber(opts *bind.CallOpts) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
@@ -631,21 +631,21 @@ func (_Rollup *RollupCaller) QueueNumber(opts *bind.CallOpts) (*big.Int, error) 
 
 // QueueNumber is a free data retrieval call binding the contract method 0x2fa6779a.
 //
-// Solidity: function queueNumber() constant returns(uint256)
+// Solidity: function queueNumber() view returns(uint256)
 func (_Rollup *RollupSession) QueueNumber() (*big.Int, error) {
 	return _Rollup.Contract.QueueNumber(&_Rollup.CallOpts)
 }
 
 // QueueNumber is a free data retrieval call binding the contract method 0x2fa6779a.
 //
-// Solidity: function queueNumber() constant returns(uint256)
+// Solidity: function queueNumber() view returns(uint256)
 func (_Rollup *RollupCallerSession) QueueNumber() (*big.Int, error) {
 	return _Rollup.Contract.QueueNumber(&_Rollup.CallOpts)
 }
 
 // TokenContract is a free data retrieval call binding the contract method 0x55a373d6.
 //
-// Solidity: function tokenContract() constant returns(address)
+// Solidity: function tokenContract() view returns(address)
 func (_Rollup *RollupCaller) TokenContract(opts *bind.CallOpts) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
@@ -657,21 +657,21 @@ func (_Rollup *RollupCaller) TokenContract(opts *bind.CallOpts) (common.Address,
 
 // TokenContract is a free data retrieval call binding the contract method 0x55a373d6.
 //
-// Solidity: function tokenContract() constant returns(address)
+// Solidity: function tokenContract() view returns(address)
 func (_Rollup *RollupSession) TokenContract() (common.Address, error) {
 	return _Rollup.Contract.TokenContract(&_Rollup.CallOpts)
 }
 
 // TokenContract is a free data retrieval call binding the contract method 0x55a373d6.
 //
-// Solidity: function tokenContract() constant returns(address)
+// Solidity: function tokenContract() view returns(address)
 func (_Rollup *RollupCallerSession) TokenContract() (common.Address, error) {
 	return _Rollup.Contract.TokenContract(&_Rollup.CallOpts)
 }
 
 // TokenRegistry is a free data retrieval call binding the contract method 0x9d23c4c7.
 //
-// Solidity: function tokenRegistry() constant returns(address)
+// Solidity: function tokenRegistry() view returns(address)
 func (_Rollup *RollupCaller) TokenRegistry(opts *bind.CallOpts) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
@@ -683,14 +683,14 @@ func (_Rollup *RollupCaller) TokenRegistry(opts *bind.CallOpts) (common.Address,
 
 // TokenRegistry is a free data retrieval call binding the contract method 0x9d23c4c7.
 //
-// Solidity: function tokenRegistry() constant returns(address)
+// Solidity: function tokenRegistry() view returns(address)
 func (_Rollup *RollupSession) TokenRegistry() (common.Address, error) {
 	return _Rollup.Contract.TokenRegistry(&_Rollup.CallOpts)
 }
 
 // TokenRegistry is a free data retrieval call binding the contract method 0x9d23c4c7.
 //
-// Solidity: function tokenRegistry() constant returns(address)
+// Solidity: function tokenRegistry() view returns(address)
 func (_Rollup *RollupCallerSession) TokenRegistry() (common.Address, error) {
 	return _Rollup.Contract.TokenRegistry(&_Rollup.CallOpts)
 }
@@ -928,21 +928,21 @@ func (_Rollup *RollupTransactorSession) RequestTokenRegistration(_tokenContractA
 
 // SubmitBatch is a paid mutator transaction binding the contract method 0x0e981757.
 //
-// Solidity: function submitBatch(bytes[] _txs, bytes32 _updatedRoot) returns()
+// Solidity: function submitBatch(bytes[] _txs, bytes32 _updatedRoot) payable returns()
 func (_Rollup *RollupTransactor) SubmitBatch(opts *bind.TransactOpts, _txs [][]byte, _updatedRoot [32]byte) (*types.Transaction, error) {
 	return _Rollup.contract.Transact(opts, "submitBatch", _txs, _updatedRoot)
 }
 
 // SubmitBatch is a paid mutator transaction binding the contract method 0x0e981757.
 //
-// Solidity: function submitBatch(bytes[] _txs, bytes32 _updatedRoot) returns()
+// Solidity: function submitBatch(bytes[] _txs, bytes32 _updatedRoot) payable returns()
 func (_Rollup *RollupSession) SubmitBatch(_txs [][]byte, _updatedRoot [32]byte) (*types.Transaction, error) {
 	return _Rollup.Contract.SubmitBatch(&_Rollup.TransactOpts, _txs, _updatedRoot)
 }
 
 // SubmitBatch is a paid mutator transaction binding the contract method 0x0e981757.
 //
-// Solidity: function submitBatch(bytes[] _txs, bytes32 _updatedRoot) returns()
+// Solidity: function submitBatch(bytes[] _txs, bytes32 _updatedRoot) payable returns()
 func (_Rollup *RollupTransactorSession) SubmitBatch(_txs [][]byte, _updatedRoot [32]byte) (*types.Transaction, error) {
 	return _Rollup.Contract.SubmitBatch(&_Rollup.TransactOpts, _txs, _updatedRoot)
 }

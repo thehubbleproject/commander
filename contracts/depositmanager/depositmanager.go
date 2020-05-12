@@ -194,7 +194,7 @@ func (_Depositmanager *DepositmanagerTransactorRaw) Transact(opts *bind.Transact
 
 // Coordinator is a free data retrieval call binding the contract method 0xf35213fc.
 //
-// Solidity: function Coordinator() constant returns(address)
+// Solidity: function Coordinator() view returns(address)
 func (_Depositmanager *DepositmanagerCaller) Coordinator(opts *bind.CallOpts) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
@@ -206,21 +206,21 @@ func (_Depositmanager *DepositmanagerCaller) Coordinator(opts *bind.CallOpts) (c
 
 // Coordinator is a free data retrieval call binding the contract method 0xf35213fc.
 //
-// Solidity: function Coordinator() constant returns(address)
+// Solidity: function Coordinator() view returns(address)
 func (_Depositmanager *DepositmanagerSession) Coordinator() (common.Address, error) {
 	return _Depositmanager.Contract.Coordinator(&_Depositmanager.CallOpts)
 }
 
 // Coordinator is a free data retrieval call binding the contract method 0xf35213fc.
 //
-// Solidity: function Coordinator() constant returns(address)
+// Solidity: function Coordinator() view returns(address)
 func (_Depositmanager *DepositmanagerCallerSession) Coordinator() (common.Address, error) {
 	return _Depositmanager.Contract.Coordinator(&_Depositmanager.CallOpts)
 }
 
 // AccountsTree is a free data retrieval call binding the contract method 0xae2926d4.
 //
-// Solidity: function accountsTree() constant returns(address)
+// Solidity: function accountsTree() view returns(address)
 func (_Depositmanager *DepositmanagerCaller) AccountsTree(opts *bind.CallOpts) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
@@ -232,21 +232,21 @@ func (_Depositmanager *DepositmanagerCaller) AccountsTree(opts *bind.CallOpts) (
 
 // AccountsTree is a free data retrieval call binding the contract method 0xae2926d4.
 //
-// Solidity: function accountsTree() constant returns(address)
+// Solidity: function accountsTree() view returns(address)
 func (_Depositmanager *DepositmanagerSession) AccountsTree() (common.Address, error) {
 	return _Depositmanager.Contract.AccountsTree(&_Depositmanager.CallOpts)
 }
 
 // AccountsTree is a free data retrieval call binding the contract method 0xae2926d4.
 //
-// Solidity: function accountsTree() constant returns(address)
+// Solidity: function accountsTree() view returns(address)
 func (_Depositmanager *DepositmanagerCallerSession) AccountsTree() (common.Address, error) {
 	return _Depositmanager.Contract.AccountsTree(&_Depositmanager.CallOpts)
 }
 
 // BalancesTree is a free data retrieval call binding the contract method 0xb2692d77.
 //
-// Solidity: function balancesTree() constant returns(address)
+// Solidity: function balancesTree() view returns(address)
 func (_Depositmanager *DepositmanagerCaller) BalancesTree(opts *bind.CallOpts) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
@@ -258,21 +258,21 @@ func (_Depositmanager *DepositmanagerCaller) BalancesTree(opts *bind.CallOpts) (
 
 // BalancesTree is a free data retrieval call binding the contract method 0xb2692d77.
 //
-// Solidity: function balancesTree() constant returns(address)
+// Solidity: function balancesTree() view returns(address)
 func (_Depositmanager *DepositmanagerSession) BalancesTree() (common.Address, error) {
 	return _Depositmanager.Contract.BalancesTree(&_Depositmanager.CallOpts)
 }
 
 // BalancesTree is a free data retrieval call binding the contract method 0xb2692d77.
 //
-// Solidity: function balancesTree() constant returns(address)
+// Solidity: function balancesTree() view returns(address)
 func (_Depositmanager *DepositmanagerCallerSession) BalancesTree() (common.Address, error) {
 	return _Depositmanager.Contract.BalancesTree(&_Depositmanager.CallOpts)
 }
 
 // DepositSubtreeHeight is a free data retrieval call binding the contract method 0x2882dd98.
 //
-// Solidity: function depositSubtreeHeight() constant returns(uint256)
+// Solidity: function depositSubtreeHeight() view returns(uint256)
 func (_Depositmanager *DepositmanagerCaller) DepositSubtreeHeight(opts *bind.CallOpts) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
@@ -284,21 +284,21 @@ func (_Depositmanager *DepositmanagerCaller) DepositSubtreeHeight(opts *bind.Cal
 
 // DepositSubtreeHeight is a free data retrieval call binding the contract method 0x2882dd98.
 //
-// Solidity: function depositSubtreeHeight() constant returns(uint256)
+// Solidity: function depositSubtreeHeight() view returns(uint256)
 func (_Depositmanager *DepositmanagerSession) DepositSubtreeHeight() (*big.Int, error) {
 	return _Depositmanager.Contract.DepositSubtreeHeight(&_Depositmanager.CallOpts)
 }
 
 // DepositSubtreeHeight is a free data retrieval call binding the contract method 0x2882dd98.
 //
-// Solidity: function depositSubtreeHeight() constant returns(uint256)
+// Solidity: function depositSubtreeHeight() view returns(uint256)
 func (_Depositmanager *DepositmanagerCallerSession) DepositSubtreeHeight() (*big.Int, error) {
 	return _Depositmanager.Contract.DepositSubtreeHeight(&_Depositmanager.CallOpts)
 }
 
 // Logger is a free data retrieval call binding the contract method 0xf24ccbfe.
 //
-// Solidity: function logger() constant returns(address)
+// Solidity: function logger() view returns(address)
 func (_Depositmanager *DepositmanagerCaller) Logger(opts *bind.CallOpts) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
@@ -310,21 +310,21 @@ func (_Depositmanager *DepositmanagerCaller) Logger(opts *bind.CallOpts) (common
 
 // Logger is a free data retrieval call binding the contract method 0xf24ccbfe.
 //
-// Solidity: function logger() constant returns(address)
+// Solidity: function logger() view returns(address)
 func (_Depositmanager *DepositmanagerSession) Logger() (common.Address, error) {
 	return _Depositmanager.Contract.Logger(&_Depositmanager.CallOpts)
 }
 
 // Logger is a free data retrieval call binding the contract method 0xf24ccbfe.
 //
-// Solidity: function logger() constant returns(address)
+// Solidity: function logger() view returns(address)
 func (_Depositmanager *DepositmanagerCallerSession) Logger() (common.Address, error) {
 	return _Depositmanager.Contract.Logger(&_Depositmanager.CallOpts)
 }
 
 // MerkleUtils is a free data retrieval call binding the contract method 0x47b0f08e.
 //
-// Solidity: function merkleUtils() constant returns(address)
+// Solidity: function merkleUtils() view returns(address)
 func (_Depositmanager *DepositmanagerCaller) MerkleUtils(opts *bind.CallOpts) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
@@ -336,21 +336,21 @@ func (_Depositmanager *DepositmanagerCaller) MerkleUtils(opts *bind.CallOpts) (c
 
 // MerkleUtils is a free data retrieval call binding the contract method 0x47b0f08e.
 //
-// Solidity: function merkleUtils() constant returns(address)
+// Solidity: function merkleUtils() view returns(address)
 func (_Depositmanager *DepositmanagerSession) MerkleUtils() (common.Address, error) {
 	return _Depositmanager.Contract.MerkleUtils(&_Depositmanager.CallOpts)
 }
 
 // MerkleUtils is a free data retrieval call binding the contract method 0x47b0f08e.
 //
-// Solidity: function merkleUtils() constant returns(address)
+// Solidity: function merkleUtils() view returns(address)
 func (_Depositmanager *DepositmanagerCallerSession) MerkleUtils() (common.Address, error) {
 	return _Depositmanager.Contract.MerkleUtils(&_Depositmanager.CallOpts)
 }
 
 // NameRegistry is a free data retrieval call binding the contract method 0x4eb7221a.
 //
-// Solidity: function nameRegistry() constant returns(address)
+// Solidity: function nameRegistry() view returns(address)
 func (_Depositmanager *DepositmanagerCaller) NameRegistry(opts *bind.CallOpts) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
@@ -362,21 +362,21 @@ func (_Depositmanager *DepositmanagerCaller) NameRegistry(opts *bind.CallOpts) (
 
 // NameRegistry is a free data retrieval call binding the contract method 0x4eb7221a.
 //
-// Solidity: function nameRegistry() constant returns(address)
+// Solidity: function nameRegistry() view returns(address)
 func (_Depositmanager *DepositmanagerSession) NameRegistry() (common.Address, error) {
 	return _Depositmanager.Contract.NameRegistry(&_Depositmanager.CallOpts)
 }
 
 // NameRegistry is a free data retrieval call binding the contract method 0x4eb7221a.
 //
-// Solidity: function nameRegistry() constant returns(address)
+// Solidity: function nameRegistry() view returns(address)
 func (_Depositmanager *DepositmanagerCallerSession) NameRegistry() (common.Address, error) {
 	return _Depositmanager.Contract.NameRegistry(&_Depositmanager.CallOpts)
 }
 
 // PendingDeposits is a free data retrieval call binding the contract method 0xa7932794.
 //
-// Solidity: function pendingDeposits(uint256 ) constant returns(bytes32)
+// Solidity: function pendingDeposits(uint256 ) view returns(bytes32)
 func (_Depositmanager *DepositmanagerCaller) PendingDeposits(opts *bind.CallOpts, arg0 *big.Int) ([32]byte, error) {
 	var (
 		ret0 = new([32]byte)
@@ -388,21 +388,21 @@ func (_Depositmanager *DepositmanagerCaller) PendingDeposits(opts *bind.CallOpts
 
 // PendingDeposits is a free data retrieval call binding the contract method 0xa7932794.
 //
-// Solidity: function pendingDeposits(uint256 ) constant returns(bytes32)
+// Solidity: function pendingDeposits(uint256 ) view returns(bytes32)
 func (_Depositmanager *DepositmanagerSession) PendingDeposits(arg0 *big.Int) ([32]byte, error) {
 	return _Depositmanager.Contract.PendingDeposits(&_Depositmanager.CallOpts, arg0)
 }
 
 // PendingDeposits is a free data retrieval call binding the contract method 0xa7932794.
 //
-// Solidity: function pendingDeposits(uint256 ) constant returns(bytes32)
+// Solidity: function pendingDeposits(uint256 ) view returns(bytes32)
 func (_Depositmanager *DepositmanagerCallerSession) PendingDeposits(arg0 *big.Int) ([32]byte, error) {
 	return _Depositmanager.Contract.PendingDeposits(&_Depositmanager.CallOpts, arg0)
 }
 
 // QueueNumber is a free data retrieval call binding the contract method 0x2fa6779a.
 //
-// Solidity: function queueNumber() constant returns(uint256)
+// Solidity: function queueNumber() view returns(uint256)
 func (_Depositmanager *DepositmanagerCaller) QueueNumber(opts *bind.CallOpts) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
@@ -414,21 +414,21 @@ func (_Depositmanager *DepositmanagerCaller) QueueNumber(opts *bind.CallOpts) (*
 
 // QueueNumber is a free data retrieval call binding the contract method 0x2fa6779a.
 //
-// Solidity: function queueNumber() constant returns(uint256)
+// Solidity: function queueNumber() view returns(uint256)
 func (_Depositmanager *DepositmanagerSession) QueueNumber() (*big.Int, error) {
 	return _Depositmanager.Contract.QueueNumber(&_Depositmanager.CallOpts)
 }
 
 // QueueNumber is a free data retrieval call binding the contract method 0x2fa6779a.
 //
-// Solidity: function queueNumber() constant returns(uint256)
+// Solidity: function queueNumber() view returns(uint256)
 func (_Depositmanager *DepositmanagerCallerSession) QueueNumber() (*big.Int, error) {
 	return _Depositmanager.Contract.QueueNumber(&_Depositmanager.CallOpts)
 }
 
 // TokenContract is a free data retrieval call binding the contract method 0x55a373d6.
 //
-// Solidity: function tokenContract() constant returns(address)
+// Solidity: function tokenContract() view returns(address)
 func (_Depositmanager *DepositmanagerCaller) TokenContract(opts *bind.CallOpts) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
@@ -440,21 +440,21 @@ func (_Depositmanager *DepositmanagerCaller) TokenContract(opts *bind.CallOpts) 
 
 // TokenContract is a free data retrieval call binding the contract method 0x55a373d6.
 //
-// Solidity: function tokenContract() constant returns(address)
+// Solidity: function tokenContract() view returns(address)
 func (_Depositmanager *DepositmanagerSession) TokenContract() (common.Address, error) {
 	return _Depositmanager.Contract.TokenContract(&_Depositmanager.CallOpts)
 }
 
 // TokenContract is a free data retrieval call binding the contract method 0x55a373d6.
 //
-// Solidity: function tokenContract() constant returns(address)
+// Solidity: function tokenContract() view returns(address)
 func (_Depositmanager *DepositmanagerCallerSession) TokenContract() (common.Address, error) {
 	return _Depositmanager.Contract.TokenContract(&_Depositmanager.CallOpts)
 }
 
 // TokenRegistry is a free data retrieval call binding the contract method 0x9d23c4c7.
 //
-// Solidity: function tokenRegistry() constant returns(address)
+// Solidity: function tokenRegistry() view returns(address)
 func (_Depositmanager *DepositmanagerCaller) TokenRegistry(opts *bind.CallOpts) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
@@ -466,14 +466,14 @@ func (_Depositmanager *DepositmanagerCaller) TokenRegistry(opts *bind.CallOpts) 
 
 // TokenRegistry is a free data retrieval call binding the contract method 0x9d23c4c7.
 //
-// Solidity: function tokenRegistry() constant returns(address)
+// Solidity: function tokenRegistry() view returns(address)
 func (_Depositmanager *DepositmanagerSession) TokenRegistry() (common.Address, error) {
 	return _Depositmanager.Contract.TokenRegistry(&_Depositmanager.CallOpts)
 }
 
 // TokenRegistry is a free data retrieval call binding the contract method 0x9d23c4c7.
 //
-// Solidity: function tokenRegistry() constant returns(address)
+// Solidity: function tokenRegistry() view returns(address)
 func (_Depositmanager *DepositmanagerCallerSession) TokenRegistry() (common.Address, error) {
 	return _Depositmanager.Contract.TokenRegistry(&_Depositmanager.CallOpts)
 }
