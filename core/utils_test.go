@@ -16,3 +16,14 @@ func TestGetParentPath(t *testing.T) {
 	// expectedParentPath := "11"
 	fmt.Println(GetParentPath(leftChildPath))
 }
+
+func TestBasicPathMutations(t *testing.T) {
+	path := UintToString(2)
+	fmt.Println("path generated", path)
+	newPath, err := SolidityPathToNodePath(2, 10)
+	if err != nil {
+		panic(err)
+	}
+	data, err := StringToUint(newPath)
+	fmt.Println("path generated", newPath, "data", data)
+}

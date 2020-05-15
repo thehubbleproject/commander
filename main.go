@@ -10,9 +10,75 @@ import (
 )
 
 func main() {
-	TestStoreNode()
+	TestDeposit()
 }
 
+func TestDeposit() {
+	db, err := core.NewDB()
+	if err != nil {
+		fmt.Println("error creating database")
+		panic(err)
+	}
+	core.DBInstance = db
+	// read genesis file
+	genesis, err := config.ReadGenesisFile()
+	common.PanicIfError(err)
+
+	// loads genesis data to the database
+	LoadGenesisData(genesis)
+
+	newParams := core.Params{StakeAmount: genesis.StakeAmount, MaxDepth: genesis.MaxTreeDepth, MaxDepositSubTreeHeight: genesis.MaxDepositSubTreeHeight}
+	core.DBInstance.UpdateStakeAmount(newParams.StakeAmount)
+	core.DBInstance.UpdateMaxDepth(newParams.MaxDepth)
+	core.DBInstance.UpdateDepositSubTreeHeight(newParams.MaxDepositSubTreeHeight)
+
+	// add bob and alice account
+	Alice := core.NewPendingUserAccount(1, 10, 1, "0x914873c8d5935837ade39cbdabd6efb3d3d4064c5918da11e555bba0ab2c58fee95974a3222830cf73d257bdc18cfcd01765482108a48e68bc0b657618acb40e")
+	Alice.CreateAccountHash()
+	Bob := core.NewPendingUserAccount(2, 10, 1, "0x90718dcbc2477c86294742fb72bf098ba85ff671b88c8d79b2e09ce19bdbd88fd87047aaebc775b168372752aa8bc4e5be1ca5d39284fed00722f341927888c3")
+	Bob.CreateAccountHash()
+	err = db.AddNewPendingAccount(*Alice)
+	if err != nil {
+		panic(err)
+	}
+	err = db.AddNewPendingAccount(*Bob)
+	if err != nil {
+		panic(err)
+	}
+
+	// create deposit
+	// pathToDepositSubTree := "010"
+	root, err := core.HexToByteArray("0x6aee22e4704db7157c8ad4df7d2509fd5e31117f50d29ce7d7320b59d9a78880")
+	if err != nil {
+		panic(err)
+	}
+	Newroot, err := db.FinaliseDepositsAndAddBatch(core.ByteArray{}, 1, root)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("new rot", Newroot, "0x6aee22e4704db7157c8ad4df7d2509fd5e31117f50d29ce7d7320b59d9a78880")
+}
+
+func TestLIKE() {
+	db, err := core.NewDB()
+	if err != nil {
+		fmt.Println("error creating database")
+		panic(err)
+	}
+	core.DBInstance = db
+	// read genesis file
+	genesis, err := config.ReadGenesisFile()
+	common.PanicIfError(err)
+
+	// loads genesis data to the database
+	LoadGenesisData(genesis)
+	result, err := db.GetAllTerminalNodes("011")
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("result", result)
+}
 func TestStoreNode() {
 	db, err := core.NewDB()
 	if err != nil {

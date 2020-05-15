@@ -1,6 +1,8 @@
 package core
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"math"
 )
@@ -67,13 +69,14 @@ func (db *DB) GetDepositNodeAndSiblings() (NodeToBeReplaced UserAccount, sibling
 	return
 }
 
-func (db *DB) FinaliseDepositsAndAddBatch(accountsRoot ByteArray, pathToDepositSubTree uint64, newBalanceRoot ByteArray) error {
+func (db *DB) FinaliseDepositsAndAddBatch(accountsRoot ByteArray, pathToDepositSubTree uint64, newBalanceRoot ByteArray) (string, error) {
+	var root string
 	db.Logger.Info("Finalising accounts", "accountRoot", accountsRoot, "NewBalanceRoot", newBalanceRoot, "pathToDepositSubTree", pathToDepositSubTree)
 
 	// get params
 	params, err := db.GetParams()
 	if err != nil {
-		return err
+		return root, err
 	}
 
 	// number of new deposits = 2**MaxDepthOfDepositTree
@@ -82,25 +85,26 @@ func (db *DB) FinaliseDepositsAndAddBatch(accountsRoot ByteArray, pathToDepositS
 	// get all pending accounts
 	pendingAccs, err := db.GetPendingDeposits(depositCount)
 	if err != nil {
-		return err
+		return root, err
 	}
 
 	db.Logger.Debug("Fetched pending deposits", "count", len(pendingAccs), "data", pendingAccs)
 
 	// update the empty leaves with new accounts
-	err = db.AddPendingDeposits(pendingAccs)
+	err = db.FinaliseDeposits(pendingAccs, pathToDepositSubTree, params.MaxDepth)
 	if err != nil {
-		return err
+		return root, err
 	}
 
-	// TODO ensure the accounts are inserted at pathToDepositSubTree
+	rootAccount, err := db.GetRoot()
+	if err != nil {
+		return root, err
+	}
 
-	//TODO  make sure all the accounts root match to accountsRoot
-
-	return nil
+	return rootAccount.Hash, nil
 }
 
-func (db *DB) AddPendingDeposits(pendingAccs []UserAccount) error {
+func (db *DB) FinaliseDeposits(pendingAccs []UserAccount, pathToDepositSubTree uint64, maxTreeDepth uint64) error {
 	var accounts []UserAccount
 
 	// fetch 2**DepositSubTree inactive accounts ordered by path
@@ -108,27 +112,25 @@ func (db *DB) AddPendingDeposits(pendingAccs []UserAccount) error {
 	if err != nil {
 		return err
 	}
-	// TODO add error for if no account found
-
-	// update the accounts
-	for i, acc := range accounts {
-		err := db.Instance.Model(&acc).Updates(UserAccount{Balance: pendingAccs[i].Balance,
-			TokenType: pendingAccs[i].TokenType,
-			AccountID: pendingAccs[i].AccountID,
-			PublicKey: pendingAccs[i].PublicKey,
-			Status:    1,
-		}).Error
-		if err != nil {
-			return err
-		}
+	height := maxTreeDepth - 1
+	getTerminalNodesOf, err := SolidityPathToNodePath(pathToDepositSubTree, height)
+	if err != nil {
+		return err
 	}
+	// TODO add error for if no account found
+	terminalNodes, err := db.GetAllTerminalNodes(getTerminalNodesOf)
+	if err != nil {
+		return err
+	}
+
+	for i, acc := range pendingAccs {
+		acc.Status = 1
+		acc.UpdatePath(terminalNodes[i])
+		acc.CreateAccountHash()
+		db.UpdateAccount(acc)
+	}
+
 	return nil
-}
-
-// create merkle proof for finalisation of deposits
-// send transaction to etherum chain using contract caller
-func (db *DB) sendDepositFinalisationTx() {
-
 }
 
 func (db *DB) GetPendingDeposits(numberOfAccs uint64) ([]UserAccount, error) {
@@ -138,4 +140,26 @@ func (db *DB) GetPendingDeposits(numberOfAccs uint64) ([]UserAccount, error) {
 		return accounts, err
 	}
 	return accounts, nil
+}
+
+func (db *DB) GetAllTerminalNodes(pathToDepositSubTree string) (terminalNodes []string, err error) {
+	buf := bytes.Buffer{}
+	buf.WriteString(pathToDepositSubTree)
+	buf.WriteString("%")
+
+	var accounts []UserAccount
+
+	// LIKE query with search for terminal nodes to DB
+	if err = db.Instance.Where("path LIKE ? AND type = ?", buf.String(), 1).Find(&accounts).Error; err != nil {
+		return
+	}
+
+	// get all accounts while making sure they are empty and append to paths array
+	for _, account := range accounts {
+		if account.Hash != ZERO_VALUE_LEAF.String() {
+			return terminalNodes, errors.New("Account not zero, aborting operation")
+		}
+		terminalNodes = append(terminalNodes, account.Path)
+	}
+	return
 }

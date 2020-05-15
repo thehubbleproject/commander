@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/big"
 	"strconv"
+	"strings"
 	"unicode/utf8"
 
 	"github.com/BOPR/common"
@@ -100,7 +101,7 @@ func isRight(path string) bool {
 func GetNthBitFromRight(path string, index int) int {
 	dataRune := []rune(path)
 	// if the bit is 0
-	if dataRune[index] == 48 {
+	if dataRune[len(dataRune)-index-1] == 48 {
 		return 0
 	} else {
 		return 1
@@ -149,4 +150,15 @@ func GetAdjacentNodePath(path string) (string, error) {
 
 func padNumberWithZero(value string, depth uint64) string {
 	return fmt.Sprintf("%03v", value)
+}
+
+func SolidityPathToNodePath(path uint64, depth uint64) (string, error) {
+	pathWithoutPrefix := UintToString(path)
+	// pad path with 0's to make it fit depth
+	var pathToNode []rune
+	for i := uint64(0); i < depth-uint64(len(pathWithoutPrefix)); i++ {
+		pathToNode = append(pathToNode, 48)
+	}
+	generatedPath := strings.Join([]string{string(pathToNode), pathWithoutPrefix}, "")
+	return generatedPath, nil
 }

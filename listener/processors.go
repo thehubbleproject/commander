@@ -39,7 +39,7 @@ func (s *Syncer) processDepositQueued(eventName string, abiObject *abi.ABI, vLog
 
 	// add new account in pending state to DB and
 	newAccount := core.NewPendingUserAccount(event.AccountID.Uint64(), event.Amount.Uint64(), event.Token.Uint64(), hex.EncodeToString(event.Pubkey))
-	if err := s.DBInstance.CreateAccount(*newAccount); err != nil {
+	if err := s.DBInstance.AddNewPendingAccount(*newAccount); err != nil {
 		panic(err)
 	}
 }
@@ -110,7 +110,12 @@ func (s *Syncer) processDepositFinalised(eventName string, abiObject *abi.ABI, v
 	)
 
 	// TODO handle error
-	s.DBInstance.FinaliseDepositsAndAddBatch(accountsRoot, pathToDepositSubTree.Uint64(), newBalanceRoot)
+	newRoot, err := s.DBInstance.FinaliseDepositsAndAddBatch(accountsRoot, pathToDepositSubTree.Uint64(), newBalanceRoot)
+	if err != nil {
+		fmt.Println("Error while finalising deposits", err)
+	}
+	fmt.Println("new root", newRoot)
+	// TODO update deposit tree
 }
 
 func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
