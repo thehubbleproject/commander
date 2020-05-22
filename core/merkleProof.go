@@ -1,21 +1,30 @@
 package core
 
 import (
-	"github.com/BOPR/contracts/rollup"
+	"github.com/BOPR/contracts/coordinatorproxy"
 )
 
-type MerkleProof struct {
+type AccountMerkleProof struct {
 	Account  UserAccount   `bson:"account"`
 	Siblings []UserAccount `bson:"siblings"`
 }
 
-func NewMerkleProof(account UserAccount, siblings []UserAccount) MerkleProof {
-	return MerkleProof{Account: account, Siblings: siblings}
+func NewAccountMerkleProof(account UserAccount, siblings []UserAccount) AccountMerkleProof {
+	return AccountMerkleProof{Account: account, Siblings: siblings}
 }
 
-func (m *MerkleProof) ToABIVersion(path int64) rollup.DataTypesAccountMerkleProof {
-	return rollup.DataTypesAccountMerkleProof{
-		AccountIP: m.Account.AccountInclusionProof(path),
-		// Siblings:  AccsToLeafHashes(m.Siblings),
+func (m *AccountMerkleProof) ToABIVersion() coordinatorproxy.TypesAccountMerkleProof {
+	// create siblings
+	var siblingNodes [][32]byte
+	for _, s := range m.Siblings {
+		siblingNodes = append(siblingNodes, s.HashToByteArray())
+	}
+
+	return coordinatorproxy.TypesAccountMerkleProof{
+		AccountIP: coordinatorproxy.TypesAccountInclusionProof{
+			PathToAccount: StringToBigInt(m.Account.Path),
+			Account:       m.Account.ToABIAccount(),
+		},
+		Siblings: siblingNodes,
 	}
 }

@@ -25,4 +25,5 @@ const (
 	TOKEN_REGISTRY_KEY       = "tkk"
 	LOGGER_KEY               = "logger"
 	DEPOSIT_MANAGER          = "depositmanager"
+	COORDINATOR_PROXY        = "coordinator"
 )

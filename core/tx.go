@@ -3,9 +3,11 @@ package core
 import (
 	"errors"
 	"fmt"
+	"math/big"
 
 	"github.com/BOPR/config"
-	"github.com/BOPR/contracts/rollup"
+	"github.com/BOPR/contracts/coordinatorproxy"
+	"github.com/ethereum/go-ethereum/accounts/abi"
 	ethCmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/rlp"
 	"golang.org/x/crypto/sha3"
@@ -104,14 +106,58 @@ func (t *Tx) String() string {
 }
 
 // ToABIVersion converts a standard tx to the the DataTypesTransaction struct on the contract
-func (t *Tx) ToABIVersion(from, to rollup.DataTypesUserAccount) rollup.DataTypesTransaction {
-	return rollup.DataTypesTransaction{
-		To:        to,
-		From:      from,
+func (t *Tx) ToABIVersion(from, to int64) coordinatorproxy.TypesTransaction {
+	return coordinatorproxy.TypesTransaction{
+		ToIndex:   big.NewInt(to),
+		FromIndex: big.NewInt(from),
 		Amount:    uint32(t.Amount),
-		TokenType: from.TokenType,
+		TokenType: big.NewInt(int64(t.TokenID)),
 		Signature: []byte(t.Signature),
 	}
+}
+
+func (tx *Tx) Compress() ([]byte, error) {
+	uint256Ty, err := abi.NewType("uint256", "uint256", nil)
+	if err != nil {
+		return []byte(""), err
+	}
+
+	bytesTy, err := abi.NewType("bytes", "bytes", nil)
+	if err != nil {
+		return []byte(""), err
+	}
+
+	arguments := abi.Arguments{
+		{
+			Type: uint256Ty,
+		},
+		{
+			Type: uint256Ty,
+		},
+		{
+			Type: uint256Ty,
+		},
+		{
+			Type: uint256Ty,
+		},
+		{
+			Type: bytesTy,
+		},
+	}
+
+	bytes, err := arguments.Pack(
+		big.NewInt(int64(tx.From)),
+		big.NewInt(int64(tx.To)),
+		big.NewInt(int64(tx.TokenID)),
+		big.NewInt(int64(tx.Amount)),
+		[]byte(tx.Signature),
+	)
+
+	if err != nil {
+		return []byte(""), err
+	}
+
+	return bytes, nil
 }
 
 // Insert tx into the DB
@@ -161,6 +207,33 @@ func (db *DB) GetTx() (tx []Tx, err error) {
 		return tx, err
 	}
 	return
+}
+
+// GetTxVerificationData fetches all the data required to prove validity fo transaction
+func (db *DB) GetTxVerificationData(tx Tx) (fromMerkleProof AccountMerkleProof, toMerkleProof AccountMerkleProof, err error) {
+	fromAcc, err := db.GetAccountByID(tx.From)
+	if err != nil {
+		return
+	}
+	fromSiblings, err := db.GetSiblings(fromAcc.Path)
+	if err != nil {
+		return
+	}
+
+	fromMerkleProof = NewAccountMerkleProof(fromAcc, fromSiblings)
+	toAcc, err := db.GetAccountByID(tx.To)
+	if err != nil {
+		return
+	}
+
+	toSiblings, err := db.GetSiblings(toAcc.Path)
+	if err != nil {
+		return
+	}
+	toMerkleProof = NewAccountMerkleProof(toAcc, toSiblings)
+
+	// TODO from PDA proof
+	return fromMerkleProof, toMerkleProof, nil
 }
 
 func rlpHash(x interface{}) (h ethCmn.Hash) {

@@ -81,7 +81,7 @@ func (s *Syncer) processDepositLeafMerged(eventName string, abiObject *abi.ABI, 
 	// if deposit subtree height = deposit finalisation height then
 	if newheight == params.MaxDepositSubTreeHeight {
 		// send deposit finalisation transction to ethereum chain
-		go s.sendDepositFinalisationTx()
+		s.SendDepositFinalisationTx()
 	}
 }
 
@@ -187,7 +187,7 @@ func (s *Syncer) processRegisteredToken(eventName string, abiObject *abi.ABI, vL
 	}
 }
 
-func (s *Syncer) sendDepositFinalisationTx() {
+func (s *Syncer) SendDepositFinalisationTx() {
 	params, err := s.DBInstance.GetParams()
 	if err != nil {
 		return

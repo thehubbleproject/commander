@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/BOPR/bazooka"
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 	"github.com/BOPR/core"
@@ -24,6 +25,9 @@ type Aggregator struct {
 	// Base service
 	core.BaseService
 
+	// contract caller to interact with contracts
+	loadedBazooka bazooka.Bazooka
+
 	// DB instance
 	DB core.DB
 
@@ -35,9 +39,14 @@ type Aggregator struct {
 func NewAggregator(db core.DB) *Aggregator {
 	// create logger
 	logger := common.Logger.With("module", AggregatingService)
+	loadedBazooka, err := bazooka.NewPreLoadedBazooka()
+	if err != nil {
+		panic(err)
+	}
 	aggregator := &Aggregator{}
 	aggregator.BaseService = *core.NewBaseService(logger, AggregatingService, aggregator)
 	aggregator.DB = db
+	aggregator.loadedBazooka = loadedBazooka
 	return aggregator
 }
 
@@ -84,13 +93,9 @@ func (a *Aggregator) pickBatch() {
 	}
 
 	// Step-2
-	// 1. Loop  all transactions
-	// 2. Run verify_tx on them and update the leafs in DB according to result
-	for i, tx := range txs {
-		a.Logger.Debug("Verifing transaction", "index", i, "tx", tx.String())
-		// Apply tx and get the updated accounts
-		a.CheckTx(tx)
-
+	err = a.CheckTx(txs)
+	if err != nil {
+		fmt.Println("Error while processing tx", "error", err)
 	}
 
 	// Step-3
@@ -100,35 +105,42 @@ func (a *Aggregator) pickBatch() {
 
 // CheckTx fetches all the data required to validate tx from smart contact
 // and calls the proccess tx function to return the updated balance root and accounts
-func (a *Aggregator) CheckTx(tx core.Tx) {
-	// fetch to account from DB
-	// fromAccount, _ := a.core.GetAccount(tx.From)
-	// fmt.Println("fetched account", fromAccount)
+func (a *Aggregator) CheckTx(txs []core.Tx) error {
+	rootAcc, err := a.DB.GetRoot()
+	if err != nil {
+		return err
+	}
 
-	// fromSiblings, err := core.FetchSiblings(fromAccount.Path, a.DB)
-	// if err != nil {
-	// 	fmt.Println("not able to fetch from siblings", "error", err)
-	// }
+	currentRoot, err := core.HexToByteArray(rootAcc.Hash)
+	if err != nil {
+		return err
+	}
 
-	// // fetch from account from DB
-	// toAccount, _ := a.core.GetAccount(tx.To)
-	// fmt.Println("fetched account", toAccount)
+	for _, tx := range txs {
+		fromAccProof, toAccProof, err := a.DB.GetTxVerificationData(tx)
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
 
-	// toSiblings, err := core.FetchSiblings(toAccount.Path, a.DB)
-	// if err != nil {
-	// 	fmt.Println("not able to fetch to siblings", "error", err)
-	// }
+		updatedRoot, updatedFromAcc, updatedToAcc, err := a.loadedBazooka.ProcessTx(currentRoot, tx, fromAccProof, toAccProof)
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
 
-	// // fetch latest batch from DB
-	// latestBatch, err := a.core.GetLatestBatch()
-	// lbRootBytes, err := hex.DecodeString(latestBatch.StateRoot)
-	// if err != nil {
-	// 	fmt.Println("not able to fetch from siblings", "error", err)
-	// }
+		err = a.DB.UpdateAccount(updatedFromAcc)
+		if err != nil {
+			return err
+		}
 
-	// newBalRoot, updatedFrom, updatedTo, err := core.ContractCallerObj.ProcessTx(core.BytesToByteArray(lbRootBytes),
-	// 	tx, core.NewMerkleProof(fromAccount, fromSiblings),
-	// 	core.NewMerkleProof(toAccount, toSiblings),
-	// )
-	// fmt.Println("all the updated data", newBalRoot, updatedFrom, updatedTo)
+		err = a.DB.UpdateAccount(updatedToAcc)
+		if err != nil {
+			return err
+		}
+
+		currentRoot = updatedRoot
+	}
+
+	return nil
 }

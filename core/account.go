@@ -7,8 +7,9 @@ import (
 	"math/big"
 
 	"github.com/BOPR/common"
-	"github.com/BOPR/contracts/rollup"
+	"github.com/BOPR/contracts/coordinatorproxy"
 	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/jinzhu/gorm"
 	gormbulk "github.com/t-tiger/gorm-bulk-insert"
 )
 
@@ -117,8 +118,8 @@ func (acc *UserAccount) String() string {
 	return fmt.Sprintf("ID: %d Bal: %d Path: %v Nonce: %v TokenType:%v NodeType: %d %v", acc.AccountID, acc.Balance, acc.Path, acc.Nonce, acc.TokenType, acc.Type, acc.Hash)
 }
 
-func (acc *UserAccount) ToABIAccount() rollup.DataTypesUserAccount {
-	return rollup.DataTypesUserAccount{
+func (acc *UserAccount) ToABIAccount() coordinatorproxy.TypesUserAccount {
+	return coordinatorproxy.TypesUserAccount{
 		ID:        UintToBigInt(acc.AccountID),
 		Balance:   UintToBigInt(acc.Balance),
 		TokenType: UintToBigInt(acc.TokenType),
@@ -150,8 +151,8 @@ func (acc *UserAccount) IsCoordinator() bool {
 	return true
 }
 
-func (acc *UserAccount) AccountInclusionProof(path int64) rollup.DataTypesAccountInclusionProof {
-	return rollup.DataTypesAccountInclusionProof{
+func (acc *UserAccount) AccountInclusionProof(path int64) coordinatorproxy.TypesAccountInclusionProof {
+	return coordinatorproxy.TypesAccountInclusionProof{
 		PathToAccount: big.NewInt(path),
 		Account:       acc.ToABIAccount(),
 	}
@@ -320,7 +321,6 @@ func (db *DB) StoreLeaf(account UserAccount, path string, siblings []UserAccount
 			if err != nil {
 				return err
 			}
-			db.Logger.Info("Updating account", "ComputedNode", computedNode.String(), "Sibling", sibling.String(), "ParentHash", parentHash)
 			// Store the node!
 			err = db.StoreNode(parentHash, computedNode, sibling)
 			if err != nil {
@@ -331,7 +331,6 @@ func (db *DB) StoreLeaf(account UserAccount, path string, siblings []UserAccount
 			if err != nil {
 				return err
 			}
-			db.Logger.Info("Updating account", "Sibling", sibling.String(), "ComputedNode", computedNode.String(), "ParentHash", parentHash)
 
 			// Store the node!
 			err = db.StoreNode(parentHash, sibling, computedNode)
@@ -353,19 +352,16 @@ func (db *DB) StoreLeaf(account UserAccount, path string, siblings []UserAccount
 		return err
 	}
 
-	fmt.Println("Updating whole balance tree root to", computedNode.Hash)
 	return nil
 }
 
 // StoreNode updates the nodes given the parent hash
 func (db *DB) StoreNode(parentHash ByteArray, leftNode UserAccount, rightNode UserAccount) (err error) {
-	db.Logger.Info("Storing account", "Account", leftNode.String(), "path", leftNode.Path)
 	// update left account
 	err = db.updateAccount(leftNode, leftNode.Path)
 	if err != nil {
 		return err
 	}
-	db.Logger.Info("Storing account", "Account", rightNode.String(), "path", rightNode.Path)
 	// update right account
 	err = db.updateAccount(rightNode, rightNode.Path)
 	if err != nil {
@@ -380,7 +376,6 @@ func (db *DB) UpdateParentWithHash(pathToParent string, newHash ByteArray) error
 	var tempAccount UserAccount
 	tempAccount.Path = pathToParent
 	tempAccount.Hash = newHash.String()
-	db.Logger.Debug("Updating parent account", "hash", tempAccount.Hash, "path", pathToParent)
 	return db.updateAccount(tempAccount, pathToParent)
 }
 
@@ -413,7 +408,6 @@ func (db *DB) GetSiblings(path string) ([]UserAccount, error) {
 // GetAccount gets the account of the given path from the DB
 func (db *DB) GetAccountByPath(path string) (UserAccount, error) {
 	var account UserAccount
-	// err := db.Instance.Model(&account).Where("path = ?", path).GetErrors()
 	err := db.Instance.Where("path = ?", path).Find(&account).GetErrors()
 	if len(err) != 0 {
 		return account, ErrRecordNotFound(fmt.Sprintf("unable to find record for path: %v err:%v", path, err))
@@ -429,9 +423,24 @@ func (db *DB) GetAccountByHash(hash string) (UserAccount, error) {
 	return account, nil
 }
 
+func (db *DB) GetAccountByID(ID uint64) (UserAccount, error) {
+	var account UserAccount
+	if err := db.Instance.Where("account_id = ?", ID).Find(&account).Error; err != nil {
+		return account, ErrRecordNotFound(fmt.Sprintf("unable to find record for ID: %v", ID))
+	}
+	return account, nil
+}
+func (db *DB) GetDepositSubTreeRoot(hash string, level uint64) (UserAccount, error) {
+	var account UserAccount
+	err := db.Instance.Where("level = ? AND hash = ?", level, hash).First(&account).Error
+	if gorm.IsRecordNotFoundError(err) {
+		return account, ErrRecordNotFound(fmt.Sprintf("unable to find record for hash: %v", hash))
+	}
+	return account, nil
+}
+
 func (db *DB) GetRoot() (UserAccount, error) {
 	var account UserAccount
-	// err := db.Instance.Model(&account).Where("path = ?", path).GetErrors()
 	err := db.Instance.Where("level = ?", 0).Find(&account).GetErrors()
 	if len(err) != 0 {
 		return account, ErrRecordNotFound(fmt.Sprintf("unable to find record. err:%v", err))
@@ -455,6 +464,15 @@ func (db *DB) GetAccountCount() (int, error) {
 	var count int
 	db.Instance.Table("user_accounts").Count(&count)
 	return count, nil
+}
+
+func (db *DB) GetAccountMerkleProof(accID uint64) {
+	// account
+
+	// path to account
+
+	// siblings
+
 }
 
 // // GetDepositNodePath is supposed to get a set of uninitialised leaves

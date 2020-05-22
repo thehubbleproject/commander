@@ -55,7 +55,7 @@ func (db *DB) GetDepositNodeAndSiblings() (NodeToBeReplaced UserAccount, sibling
 	expectedHash := defaultHashes[params.MaxDepositSubTreeHeight]
 
 	// getNode with the expectedHash
-	NodeToBeReplaced, err = db.GetAccountByHash(expectedHash.String())
+	NodeToBeReplaced, err = db.GetDepositSubTreeRoot(expectedHash.String(), params.MaxDepth-params.MaxDepositSubTreeHeight)
 	if err != nil {
 		return
 	}

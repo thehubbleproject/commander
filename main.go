@@ -7,6 +7,7 @@ import (
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 	"github.com/BOPR/core"
+	"github.com/BOPR/listener"
 )
 
 func main() {
@@ -45,6 +46,10 @@ func TestDeposit() {
 	if err != nil {
 		panic(err)
 	}
+	syncer := listener.NewSyncer()
+	syncer.Start()
+	defer syncer.Stop()
+	syncer.SendDepositFinalisationTx()
 
 	// create deposit
 	// pathToDepositSubTree := "010"
