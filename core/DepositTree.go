@@ -108,7 +108,7 @@ func (db *DB) FinaliseDeposits(pendingAccs []UserAccount, pathToDepositSubTree u
 	var accounts []UserAccount
 
 	// fetch 2**DepositSubTree inactive accounts ordered by path
-	err := db.Instance.Limit(len(pendingAccs)).Order("path").Where("status = ?", 100).Find(&accounts).Error
+	err := db.Instance.Limit(len(pendingAccs)).Order("path").Where("status = ?", STATUS_NON_INITIALIZED).Find(&accounts).Error
 	if err != nil {
 		return err
 	}
@@ -124,10 +124,13 @@ func (db *DB) FinaliseDeposits(pendingAccs []UserAccount, pathToDepositSubTree u
 	}
 
 	for i, acc := range pendingAccs {
-		acc.Status = 1
+		acc.Status = STATUS_ACTIVE
 		acc.UpdatePath(terminalNodes[i])
 		acc.CreateAccountHash()
-		db.UpdateAccount(acc)
+		err := db.UpdateAccount(acc)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

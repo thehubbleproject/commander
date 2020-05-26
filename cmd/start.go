@@ -179,6 +179,7 @@ func LoadGenesisData(genesis config.Genesis) {
 	for diff > 0 {
 		newAcc := core.EmptyAccount()
 		newAcc.Hash = core.ZERO_VALUE_LEAF.String()
+		newAcc.PublicKeyHash = core.ZERO_VALUE_LEAF.String()
 		allAccounts = append(allAccounts, newAcc)
 		diff--
 	}

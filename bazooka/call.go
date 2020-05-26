@@ -6,7 +6,6 @@ import (
 	big "math/big"
 
 	"github.com/BOPR/common"
-	"github.com/BOPR/contracts/coordinatorproxy"
 	"github.com/BOPR/core"
 	ethCmn "github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
@@ -68,8 +67,8 @@ func (b *Bazooka) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, err err
 
 // ProcessTx calls the ProcessTx function on the contract to verify the tx
 // returns the updated accounts and the new balance root
-func (b *Bazooka) ProcessTx(balanceTreeRoot core.ByteArray, tx core.Tx, fromMerkleProof, toMerkleProof core.AccountMerkleProof) (newBalanceRoot core.ByteArray, from, to core.UserAccount, err error) {
-	updatedRoot, newBalFrom, newBalTo, IsValidTx, err := b.CoordinatorProxy.ProcessTx(nil, balanceTreeRoot, balanceTreeRoot, tx.ToABIVersion(int64(tx.From), int64(tx.To)), coordinatorproxy.TypesPDAMerkleProof{}, fromMerkleProof.ToABIVersion(), toMerkleProof.ToABIVersion())
+func (b *Bazooka) ProcessTx(balanceTreeRoot core.ByteArray, tx core.Tx, fromMerkleProof, toMerkleProof core.AccountMerkleProof, pdaProof core.PDAMerkleProof) (newBalanceRoot core.ByteArray, from, to core.UserAccount, err error) {
+	updatedRoot, newBalFrom, newBalTo, IsValidTx, err := b.CoordinatorProxy.ProcessTx(nil, balanceTreeRoot, balanceTreeRoot, tx.ToABIVersion(int64(tx.From), int64(tx.To)), pdaProof.ToABIVersion(), fromMerkleProof.ToABIVersion(), toMerkleProof.ToABIVersion())
 	if err != nil {
 		return
 	}

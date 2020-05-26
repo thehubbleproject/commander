@@ -117,7 +117,7 @@ func (a *Aggregator) CheckTx(txs []core.Tx) error {
 	}
 
 	for _, tx := range txs {
-		fromAccProof, toAccProof, err := a.DB.GetTxVerificationData(tx)
+		fromAccProof, toAccProof, PDAproof, err := a.DB.GetTxVerificationData(tx)
 		if err != nil {
 			fmt.Println(err)
 			return err

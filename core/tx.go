@@ -210,7 +210,7 @@ func (db *DB) GetTx() (tx []Tx, err error) {
 }
 
 // GetTxVerificationData fetches all the data required to prove validity fo transaction
-func (db *DB) GetTxVerificationData(tx Tx) (fromMerkleProof AccountMerkleProof, toMerkleProof AccountMerkleProof, err error) {
+func (db *DB) GetTxVerificationData(tx Tx) (fromMerkleProof, toMerkleProof AccountMerkleProof, PDAProof PDAMerkleProof, err error) {
 	fromAcc, err := db.GetAccountByID(tx.From)
 	if err != nil {
 		return
@@ -232,8 +232,8 @@ func (db *DB) GetTxVerificationData(tx Tx) (fromMerkleProof AccountMerkleProof, 
 	}
 	toMerkleProof = NewAccountMerkleProof(toAcc, toSiblings)
 
-	// TODO from PDA proof
-	return fromMerkleProof, toMerkleProof, nil
+	PDAProof := NewPDAProof(fromAcc.Path, fromAcc.PublicKey, fromSiblings)
+	return fromMerkleProof, toMerkleProof, PDAProof, nil
 }
 
 func rlpHash(x interface{}) (h ethCmn.Hash) {

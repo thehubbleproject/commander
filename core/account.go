@@ -34,6 +34,9 @@ type UserAccount struct {
 	// Public key for the user
 	PublicKey string `gorm:"size:1000"`
 
+	// PublicKeyHash
+	PublicKeyHash string `gorm:""`
+
 	// Path from root to leaf
 	// NOTE: not a part of the leaf
 	// Path is a string to that we can run LIKE queries
@@ -66,7 +69,7 @@ func NewUserAccount(id, balance, tokenType, nonce, status uint64, pubkey, path s
 		Nonce:     nonce,
 		Path:      path,
 		Status:    status,
-		Type:      1,
+		Type:      TYPE_TERMINAL,
 	}
 	newAcccount.UpdatePath(newAcccount.Path)
 	newAcccount.CreateAccountHash()
@@ -78,11 +81,11 @@ func NewPendingUserAccount(id, balance, tokenType uint64, _pubkey string) *UserA
 		AccountID: id,
 		TokenType: tokenType,
 		Balance:   balance,
-		Nonce:     0,
-		Path:      "0",
-		Status:    0,
+		Nonce:     NONCE_ZERO,
+		Path:      UNINITIALIZED_PATH,
+		Status:    STATUS_PENDING,
 		PublicKey: _pubkey,
-		Type:      1,
+		Type:      TYPE_TERMINAL,
 	}
 	newAcccount.UpdatePath(newAcccount.Path)
 	newAcccount.CreateAccountHash()
@@ -91,14 +94,14 @@ func NewPendingUserAccount(id, balance, tokenType uint64, _pubkey string) *UserA
 
 func NewAccountNode(path, hash string) *UserAccount {
 	newAcccount := &UserAccount{
-		AccountID: 0,
+		AccountID: ZERO,
 		PublicKey: "",
-		Balance:   0,
-		TokenType: 0,
-		Nonce:     0,
+		Balance:   ZERO,
+		TokenType: ZERO,
+		Nonce:     ZERO,
 		Path:      path,
-		Status:    1,
-		Type:      2,
+		Status:    STATUS_ACTIVE,
+		Type:      TYPE_NON_TERMINAL,
 	}
 	newAcccount.UpdatePath(newAcccount.Path)
 	newAcccount.Hash = hash
@@ -111,7 +114,7 @@ func (acc *UserAccount) UpdatePath(path string) {
 }
 
 func EmptyAccount() UserAccount {
-	return *NewUserAccount(0, 0, 0, 0, 1, "", "")
+	return *NewUserAccount(ZERO, ZERO, ZERO, ZERO, STATUS_ACTIVE, "", "")
 }
 
 func (acc *UserAccount) String() string {
@@ -128,6 +131,14 @@ func (acc *UserAccount) ToABIAccount() coordinatorproxy.TypesUserAccount {
 }
 
 func (acc *UserAccount) HashToByteArray() ByteArray {
+	ba, err := HexToByteArray(acc.Hash)
+	if err != nil {
+		panic(err)
+	}
+	return ba
+}
+
+func (acc *UserAccount) PubkeyHashToByteArray() ByteArray {
 	ba, err := HexToByteArray(acc.Hash)
 	if err != nil {
 		panic(err)
@@ -228,7 +239,6 @@ func (db *DB) InitBalancesTree(depth uint64, genesisAccounts []UserAccount) erro
 		}
 		db.Logger.Debug("Obtained adjacent node path", "adjacentNodePath", pathToAdjacentNode, "currentNodePath", prevNodePath)
 		genesisAccounts[i].UpdatePath(pathToAdjacentNode)
-		// TODO set type and other node level data as well
 		insertRecords = append(insertRecords, genesisAccounts[i])
 		prevNodePath = genesisAccounts[i].Path
 	}
@@ -297,6 +307,14 @@ func (db *DB) GetAccountsAtDepth(depth uint64) ([]UserAccount, error) {
 }
 
 func (db *DB) UpdateAccount(account UserAccount) error {
+	// update the pubkey hash of the account
+	bz, err := ABIEncodePubkey(account.PublicKey)
+	if err != nil {
+		return err
+	}
+	account.PublicKeyHash = common.Keccak256(bz).String()
+
+	db.Logger.Info("Updated account pubkey", "ID", account.AccountID, "PubkeyHash", account.PublicKeyHash)
 	siblings, err := db.GetSiblings(account.Path)
 	if err != nil {
 		return err
@@ -311,6 +329,7 @@ func (db *DB) StoreLeaf(account UserAccount, path string, siblings []UserAccount
 	computedNode := account
 	for i := 0; i < len(siblings); i++ {
 		var parentHash ByteArray
+		var parentPubkeyHash ByteArray
 		sibling := siblings[i]
 		isComputedRightSibling := GetNthBitFromRight(
 			path,
@@ -321,8 +340,12 @@ func (db *DB) StoreLeaf(account UserAccount, path string, siblings []UserAccount
 			if err != nil {
 				return err
 			}
+			parentPubkeyHash, err = GetParent(computedNode.PubkeyHashToByteArray(), sibling.PubkeyHashToByteArray())
+			if err != nil {
+				return err
+			}
 			// Store the node!
-			err = db.StoreNode(parentHash, computedNode, sibling)
+			err = db.StoreNode(parentHash, parentPubkeyHash, computedNode, sibling)
 			if err != nil {
 				return err
 			}
@@ -331,9 +354,13 @@ func (db *DB) StoreLeaf(account UserAccount, path string, siblings []UserAccount
 			if err != nil {
 				return err
 			}
+			parentPubkeyHash, err = GetParent(computedNode.PubkeyHashToByteArray(), sibling.PubkeyHashToByteArray())
+			if err != nil {
+				return err
+			}
 
 			// Store the node!
-			err = db.StoreNode(parentHash, sibling, computedNode)
+			err = db.StoreNode(parentHash, parentPubkeyHash, sibling, computedNode)
 			if err != nil {
 				return err
 			}
@@ -347,7 +374,7 @@ func (db *DB) StoreLeaf(account UserAccount, path string, siblings []UserAccount
 	}
 
 	// Store the new root
-	err = db.UpdateRootNode(computedNode.HashToByteArray())
+	err = db.UpdateRootNodeHashes(computedNode.HashToByteArray(), computedNode.PubkeyHashToByteArray())
 	if err != nil {
 		return err
 	}
@@ -356,7 +383,7 @@ func (db *DB) StoreLeaf(account UserAccount, path string, siblings []UserAccount
 }
 
 // StoreNode updates the nodes given the parent hash
-func (db *DB) StoreNode(parentHash ByteArray, leftNode UserAccount, rightNode UserAccount) (err error) {
+func (db *DB) StoreNode(parentHash, parentPubkeyHash ByteArray, leftNode UserAccount, rightNode UserAccount) (err error) {
 	// update left account
 	err = db.updateAccount(leftNode, leftNode.Path)
 	if err != nil {
@@ -367,22 +394,24 @@ func (db *DB) StoreNode(parentHash ByteArray, leftNode UserAccount, rightNode Us
 	if err != nil {
 		return err
 	}
-	// update the parent with the new hash
-	return db.UpdateParentWithHash(GetParentPath(leftNode.Path), parentHash)
+	// update the parent with the new hashes
+	return db.UpdateParentWithHash(GetParentPath(leftNode.Path), parentHash, parentPubkeyHash)
 }
 
-func (db *DB) UpdateParentWithHash(pathToParent string, newHash ByteArray) error {
+func (db *DB) UpdateParentWithHash(pathToParent string, newHash, newPubkeyHash ByteArray) error {
 	// Update the root hash
 	var tempAccount UserAccount
 	tempAccount.Path = pathToParent
 	tempAccount.Hash = newHash.String()
+	tempAccount.PublicKeyHash = newPubkeyHash.String()
 	return db.updateAccount(tempAccount, pathToParent)
 }
 
-func (db *DB) UpdateRootNode(newRoot ByteArray) error {
+func (db *DB) UpdateRootNodeHashes(newRoot ByteArray, newPubkeyHash ByteArray) error {
 	var tempAccount UserAccount
 	tempAccount.Path = ""
 	tempAccount.Hash = newRoot.String()
+	tempAccount.PublicKeyHash = newPubkeyHash.String()
 	return db.updateAccount(tempAccount, tempAccount.Path)
 }
 
@@ -466,40 +495,30 @@ func (db *DB) GetAccountCount() (int, error) {
 	return count, nil
 }
 
-func (db *DB) GetAccountMerkleProof(accID uint64) {
-	// account
+//
+// Pubkey related interactions
+//
+// Public key updates will happen only when adding new pending deposits
+// Most of the time we will be always just fetching for creating merkle proofs
+func ABIEncodePubkey(pubkey string) ([]byte, error) {
+	uint256Ty, err := abi.NewType("string", "uint256", nil)
+	if err != nil {
+		return []byte(""), err
+	}
 
-	// path to account
+	arguments := abi.Arguments{
+		{
+			Type: uint256Ty,
+		},
+	}
 
-	// siblings
+	bytes, err := arguments.Pack(
+		pubkey,
+	)
 
+	if err != nil {
+		return []byte(""), err
+	}
+
+	return bytes, nil
 }
-
-// // GetDepositNodePath is supposed to get a set of uninitialised leaves
-// // number of uninitialised nodes have to be == 2**MaxDepositSubTreeHeight
-// // Then we return the path of this node
-// func (db *DB) GetDepositNodePath() (path string, err error) {
-// 	// get first uninitialised leaf
-// 	firstLeaf, err := db.GetAccountByStatus(100)
-// 	if err != nil {
-// 		return
-// 	}
-// 	params, err := db.GetParams()
-// 	if err != nil {
-// 		return
-// 	}
-// 	numberOfLeaves := math.Exp2(float64(params.MaxDepositSubTreeHeight))
-
-// 	lastLeafPath := firstLeaf.Path + uint64(numberOfLeaves)
-
-// 	var accounts []UserAccount
-// 	err = db.Instance.Where("path BETWEEN ? AND ? AND status==?", firstLeaf.Path, lastLeafPath, 100).Find(&accounts).Error
-// 	if err != nil {
-// 		return
-// 	}
-
-// 	fmt.Println("found accounts", accounts)
-// 	pathToFirstLeafStr := UintToBigInt(firstLeaf.Path).String()
-// 	depth := params.MaxDepth - params.MaxDepositSubTreeHeight
-// 	return pathToFirstLeafStr[:depth], nil
-// }

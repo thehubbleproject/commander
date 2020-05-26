@@ -41,12 +41,14 @@ func (b *Bazooka) FireDepositFinalisation(TBreplaced core.UserAccount, siblings 
 	if err != nil {
 		return err
 	}
+
 	coordinatorProxyAddr := ethCmn.HexToAddress(config.GlobalCfg.CoordinatorProxyAddress)
 	// generate call msg
 	callMsg := ethereum.CallMsg{
 		To:   &coordinatorProxyAddr,
 		Data: data,
 	}
+
 	auth, err := b.GenerateAuthObj(b.EthClient, callMsg)
 	if err != nil {
 		return err
