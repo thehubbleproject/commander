@@ -34,7 +34,7 @@ type UserAccount struct {
 	// Public key for the user
 	PublicKey string `gorm:"size:1000"`
 
-	// PublicKeyHash
+	// PublicKeyHash = Hash(publicKey)
 	PublicKeyHash string `gorm:""`
 
 	// Path from root to leaf
@@ -60,6 +60,7 @@ type UserAccount struct {
 	Level uint64 `gorm:"not null;index:Level"`
 }
 
+// NewUserAccount creates a new user account
 func NewUserAccount(id, balance, tokenType, nonce, status uint64, pubkey, path string) *UserAccount {
 	newAcccount := &UserAccount{
 		AccountID: id,
@@ -76,22 +77,8 @@ func NewUserAccount(id, balance, tokenType, nonce, status uint64, pubkey, path s
 	return newAcccount
 }
 
-func NewPendingUserAccount(id, balance, tokenType uint64, _pubkey string) *UserAccount {
-	newAcccount := &UserAccount{
-		AccountID: id,
-		TokenType: tokenType,
-		Balance:   balance,
-		Nonce:     NONCE_ZERO,
-		Path:      UNINITIALIZED_PATH,
-		Status:    STATUS_PENDING,
-		PublicKey: _pubkey,
-		Type:      TYPE_TERMINAL,
-	}
-	newAcccount.UpdatePath(newAcccount.Path)
-	newAcccount.CreateAccountHash()
-	return newAcccount
-}
-
+// NewAccountNode creates a new non-terminal user account, the only this useful in this is
+// Path, Status, Hash, PubkeyHash
 func NewAccountNode(path, hash string) *UserAccount {
 	newAcccount := &UserAccount{
 		AccountID: ZERO,
@@ -108,13 +95,27 @@ func NewAccountNode(path, hash string) *UserAccount {
 	return newAcccount
 }
 
+// NewAccountNode creates a new terminal user account but in pending state
+// It is to be used while adding new deposits while they are not finalised
+func NewPendingUserAccount(id, balance, tokenType uint64, _pubkey string) *UserAccount {
+	newAcccount := &UserAccount{
+		AccountID: id,
+		TokenType: tokenType,
+		Balance:   balance,
+		Nonce:     NONCE_ZERO,
+		Path:      UNINITIALIZED_PATH,
+		Status:    STATUS_PENDING,
+		PublicKey: _pubkey,
+		Type:      TYPE_TERMINAL,
+	}
+	newAcccount.UpdatePath(newAcccount.Path)
+	newAcccount.CreateAccountHash()
+	return newAcccount
+}
+
 func (acc *UserAccount) UpdatePath(path string) {
 	acc.Path = path
 	acc.Level = uint64(len(path))
-}
-
-func EmptyAccount() UserAccount {
-	return *NewUserAccount(ZERO, ZERO, ZERO, ZERO, STATUS_ACTIVE, "", "")
 }
 
 func (acc *UserAccount) String() string {
@@ -210,6 +211,19 @@ func (acc *UserAccount) CreateAccountHash() {
 	accountHash := common.Keccak256(data)
 	acc.Hash = accountHash.String()
 }
+
+//
+// Utils
+//
+
+// EmptyAcccount creates a new account which has the same hash as ZERO_VALUE_LEAF
+func EmptyAccount() UserAccount {
+	return *NewUserAccount(ZERO, ZERO, ZERO, ZERO, STATUS_ACTIVE, "", "")
+}
+
+//
+// DB interactions for account
+//
 
 // InitBalancesTree initialises the balances tree
 func (db *DB) InitBalancesTree(depth uint64, genesisAccounts []UserAccount) error {
@@ -313,7 +327,6 @@ func (db *DB) UpdateAccount(account UserAccount) error {
 		return err
 	}
 	account.PublicKeyHash = common.Keccak256(bz).String()
-
 	db.Logger.Info("Updated account pubkey", "ID", account.AccountID, "PubkeyHash", account.PublicKeyHash)
 	siblings, err := db.GetSiblings(account.Path)
 	if err != nil {
@@ -498,8 +511,6 @@ func (db *DB) GetAccountCount() (int, error) {
 //
 // Pubkey related interactions
 //
-// Public key updates will happen only when adding new pending deposits
-// Most of the time we will be always just fetching for creating merkle proofs
 func ABIEncodePubkey(pubkey string) ([]byte, error) {
 	uint256Ty, err := abi.NewType("string", "uint256", nil)
 	if err != nil {

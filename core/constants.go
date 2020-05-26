@@ -13,4 +13,10 @@ const (
 	NONCE_ZERO         = 0
 	UNINITIALIZED_PATH = "-1"
 	ZERO               = 0
+
+	// TX Status constants
+	TX_STATUS_PENDING    = 100
+	TX_STATUS_PROCESSING = 200
+	TX_STATUS_PROCESSED  = 300
+	TX_STATUS_REVERTED   = 400
 )

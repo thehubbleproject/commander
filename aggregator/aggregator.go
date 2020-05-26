@@ -123,7 +123,7 @@ func (a *Aggregator) CheckTx(txs []core.Tx) error {
 			return err
 		}
 
-		updatedRoot, updatedFromAcc, updatedToAcc, err := a.loadedBazooka.ProcessTx(currentRoot, tx, fromAccProof, toAccProof)
+		updatedRoot, updatedFromAcc, updatedToAcc, err := a.loadedBazooka.ProcessTx(currentRoot, tx, fromAccProof, toAccProof, PDAproof)
 		if err != nil {
 			fmt.Println(err)
 			return err
