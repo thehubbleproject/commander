@@ -3,6 +3,7 @@ package bazooka
 import (
 	"context"
 	"errors"
+	"fmt"
 	big "math/big"
 
 	"github.com/BOPR/common"
@@ -22,7 +23,7 @@ func (b *Bazooka) GetMainChainBlock(blockNum *big.Int) (header *ethTypes.Header,
 
 // TotalBatches returns the total number of batches that have been submitted on chain
 func (b *Bazooka) TotalBatches() (uint64, error) {
-	totalBatches, err := b.RollupContract.NumberOfBatches(nil)
+	totalBatches, err := b.RollupContract.NumOfBatchesSubmitted(nil)
 	if err != nil {
 		return 0, err
 	}
@@ -30,7 +31,7 @@ func (b *Bazooka) TotalBatches() (uint64, error) {
 }
 
 func (b *Bazooka) FetchBalanceTreeRoot() (core.ByteArray, error) {
-	root, err := b.RollupContract.GetBalanceTreeRoot(nil)
+	root, err := b.RollupContract.GetLatestBalanceTreeRoot(nil)
 	if err != nil {
 		return core.ByteArray{}, err
 	}
@@ -52,7 +53,7 @@ func (b *Bazooka) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, err err
 
 	payload := tx.Data()
 	decodedPayload := payload[4:]
-
+	fmt.Println("decoded payload", decodedPayload)
 	inputDataMap := make(map[string]interface{})
 	method := b.ContractABI[common.ROLLUP_CONTRACT_KEY].Methods["submitBatch"]
 	err = method.Inputs.UnpackIntoMap(inputDataMap, decodedPayload)

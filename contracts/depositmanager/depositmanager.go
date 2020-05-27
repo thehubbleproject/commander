@@ -48,7 +48,7 @@ type TypesUserAccount struct {
 }
 
 // DepositmanagerABI is the input ABI used to generate the binding from.
-const DepositmanagerABI = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_registryAddr\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"constant\":true,\"inputs\":[],\"name\":\"Coordinator\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"accountsTree\",\"outputs\":[{\"internalType\":\"contractIncrementalTree\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"balancesTree\",\"outputs\":[{\"internalType\":\"contractTree\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"depositSubtreeHeight\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"logger\",\"outputs\":[{\"internalType\":\"contractLogger\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"merkleUtils\",\"outputs\":[{\"internalType\":\"contractMerkleTreeUtils\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"nameRegistry\",\"outputs\":[{\"internalType\":\"contractNameRegistry\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"pendingDeposits\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"queueNumber\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"tokenContract\",\"outputs\":[{\"internalType\":\"contractIERC20\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"tokenRegistry\",\"outputs\":[{\"internalType\":\"contractITokenRegistry\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_tokenType\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_pubkey\",\"type\":\"bytes\"}],\"name\":\"deposit\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destination\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_tokenType\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_pubkey\",\"type\":\"bytes\"}],\"name\":\"depositFor\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_subTreeDepth\",\"type\":\"uint256\"},{\"components\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"pathToAccount\",\"type\":\"uint256\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"ID\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structTypes.UserAccount\",\"name\":\"account\",\"type\":\"tuple\"}],\"internalType\":\"structTypes.AccountInclusionProof\",\"name\":\"accountIP\",\"type\":\"tuple\"},{\"internalType\":\"bytes32[]\",\"name\":\"siblings\",\"type\":\"bytes32[]\"}],\"internalType\":\"structTypes.AccountMerkleProof\",\"name\":\"_zero_account_mp\",\"type\":\"tuple\"}],\"name\":\"finaliseDeposits\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+const DepositmanagerABI = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_registryAddr\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"constant\":true,\"inputs\":[],\"name\":\"ZERO_BYTES32\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"accountsTree\",\"outputs\":[{\"internalType\":\"contractIncrementalTree\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"depositSubtreeHeight\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"governance\",\"outputs\":[{\"internalType\":\"contractGovernance\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"logger\",\"outputs\":[{\"internalType\":\"contractLogger\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"merkleUtils\",\"outputs\":[{\"internalType\":\"contractMerkleTreeUtils\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"nameRegistry\",\"outputs\":[{\"internalType\":\"contractNameRegistry\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"pendingDeposits\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"queueNumber\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"tokenContract\",\"outputs\":[{\"internalType\":\"contractIERC20\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"tokenRegistry\",\"outputs\":[{\"internalType\":\"contractITokenRegistry\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"isDepositPaused\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_tokenType\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_pubkey\",\"type\":\"bytes\"}],\"name\":\"deposit\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destination\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_tokenType\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_pubkey\",\"type\":\"bytes\"}],\"name\":\"depositFor\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_subTreeDepth\",\"type\":\"uint256\"},{\"components\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"pathToAccount\",\"type\":\"uint256\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"ID\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"internalType\":\"structTypes.UserAccount\",\"name\":\"account\",\"type\":\"tuple\"}],\"internalType\":\"structTypes.AccountInclusionProof\",\"name\":\"accountIP\",\"type\":\"tuple\"},{\"internalType\":\"bytes32[]\",\"name\":\"siblings\",\"type\":\"bytes32[]\"}],\"internalType\":\"structTypes.AccountMerkleProof\",\"name\":\"_zero_account_mp\",\"type\":\"tuple\"},{\"internalType\":\"bytes32\",\"name\":\"latestBalanceTree\",\"type\":\"bytes32\"}],\"name\":\"finaliseDeposits\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
 
 // Depositmanager is an auto generated Go binding around an Ethereum contract.
 type Depositmanager struct {
@@ -192,30 +192,30 @@ func (_Depositmanager *DepositmanagerTransactorRaw) Transact(opts *bind.Transact
 	return _Depositmanager.Contract.contract.Transact(opts, method, params...)
 }
 
-// Coordinator is a free data retrieval call binding the contract method 0xf35213fc.
+// ZEROBYTES32 is a free data retrieval call binding the contract method 0x069321b0.
 //
-// Solidity: function Coordinator() view returns(address)
-func (_Depositmanager *DepositmanagerCaller) Coordinator(opts *bind.CallOpts) (common.Address, error) {
+// Solidity: function ZERO_BYTES32() view returns(bytes32)
+func (_Depositmanager *DepositmanagerCaller) ZEROBYTES32(opts *bind.CallOpts) ([32]byte, error) {
 	var (
-		ret0 = new(common.Address)
+		ret0 = new([32]byte)
 	)
 	out := ret0
-	err := _Depositmanager.contract.Call(opts, out, "Coordinator")
+	err := _Depositmanager.contract.Call(opts, out, "ZERO_BYTES32")
 	return *ret0, err
 }
 
-// Coordinator is a free data retrieval call binding the contract method 0xf35213fc.
+// ZEROBYTES32 is a free data retrieval call binding the contract method 0x069321b0.
 //
-// Solidity: function Coordinator() view returns(address)
-func (_Depositmanager *DepositmanagerSession) Coordinator() (common.Address, error) {
-	return _Depositmanager.Contract.Coordinator(&_Depositmanager.CallOpts)
+// Solidity: function ZERO_BYTES32() view returns(bytes32)
+func (_Depositmanager *DepositmanagerSession) ZEROBYTES32() ([32]byte, error) {
+	return _Depositmanager.Contract.ZEROBYTES32(&_Depositmanager.CallOpts)
 }
 
-// Coordinator is a free data retrieval call binding the contract method 0xf35213fc.
+// ZEROBYTES32 is a free data retrieval call binding the contract method 0x069321b0.
 //
-// Solidity: function Coordinator() view returns(address)
-func (_Depositmanager *DepositmanagerCallerSession) Coordinator() (common.Address, error) {
-	return _Depositmanager.Contract.Coordinator(&_Depositmanager.CallOpts)
+// Solidity: function ZERO_BYTES32() view returns(bytes32)
+func (_Depositmanager *DepositmanagerCallerSession) ZEROBYTES32() ([32]byte, error) {
+	return _Depositmanager.Contract.ZEROBYTES32(&_Depositmanager.CallOpts)
 }
 
 // AccountsTree is a free data retrieval call binding the contract method 0xae2926d4.
@@ -244,32 +244,6 @@ func (_Depositmanager *DepositmanagerCallerSession) AccountsTree() (common.Addre
 	return _Depositmanager.Contract.AccountsTree(&_Depositmanager.CallOpts)
 }
 
-// BalancesTree is a free data retrieval call binding the contract method 0xb2692d77.
-//
-// Solidity: function balancesTree() view returns(address)
-func (_Depositmanager *DepositmanagerCaller) BalancesTree(opts *bind.CallOpts) (common.Address, error) {
-	var (
-		ret0 = new(common.Address)
-	)
-	out := ret0
-	err := _Depositmanager.contract.Call(opts, out, "balancesTree")
-	return *ret0, err
-}
-
-// BalancesTree is a free data retrieval call binding the contract method 0xb2692d77.
-//
-// Solidity: function balancesTree() view returns(address)
-func (_Depositmanager *DepositmanagerSession) BalancesTree() (common.Address, error) {
-	return _Depositmanager.Contract.BalancesTree(&_Depositmanager.CallOpts)
-}
-
-// BalancesTree is a free data retrieval call binding the contract method 0xb2692d77.
-//
-// Solidity: function balancesTree() view returns(address)
-func (_Depositmanager *DepositmanagerCallerSession) BalancesTree() (common.Address, error) {
-	return _Depositmanager.Contract.BalancesTree(&_Depositmanager.CallOpts)
-}
-
 // DepositSubtreeHeight is a free data retrieval call binding the contract method 0x2882dd98.
 //
 // Solidity: function depositSubtreeHeight() view returns(uint256)
@@ -294,6 +268,32 @@ func (_Depositmanager *DepositmanagerSession) DepositSubtreeHeight() (*big.Int, 
 // Solidity: function depositSubtreeHeight() view returns(uint256)
 func (_Depositmanager *DepositmanagerCallerSession) DepositSubtreeHeight() (*big.Int, error) {
 	return _Depositmanager.Contract.DepositSubtreeHeight(&_Depositmanager.CallOpts)
+}
+
+// Governance is a free data retrieval call binding the contract method 0x5aa6e675.
+//
+// Solidity: function governance() view returns(address)
+func (_Depositmanager *DepositmanagerCaller) Governance(opts *bind.CallOpts) (common.Address, error) {
+	var (
+		ret0 = new(common.Address)
+	)
+	out := ret0
+	err := _Depositmanager.contract.Call(opts, out, "governance")
+	return *ret0, err
+}
+
+// Governance is a free data retrieval call binding the contract method 0x5aa6e675.
+//
+// Solidity: function governance() view returns(address)
+func (_Depositmanager *DepositmanagerSession) Governance() (common.Address, error) {
+	return _Depositmanager.Contract.Governance(&_Depositmanager.CallOpts)
+}
+
+// Governance is a free data retrieval call binding the contract method 0x5aa6e675.
+//
+// Solidity: function governance() view returns(address)
+func (_Depositmanager *DepositmanagerCallerSession) Governance() (common.Address, error) {
+	return _Depositmanager.Contract.Governance(&_Depositmanager.CallOpts)
 }
 
 // Logger is a free data retrieval call binding the contract method 0xf24ccbfe.
@@ -520,23 +520,44 @@ func (_Depositmanager *DepositmanagerTransactorSession) DepositFor(_destination 
 	return _Depositmanager.Contract.DepositFor(&_Depositmanager.TransactOpts, _destination, _amount, _tokenType, _pubkey)
 }
 
-// FinaliseDeposits is a paid mutator transaction binding the contract method 0x1450e6ec.
+// FinaliseDeposits is a paid mutator transaction binding the contract method 0x4e59adc9.
 //
-// Solidity: function finaliseDeposits(uint256 _subTreeDepth, TypesAccountMerkleProof _zero_account_mp) returns(bytes32)
-func (_Depositmanager *DepositmanagerTransactor) FinaliseDeposits(opts *bind.TransactOpts, _subTreeDepth *big.Int, _zero_account_mp TypesAccountMerkleProof) (*types.Transaction, error) {
-	return _Depositmanager.contract.Transact(opts, "finaliseDeposits", _subTreeDepth, _zero_account_mp)
+// Solidity: function finaliseDeposits(uint256 _subTreeDepth, TypesAccountMerkleProof _zero_account_mp, bytes32 latestBalanceTree) returns(bytes32)
+func (_Depositmanager *DepositmanagerTransactor) FinaliseDeposits(opts *bind.TransactOpts, _subTreeDepth *big.Int, _zero_account_mp TypesAccountMerkleProof, latestBalanceTree [32]byte) (*types.Transaction, error) {
+	return _Depositmanager.contract.Transact(opts, "finaliseDeposits", _subTreeDepth, _zero_account_mp, latestBalanceTree)
 }
 
-// FinaliseDeposits is a paid mutator transaction binding the contract method 0x1450e6ec.
+// FinaliseDeposits is a paid mutator transaction binding the contract method 0x4e59adc9.
 //
-// Solidity: function finaliseDeposits(uint256 _subTreeDepth, TypesAccountMerkleProof _zero_account_mp) returns(bytes32)
-func (_Depositmanager *DepositmanagerSession) FinaliseDeposits(_subTreeDepth *big.Int, _zero_account_mp TypesAccountMerkleProof) (*types.Transaction, error) {
-	return _Depositmanager.Contract.FinaliseDeposits(&_Depositmanager.TransactOpts, _subTreeDepth, _zero_account_mp)
+// Solidity: function finaliseDeposits(uint256 _subTreeDepth, TypesAccountMerkleProof _zero_account_mp, bytes32 latestBalanceTree) returns(bytes32)
+func (_Depositmanager *DepositmanagerSession) FinaliseDeposits(_subTreeDepth *big.Int, _zero_account_mp TypesAccountMerkleProof, latestBalanceTree [32]byte) (*types.Transaction, error) {
+	return _Depositmanager.Contract.FinaliseDeposits(&_Depositmanager.TransactOpts, _subTreeDepth, _zero_account_mp, latestBalanceTree)
 }
 
-// FinaliseDeposits is a paid mutator transaction binding the contract method 0x1450e6ec.
+// FinaliseDeposits is a paid mutator transaction binding the contract method 0x4e59adc9.
 //
-// Solidity: function finaliseDeposits(uint256 _subTreeDepth, TypesAccountMerkleProof _zero_account_mp) returns(bytes32)
-func (_Depositmanager *DepositmanagerTransactorSession) FinaliseDeposits(_subTreeDepth *big.Int, _zero_account_mp TypesAccountMerkleProof) (*types.Transaction, error) {
-	return _Depositmanager.Contract.FinaliseDeposits(&_Depositmanager.TransactOpts, _subTreeDepth, _zero_account_mp)
+// Solidity: function finaliseDeposits(uint256 _subTreeDepth, TypesAccountMerkleProof _zero_account_mp, bytes32 latestBalanceTree) returns(bytes32)
+func (_Depositmanager *DepositmanagerTransactorSession) FinaliseDeposits(_subTreeDepth *big.Int, _zero_account_mp TypesAccountMerkleProof, latestBalanceTree [32]byte) (*types.Transaction, error) {
+	return _Depositmanager.Contract.FinaliseDeposits(&_Depositmanager.TransactOpts, _subTreeDepth, _zero_account_mp, latestBalanceTree)
+}
+
+// IsDepositPaused is a paid mutator transaction binding the contract method 0xf560d0b2.
+//
+// Solidity: function isDepositPaused() returns(bool)
+func (_Depositmanager *DepositmanagerTransactor) IsDepositPaused(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _Depositmanager.contract.Transact(opts, "isDepositPaused")
+}
+
+// IsDepositPaused is a paid mutator transaction binding the contract method 0xf560d0b2.
+//
+// Solidity: function isDepositPaused() returns(bool)
+func (_Depositmanager *DepositmanagerSession) IsDepositPaused() (*types.Transaction, error) {
+	return _Depositmanager.Contract.IsDepositPaused(&_Depositmanager.TransactOpts)
+}
+
+// IsDepositPaused is a paid mutator transaction binding the contract method 0xf560d0b2.
+//
+// Solidity: function isDepositPaused() returns(bool)
+func (_Depositmanager *DepositmanagerTransactorSession) IsDepositPaused() (*types.Transaction, error) {
+	return _Depositmanager.Contract.IsDepositPaused(&_Depositmanager.TransactOpts)
 }

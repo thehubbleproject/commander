@@ -118,12 +118,6 @@
           "internalType": "uint256",
           "name": "pathToSubTree",
           "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "bytes32",
-          "name": "newBalanceRoot",
-          "type": "bytes32"
         }
       ],
       "name": "DepositsFinalised",
@@ -447,11 +441,6 @@
           "internalType": "uint256",
           "name": "pathToSubTree",
           "type": "uint256"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "newBalanceRoot",
-          "type": "bytes32"
         }
       ],
       "name": "logDepositFinalised",

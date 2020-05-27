@@ -30,13 +30,13 @@ func (m *AccountMerkleProof) ToABIVersion() coordinatorproxy.TypesAccountMerkleP
 }
 
 type PDAMerkleProof struct {
-	Path string
-	PublicKey     string
-	Siblings      []UserAccount
+	Path      string
+	PublicKey string
+	Siblings  []UserAccount
 }
 
-func NewPDAProof(path string, publicKey string,siblings []UserAccount) PDAMerkleProof {
-	return PDAMerkleProof{PublicKey: publicKey, Siblings: siblings,Path:path}
+func NewPDAProof(path string, publicKey string, siblings []UserAccount) PDAMerkleProof {
+	return PDAMerkleProof{PublicKey: publicKey, Siblings: siblings, Path: path}
 }
 
 func (m *PDAMerkleProof) ToABIVersion() coordinatorproxy.TypesPDAMerkleProof {
@@ -45,11 +45,11 @@ func (m *PDAMerkleProof) ToABIVersion() coordinatorproxy.TypesPDAMerkleProof {
 	for _, s := range m.Siblings {
 		siblingNodes = append(siblingNodes, s.PubkeyHashToByteArray())
 	}
-	pubkey,_:=ABIEncodePubkey(m.PublicKey)
+	pubkey, _ := ABIEncodePubkey(m.PublicKey)
 	return coordinatorproxy.TypesPDAMerkleProof{
 		Pda: coordinatorproxy.TypesPDAInclusionProof{
 			PathToPubkey: StringToBigInt(m.Path),
-			PubkeyLeaf: coordinatorproxy.TypesPDALeaf{Pubkey: pubkey},
+			PubkeyLeaf:   coordinatorproxy.TypesPDALeaf{Pubkey: pubkey},
 		},
 		Siblings: siblingNodes,
 	}

@@ -2,6 +2,7 @@ package listener
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/BOPR/common"
@@ -21,7 +22,7 @@ type Syncer struct {
 	core.BaseService
 
 	// ABIs
-	abis []*abi.ABI
+	abis []abi.ABI
 
 	// storage client
 	DBInstance core.DB
@@ -52,10 +53,11 @@ func NewSyncer() Syncer {
 	if err != nil {
 		panic(err)
 	}
-	var abis []*abi.ABI
-	for _, v := range loadedBazooka.ContractABI {
-		abis = append(abis, &v)
-	}
+	var abis []abi.ABI
+	abis = append(abis, loadedBazooka.ContractABI[common.LOGGER_KEY])
+	// for _, v := range loadedBazooka.ContractABI {
+	// 	abis = append(abis, &v)
+	// }
 
 	// abis for all the events
 	syncerService.abis = abis
@@ -199,6 +201,7 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 	} else if len(logs) > 0 {
 		s.Logger.Debug("New logs found", "numberOfLogs", len(logs))
 	}
+	fmt.Println("logs", logs)
 
 	/* We search for the following events in the blockchain
 	1. Token Registration request
@@ -212,25 +215,23 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 	// TODO test if this works if one block has more than one log
 	for _, vLog := range logs {
 		topic := vLog.Topics[0].Bytes()
+
 		for _, abiObject := range s.abis {
-			selectedEvent := EventByID(abiObject, topic)
+			selectedEvent := EventByID(&abiObject, topic)
+			fmt.Println("selected event", selectedEvent)
 			if selectedEvent != nil {
 				s.Logger.Debug("Found an event", "name", selectedEvent.Name)
 				switch selectedEvent.Name {
 				case "RegisteredToken":
-					s.processRegisteredToken(selectedEvent.Name, abiObject, &vLog)
-				// case "RegistrationRequest":
-				// 	s.processRegisteredToken(selectedEvent.Name, abiObject, &vLog)
-				// case "RegistrationRequest":
-				// 	s.processDeposit(selectedEvent.Name, abiObject, &vLog)
+					s.processRegisteredToken(selectedEvent.Name, &abiObject, &vLog)
 				case "NewBatch":
-					s.processNewBatch(selectedEvent.Name, abiObject, &vLog)
+					s.processNewBatch(selectedEvent.Name, &abiObject, &vLog)
 				case "DepositQueued":
-					s.processDepositQueued(selectedEvent.Name, abiObject, &vLog)
+					s.processDepositQueued(selectedEvent.Name, &abiObject, &vLog)
 				case "DepositLeafMerged":
-					s.processDepositLeafMerged(selectedEvent.Name, abiObject, &vLog)
+					s.processDepositLeafMerged(selectedEvent.Name, &abiObject, &vLog)
 				case "DepositFinalised":
-					s.processDepositFinalised(selectedEvent.Name, abiObject, &vLog)
+					s.processDepositFinalised(selectedEvent.Name, &abiObject, &vLog)
 				}
 				// break the inner loop
 				break

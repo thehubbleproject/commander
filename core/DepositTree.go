@@ -69,9 +69,9 @@ func (db *DB) GetDepositNodeAndSiblings() (NodeToBeReplaced UserAccount, sibling
 	return
 }
 
-func (db *DB) FinaliseDepositsAndAddBatch(accountsRoot ByteArray, pathToDepositSubTree uint64, newBalanceRoot ByteArray) (string, error) {
+func (db *DB) FinaliseDepositsAndAddBatch(accountsRoot ByteArray, pathToDepositSubTree uint64) (string, error) {
 	var root string
-	db.Logger.Info("Finalising accounts", "accountRoot", accountsRoot, "NewBalanceRoot", newBalanceRoot, "pathToDepositSubTree", pathToDepositSubTree)
+	db.Logger.Info("Finalising accounts", "accountRoot", accountsRoot, "pathToDepositSubTree", pathToDepositSubTree)
 
 	// get params
 	params, err := db.GetParams()

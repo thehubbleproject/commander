@@ -11,7 +11,6 @@ import (
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 
 	"github.com/BOPR/contracts/logger"
-	"github.com/BOPR/contracts/rollup"
 )
 
 func (s *Syncer) processDepositQueued(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
@@ -99,18 +98,16 @@ func (s *Syncer) processDepositFinalised(eventName string, abiObject *abi.ABI, v
 	}
 	accountsRoot := core.ByteArray(event.DepositSubTreeRoot)
 	pathToDepositSubTree := event.PathToSubTree
-	newBalanceRoot := core.ByteArray(event.NewBalanceRoot)
 
 	s.Logger.Info(
 		"⬜ New event found",
 		"event", eventName,
 		"DepositSubTreeRoot", accountsRoot.String(),
 		"PathToDepositSubTreeInserted", pathToDepositSubTree.String(),
-		"NewBalanceTreeRoot", newBalanceRoot.String(),
 	)
 
 	// TODO handle error
-	newRoot, err := s.DBInstance.FinaliseDepositsAndAddBatch(accountsRoot, pathToDepositSubTree.Uint64(), newBalanceRoot)
+	newRoot, err := s.DBInstance.FinaliseDepositsAndAddBatch(accountsRoot, pathToDepositSubTree.Uint64())
 	if err != nil {
 		fmt.Println("Error while finalising deposits", err)
 	}
@@ -121,7 +118,7 @@ func (s *Syncer) processDepositFinalised(eventName string, abiObject *abi.ABI, v
 func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
 	s.Logger.Info("New batch submitted on eth chain")
 
-	event := new(rollup.RollupNewBatch)
+	event := new(logger.LoggerNewBatch)
 
 	err := common.UnpackLog(abiObject, event, eventName, vLog)
 	if err != nil {
@@ -137,17 +134,26 @@ func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *eth
 		"NewStateRoot", core.ByteArray(event.UpdatedRoot).String(),
 		"Committer", event.Committer.String(),
 	)
-
+	params, err := s.DBInstance.GetParams()
+	if err != nil {
+		return
+	}
+	var txs [][]byte
+	var stakeAmount uint64
+	if event.Index.Uint64() == 0 {
+		stakeAmount = 0
+	} else {
+		// pick the calldata for the batch
+		txHash := vLog.TxHash
+		txs, err = s.loadedBazooka.FetchBatchInputData(txHash)
+		if err != nil {
+			// TODO do something with this error
+			panic(err)
+		}
+		stakeAmount = params.StakeAmount
+	}
 	// TODO run the transactions through ProcessTx present on-chain
 	// if any tx is fraud, challenge
-
-	// pick the calldata for the batch
-	txHash := vLog.TxHash
-	txs, err := s.loadedBazooka.FetchBatchInputData(txHash)
-	if err != nil {
-		// TODO do something with this error
-		panic(err)
-	}
 
 	newBatch := core.Batch{
 		Index:                event.Index.Uint64(),
@@ -155,7 +161,7 @@ func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *eth
 		TxRoot:               core.ByteArray(event.Txroot),
 		TransactionsIncluded: txs,
 		Committer:            event.Committer.String(),
-		StakeAmount:          32,
+		StakeAmount:          stakeAmount,
 		FinalisesOn:          *big.NewInt(100),
 	}
 
@@ -181,7 +187,7 @@ func (s *Syncer) processRegisteredToken(eventName string, abiObject *abi.ABI, vL
 		"TokenAddress", event.TokenContract.String(),
 		"TokenID", event.TokenType,
 	)
-	newToken := core.Token{TokenID: event.TokenType.Uint64(), Address: core.Address(event.TokenContract)}
+	newToken := core.Token{TokenID: event.TokenType.Uint64(), Address: event.TokenContract.String()}
 	if err := s.DBInstance.AddToken(newToken); err != nil {
 		panic(err)
 	}
