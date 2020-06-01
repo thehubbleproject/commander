@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 	"github.com/BOPR/contracts/coordinatorproxy"
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -16,14 +17,14 @@ import (
 // Tx represets the transaction on BOPRU
 type Tx struct {
 	DBModel
-
 	To        uint64 `json:"to"`
 	From      uint64 `json:"from"`
 	Amount    uint64 `json:"amount"`
 	Nonce     uint64 `json:"nonce"`
 	TokenID   uint64 `json:"tokenID"`
-	Signature string `json:"sig" gorm:"unique;not null"`
-	TxHash    string `json:"hash" gorm:"unique;not null"`
+	Signature string `json:"sig" gorm:"not null"`
+	TxHash    string `json:"hash" gorm:"not null"`
+
 	// 100 Pending
 	// 200 Processing
 	// 300 Processed
@@ -43,7 +44,52 @@ func NewTx(to uint64, from uint64, amount uint64, nonce uint64, sig string, toke
 	}
 }
 
-// NewTx creates a new transaction
+// GetSignBytes returns the transaction data that has to be signed
+func (tx Tx) GetSignBytes() (signBytes []byte, err error) {
+	data, err := tx.Bytes()
+	if err != nil {
+		return signBytes, err
+	}
+	return common.Keccak256(data).Bytes(), nil
+}
+
+// Bytes just contains the tx apart from the bytes
+func (tx *Tx) Bytes() ([]byte, error) {
+	uint256Ty, err := abi.NewType("uint256", "uint256", nil)
+	if err != nil {
+		return []byte(""), err
+	}
+
+	arguments := abi.Arguments{
+		{
+			Type: uint256Ty,
+		},
+		{
+			Type: uint256Ty,
+		},
+		{
+			Type: uint256Ty,
+		},
+		{
+			Type: uint256Ty,
+		},
+	}
+
+	bytes, err := arguments.Pack(
+		big.NewInt(int64(tx.From)),
+		big.NewInt(int64(tx.To)),
+		big.NewInt(int64(tx.TokenID)),
+		big.NewInt(int64(tx.Amount)),
+	)
+
+	if err != nil {
+		return []byte(""), err
+	}
+
+	return bytes, nil
+}
+
+// AssignHash creates a tx hash and add it to the tx
 func (t *Tx) AssignHash() {
 	if t.TxHash != "" {
 		return
@@ -68,11 +114,6 @@ func NewPendingTx(to uint64, from uint64, amount uint64, nonce uint64, sig strin
 // ValidateTx validates a transaction
 // NOTE: This is a stateless op, should be run before adding txs to mempool
 func (t *Tx) ValidateBasic() error {
-	// signature len verification
-	if len(t.Signature) != 65 {
-		return errors.New("Signature invalid")
-	}
-
 	// check status is within the permissible status codes
 	if t.Status < TX_STATUS_PENDING {
 		return errors.New("Invalid status code for the transaction found")
@@ -215,21 +256,26 @@ func (db *DB) GetTxVerificationData(tx Tx) (fromMerkleProof, toMerkleProof Accou
 	if err != nil {
 		return
 	}
+	fmt.Println("got from account", fromAcc.String())
 	fromSiblings, err := db.GetSiblings(fromAcc.Path)
 	if err != nil {
 		return
 	}
+	fmt.Println("got siblings", fromAcc.String())
 
 	fromMerkleProof = NewAccountMerkleProof(fromAcc, fromSiblings)
 	toAcc, err := db.GetAccountByID(tx.To)
 	if err != nil {
 		return
 	}
+	fmt.Println("got to account", toAcc.String())
 
 	toSiblings, err := db.GetSiblings(toAcc.Path)
 	if err != nil {
 		return
 	}
+	fmt.Println("got siblings", toSiblings)
+
 	toMerkleProof = NewAccountMerkleProof(toAcc, toSiblings)
 
 	PDAProof = NewPDAProof(fromAcc.Path, fromAcc.PublicKey, fromSiblings)

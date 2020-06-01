@@ -23,6 +23,7 @@ func (b *Bazooka) GenerateAuthObj(client *ethclient.Client, callMsg ethereum.Cal
 	if err != nil {
 		return
 	}
+
 	// fetch nonce
 	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
 	if err != nil {

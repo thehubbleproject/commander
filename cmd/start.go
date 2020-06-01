@@ -100,7 +100,7 @@ func StartCmd() *cobra.Command {
 			if err != nil {
 				panic(err)
 			}
-			fmt.Println("Server started on port 8080 🎉")
+			fmt.Println("Server started on port 3000 🎉")
 		},
 	}
 }
@@ -140,7 +140,6 @@ func InitGlobalDBInstance() {
 
 	// init global DB instance
 	core.DBInstance = tempDB
-	fmt.Println("db instance populated", core.DBInstance)
 }
 
 func InitGlobalBazooka() {
@@ -162,15 +161,21 @@ func LoadGenesisData(genesis config.Genesis) {
 
 	// convert genesis accounts to user accounts
 	for _, account := range genesis.GenesisAccounts.Accounts {
+		// bz, err := core.ABIEncodePubkey(account.PublicKey)
+		// if err != nil {
+		// 	common.PanicIfError(err)
+		// }
+		pubkeyHash := core.ZERO_VALUE_LEAF.String()
 		allAccounts = append(
 			allAccounts,
 			core.UserAccount{
-				AccountID: account.ID,
-				Balance:   account.Balance,
-				TokenType: account.TokenType,
-				Nonce:     account.Nonce,
-				Status:    account.Status,
-				PublicKey: account.PublicKey,
+				AccountID:     account.ID,
+				Balance:       account.Balance,
+				TokenType:     account.TokenType,
+				Nonce:         account.Nonce,
+				Status:        account.Status,
+				PublicKey:     account.PublicKey,
+				PublicKeyHash: pubkeyHash,
 			},
 		)
 	}

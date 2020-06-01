@@ -68,11 +68,23 @@ func (b *Bazooka) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, err err
 
 // ProcessTx calls the ProcessTx function on the contract to verify the tx
 // returns the updated accounts and the new balance root
-func (b *Bazooka) ProcessTx(balanceTreeRoot core.ByteArray, tx core.Tx, fromMerkleProof, toMerkleProof core.AccountMerkleProof, pdaProof core.PDAMerkleProof) (newBalanceRoot core.ByteArray, from, to core.UserAccount, err error) {
-	updatedRoot, newBalFrom, newBalTo, IsValidTx, err := b.CoordinatorProxy.ProcessTx(nil, balanceTreeRoot, balanceTreeRoot, tx.ToABIVersion(int64(tx.From), int64(tx.To)), pdaProof.ToABIVersion(), fromMerkleProof.ToABIVersion(), toMerkleProof.ToABIVersion())
+func (b *Bazooka) ProcessTx(balanceTreeRoot, accountTreeRoot core.ByteArray, tx core.Tx, fromMerkleProof, toMerkleProof core.AccountMerkleProof, pdaProof core.PDAMerkleProof) (newBalanceRoot core.ByteArray, from, to core.UserAccount, err error) {
+	txABIVersion := tx.ToABIVersion(int64(tx.From), int64(tx.To))
+
+	updatedRoot, newBalFrom, newBalTo, IsValidTx, err := b.CoordinatorProxy.ProcessTx(nil,
+		balanceTreeRoot,
+		accountTreeRoot,
+		txABIVersion,
+		pdaProof.ToABIVersion(),
+		fromMerkleProof.ToABIVersion(),
+		toMerkleProof.ToABIVersion(),
+	)
 	if err != nil {
 		return
 	}
+
+	b.log.Info("Processed transaction", "success", IsValidTx, "newRoot", updatedRoot)
+
 	if !IsValidTx {
 		return newBalanceRoot, from, to, errors.New("Tx is invalid")
 	}
@@ -86,4 +98,8 @@ func (b *Bazooka) ProcessTx(balanceTreeRoot core.ByteArray, tx core.Tx, fromMerk
 	to = toMerkleProof.Account
 
 	return newBalanceRoot, from, to, nil
+}
+
+func (b *Bazooka) VerifyPDAProof(accountsRoot core.ByteArray, leaf core.ByteArray, proofpath *big.Int, siblings [][32]byte) (bool, error) {
+	return b.BalanceTree.VerifyLeaf(nil, accountsRoot, leaf, proofpath, siblings)
 }

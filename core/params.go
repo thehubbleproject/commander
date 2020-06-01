@@ -35,7 +35,6 @@ type SyncStatus struct {
 func (ss *SyncStatus) LastEthBlockBigInt() *big.Int {
 	n := new(big.Int)
 	return n.SetUint64(ss.LastEthBlockRecorded)
-
 }
 
 func (db *DB) UpdateSyncStatusWithBatchNumber(batchIndex uint64) error {

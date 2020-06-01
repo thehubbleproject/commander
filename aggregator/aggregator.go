@@ -26,7 +26,7 @@ type Aggregator struct {
 	core.BaseService
 
 	// contract caller to interact with contracts
-	loadedBazooka bazooka.Bazooka
+	LoadedBazooka bazooka.Bazooka
 
 	// DB instance
 	DB core.DB
@@ -39,14 +39,14 @@ type Aggregator struct {
 func NewAggregator(db core.DB) *Aggregator {
 	// create logger
 	logger := common.Logger.With("module", AggregatingService)
-	loadedBazooka, err := bazooka.NewPreLoadedBazooka()
+	LoadedBazooka, err := bazooka.NewPreLoadedBazooka()
 	if err != nil {
 		panic(err)
 	}
 	aggregator := &Aggregator{}
 	aggregator.BaseService = *core.NewBaseService(logger, AggregatingService, aggregator)
 	aggregator.DB = db
-	aggregator.loadedBazooka = loadedBazooka
+	aggregator.LoadedBazooka = LoadedBazooka
 	return aggregator
 }
 
@@ -96,11 +96,21 @@ func (a *Aggregator) pickBatch() {
 	err = a.CheckTx(txs)
 	if err != nil {
 		fmt.Println("Error while processing tx", "error", err)
+		return
 	}
 
 	// Step-3
 	// Finally create a merkel root of all updated leafs and push batch on-chain
-
+	rootAcc, err := a.DB.GetRoot()
+	if err != nil {
+		fmt.Println("Error while getting root", "error", err)
+		return
+	}
+	err = a.LoadedBazooka.SubmitBatch(rootAcc.HashToByteArray(), txs)
+	if err != nil {
+		fmt.Println("Error while submitting batch", "error", err)
+		return
+	}
 }
 
 // CheckTx fetches all the data required to validate tx from smart contact
@@ -110,8 +120,13 @@ func (a *Aggregator) CheckTx(txs []core.Tx) error {
 	if err != nil {
 		return err
 	}
+	a.Logger.Debug("Latest root", "root", rootAcc.Hash)
 
 	currentRoot, err := core.HexToByteArray(rootAcc.Hash)
+	if err != nil {
+		return err
+	}
+	currentAccountTreeRoot, err := core.HexToByteArray(rootAcc.PublicKeyHash)
 	if err != nil {
 		return err
 	}
@@ -119,23 +134,25 @@ func (a *Aggregator) CheckTx(txs []core.Tx) error {
 	for _, tx := range txs {
 		fromAccProof, toAccProof, PDAproof, err := a.DB.GetTxVerificationData(tx)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("here", err)
 			return err
 		}
-
-		updatedRoot, updatedFromAcc, updatedToAcc, err := a.loadedBazooka.ProcessTx(currentRoot, tx, fromAccProof, toAccProof, PDAproof)
+		a.Logger.Debug("Fetched latest account proofs", "tx", tx.String(), "fromMP", fromAccProof, "toMP", toAccProof, "PDAProof", PDAproof)
+		updatedRoot, updatedFromAcc, updatedToAcc, err := a.LoadedBazooka.ProcessTx(currentRoot, currentAccountTreeRoot, tx, fromAccProof, toAccProof, PDAproof)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("here2", err)
 			return err
 		}
 
 		err = a.DB.UpdateAccount(updatedFromAcc)
 		if err != nil {
+			fmt.Println("here3", err)
 			return err
 		}
 
 		err = a.DB.UpdateAccount(updatedToAcc)
 		if err != nil {
+			fmt.Println("here4", err)
 			return err
 		}
 

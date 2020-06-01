@@ -131,9 +131,15 @@ func (db *DB) FinaliseDeposits(pendingAccs []UserAccount, pathToDepositSubTree u
 		if err != nil {
 			return err
 		}
+
+		// delete pending account
+		err = db.DeletePendingAccount(acc.AccountID)
+		if err != nil {
+			return err
+		}
 	}
 
-	return nil
+	return db.ResetDepositSubTree()
 }
 
 func (db *DB) GetPendingDeposits(numberOfAccs uint64) ([]UserAccount, error) {
@@ -165,4 +171,13 @@ func (db *DB) GetAllTerminalNodes(pathToDepositSubTree string) (terminalNodes []
 		terminalNodes = append(terminalNodes, account.Path)
 	}
 	return
+}
+
+func (db *DB) ResetDepositSubTree() error {
+	var depositTree DepositTree
+	if err := db.Instance.Delete(&depositTree).Error; err != nil {
+		return err
+	}
+
+	return db.InitEmptyDepositTree()
 }

@@ -140,8 +140,11 @@ func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *eth
 	}
 	var txs [][]byte
 	var stakeAmount uint64
+
 	if event.Index.Uint64() == 0 {
 		stakeAmount = 0
+	} else if "0x0000000000000000000000000000000000000000000000000000000000000000" == core.ByteArray(event.Txroot).String() {
+		stakeAmount = params.StakeAmount
 	} else {
 		// pick the calldata for the batch
 		txHash := vLog.TxHash
@@ -152,9 +155,11 @@ func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *eth
 		}
 		stakeAmount = params.StakeAmount
 	}
+
 	// TODO run the transactions through ProcessTx present on-chain
 	// if any tx is fraud, challenge
 
+	// create a new batch
 	newBatch := core.Batch{
 		Index:                event.Index.Uint64(),
 		StateRoot:            core.ByteArray(event.UpdatedRoot),

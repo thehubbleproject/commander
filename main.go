@@ -4,65 +4,111 @@ import (
 	"fmt"
 	"math"
 
+	agg "github.com/BOPR/aggregator"
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 	"github.com/BOPR/core"
-	"github.com/BOPR/listener"
 )
 
 func main() {
-	TestDeposit()
+	TestProcessTx()
 }
-
-func TestDeposit() {
+func TestProcessTx() {
 	db, err := core.NewDB()
 	if err != nil {
 		fmt.Println("error creating database")
 		panic(err)
 	}
-	core.DBInstance = db
-	// read genesis file
-	genesis, err := config.ReadGenesisFile()
-	common.PanicIfError(err)
+	a := agg.NewAggregator(db)
+	latestFromAcc, err := a.DB.GetAccountByID(uint64(2))
+	if err != nil {
+		fmt.Println("unable to fetch latest account", err)
+		return
+	}
 
-	// loads genesis data to the database
-	LoadGenesisData(genesis)
+	var txCore = core.Tx{
+		From:    2,
+		To:      3,
+		Amount:  1,
+		TokenID: 1,
+		Nonce:   latestFromAcc.Nonce + 1,
+	}
 
-	newParams := core.Params{StakeAmount: genesis.StakeAmount, MaxDepth: genesis.MaxTreeDepth, MaxDepositSubTreeHeight: genesis.MaxDepositSubTreeHeight}
-	core.DBInstance.UpdateStakeAmount(newParams.StakeAmount)
-	core.DBInstance.UpdateMaxDepth(newParams.MaxDepth)
-	core.DBInstance.UpdateDepositSubTreeHeight(newParams.MaxDepositSubTreeHeight)
-
-	// add bob and alice account
-	Alice := core.NewPendingUserAccount(1, 10, 1, "0x914873c8d5935837ade39cbdabd6efb3d3d4064c5918da11e555bba0ab2c58fee95974a3222830cf73d257bdc18cfcd01765482108a48e68bc0b657618acb40e")
-	Alice.CreateAccountHash()
-	Bob := core.NewPendingUserAccount(2, 10, 1, "0x90718dcbc2477c86294742fb72bf098ba85ff671b88c8d79b2e09ce19bdbd88fd87047aaebc775b168372752aa8bc4e5be1ca5d39284fed00722f341927888c3")
-	Bob.CreateAccountHash()
-	err = db.AddNewPendingAccount(*Alice)
+	var txs []core.Tx
+	txs = append(txs, txCore)
+	_, _, PDA, err := db.GetTxVerificationData(txCore)
+	if err != nil {
+		fmt.Println("error", err)
+		panic(err)
+	}
+	rootAcc, err := a.DB.GetRoot()
 	if err != nil {
 		panic(err)
 	}
-	err = db.AddNewPendingAccount(*Bob)
-	if err != nil {
-		panic(err)
-	}
-	syncer := listener.NewSyncer()
-	syncer.Start()
-	defer syncer.Stop()
-	syncer.SendDepositFinalisationTx()
 
-	// create deposit
-	// pathToDepositSubTree := "010"
-	root, err := core.HexToByteArray("0x6aee22e4704db7157c8ad4df7d2509fd5e31117f50d29ce7d7320b59d9a78880")
+	fromAccount, err := db.GetAccountByID(2)
+	PDAAbiVersion := PDA.ToABIVersion()
+	fmt.Println("pubkey", fromAccount.PubkeyHashToByteArray())
+	result, err := a.LoadedBazooka.VerifyPDAProof(rootAcc.PubkeyHashToByteArray(),
+		fromAccount.PubkeyHashToByteArray(),
+		PDAAbiVersion.Pda.PathToPubkey,
+		PDAAbiVersion.Siblings)
 	if err != nil {
 		panic(err)
 	}
-	Newroot, err := db.FinaliseDepositsAndAddBatch(core.ByteArray{}, 1, root)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("new rot", Newroot, "0x6aee22e4704db7157c8ad4df7d2509fd5e31117f50d29ce7d7320b59d9a78880")
+	fmt.Println(result)
+	// TODO start from checking the MP's manually before sending
 }
+
+// func TestDeposit() {
+// 	db, err := core.NewDB()
+// 	if err != nil {
+// 		fmt.Println("error creating database")
+// 		panic(err)
+// 	}
+// 	core.DBInstance = db
+// 	// read genesis file
+// 	genesis, err := config.ReadGenesisFile()
+// 	common.PanicIfError(err)
+
+// 	// loads genesis data to the database
+// 	LoadGenesisData(genesis)
+
+// 	newParams := core.Params{StakeAmount: genesis.StakeAmount, MaxDepth: genesis.MaxTreeDepth, MaxDepositSubTreeHeight: genesis.MaxDepositSubTreeHeight}
+// 	core.DBInstance.UpdateStakeAmount(newParams.StakeAmount)
+// 	core.DBInstance.UpdateMaxDepth(newParams.MaxDepth)
+// 	core.DBInstance.UpdateDepositSubTreeHeight(newParams.MaxDepositSubTreeHeight)
+
+// 	// add bob and alice account
+// 	Alice := core.NewPendingUserAccount(1, 10, 1, "0x914873c8d5935837ade39cbdabd6efb3d3d4064c5918da11e555bba0ab2c58fee95974a3222830cf73d257bdc18cfcd01765482108a48e68bc0b657618acb40e")
+// 	Alice.CreateAccountHash()
+// 	Bob := core.NewPendingUserAccount(2, 10, 1, "0x90718dcbc2477c86294742fb72bf098ba85ff671b88c8d79b2e09ce19bdbd88fd87047aaebc775b168372752aa8bc4e5be1ca5d39284fed00722f341927888c3")
+// 	Bob.CreateAccountHash()
+// 	err = db.AddNewPendingAccount(*Alice)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	err = db.AddNewPendingAccount(*Bob)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	syncer := listener.NewSyncer()
+// 	syncer.Start()
+// 	defer syncer.Stop()
+// 	syncer.SendDepositFinalisationTx()
+
+// 	// create deposit
+// 	// pathToDepositSubTree := "010"
+// 	root, err := core.HexToByteArray("0x6aee22e4704db7157c8ad4df7d2509fd5e31117f50d29ce7d7320b59d9a78880")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	Newroot, err := db.FinaliseDepositsAndAddBatch(core.ByteArray{}, 1, root)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	fmt.Println("new rot", Newroot, "0x6aee22e4704db7157c8ad4df7d2509fd5e31117f50d29ce7d7320b59d9a78880")
+// }
 
 func TestLIKE() {
 	db, err := core.NewDB()

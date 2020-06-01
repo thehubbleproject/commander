@@ -2,10 +2,14 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
+	"os/signal"
 
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
+	"github.com/BOPR/simulator"
+	"github.com/gorilla/mux"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -43,6 +47,7 @@ func main() {
 	rootCmd.AddCommand(InitCmd())
 	rootCmd.AddCommand(StartCmd())
 	rootCmd.AddCommand(ResetCmd())
+	rootCmd.AddCommand(StartSimulatorCmd())
 	rootCmd.AddCommand(AddGenesisAcccountsCmd())
 
 	rootCmd.AddCommand(SendTransferTx())
@@ -104,6 +109,37 @@ func AddGenesisAcccountsCmd() *cobra.Command {
 			// 	common.PanicIfError(err)
 			// }
 			// common.PanicIfError(err)
+		},
+	}
+}
+
+// StartSimulatorCmd starts the simulator
+func StartSimulatorCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "start-simulating",
+		Short: "starts a simulator that sends transaction to the rollupchain periodically",
+		Run: func(cmd *cobra.Command, args []string) {
+			sim := simulator.NewSimulator()
+			if err := sim.Start(); err != nil {
+				panic(err)
+			}
+
+			// go routine to catch signal
+			catchSignal := make(chan os.Signal, 1)
+			signal.Notify(catchSignal, os.Interrupt)
+			go func() {
+				for range catchSignal {
+					sim.Stop()
+					// exit
+					os.Exit(1)
+				}
+			}()
+
+			r := mux.NewRouter()
+			err := http.ListenAndServe(":4000", r)
+			if err != nil {
+				panic(err)
+			}
 		},
 	}
 }

@@ -13,8 +13,8 @@ import (
 type (
 	// TxReceiver represents the tx received from user
 	TxReceiver struct {
-		To        uint64 `json:"to"`
 		From      uint64 `json:"from"`
+		To        uint64 `json:"to"`
 		Amount    uint64 `json:"amount"`
 		Nonce     uint64 `json:"nonce"`
 		TokenID   uint64 `json:"token"`
@@ -27,10 +27,6 @@ func (tx *TxReceiver) Validate() error {
 		return errors.New("amount in the transaction cannot be 0")
 	}
 
-	if len(tx.Signature) != 65 {
-		return errors.New("signature invalid")
-	}
-
 	return nil
 }
 
@@ -40,6 +36,10 @@ func TxReceiverHandler(w http.ResponseWriter, r *http.Request) {
 	var tx TxReceiver
 	if !ReadRESTReq(w, r, &tx) {
 		WriteErrorResponse(w, http.StatusBadRequest, "Cannot read request")
+	}
+
+	if err := tx.Validate(); err != nil {
+		WriteErrorResponse(w, http.StatusBadRequest, "Bad input data for transation")
 	}
 
 	// create a new pending transaction
@@ -68,7 +68,6 @@ func TxReceiverHandler(w http.ResponseWriter, r *http.Request) {
 	// write headers and data
 	w.Header().Set("Content-Type", "application/json")
 	_, _ = w.Write(output)
-
 	return
 }
 

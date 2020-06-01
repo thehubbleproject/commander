@@ -53,7 +53,7 @@ require (
 	github.com/tendermint/crypto v0.0.0-20191022145703-50d29ede1e15 // indirect
 	github.com/tendermint/go-amino v0.15.1 // indirect
 	github.com/tendermint/tendermint v0.32.7
-	github.com/tendermint/tm-db v0.5.0 // indirect
+	github.com/tendermint/tm-db v0.5.0
 	github.com/tinylib/msgp v1.1.1 // indirect
 	github.com/tyler-smith/go-bip39 v1.0.2 // indirect
 	github.com/willf/pad v0.0.0-20200313202418-172aa767f2a4

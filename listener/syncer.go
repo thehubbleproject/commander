@@ -230,7 +230,7 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 					s.processDepositQueued(selectedEvent.Name, &abiObject, &vLog)
 				case "DepositLeafMerged":
 					s.processDepositLeafMerged(selectedEvent.Name, &abiObject, &vLog)
-				case "DepositFinalised":
+				case "DepositsFinalised":
 					s.processDepositFinalised(selectedEvent.Name, &abiObject, &vLog)
 				}
 				// break the inner loop

@@ -1,6 +1,7 @@
 package core
 
 import (
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"math"
@@ -15,8 +16,6 @@ import (
 
 // UserAccount is the user data stored on the node per user
 type UserAccount struct {
-	// DBModel
-
 	// ID is the path of the user account in the PDA Tree
 	// Cannot be changed once created
 	AccountID uint64 `gorm:"not null;index:AccountID"`
@@ -79,16 +78,17 @@ func NewUserAccount(id, balance, tokenType, nonce, status uint64, pubkey, path s
 
 // NewAccountNode creates a new non-terminal user account, the only this useful in this is
 // Path, Status, Hash, PubkeyHash
-func NewAccountNode(path, hash string) *UserAccount {
+func NewAccountNode(path, hash, pubkeyHash string) *UserAccount {
 	newAcccount := &UserAccount{
-		AccountID: ZERO,
-		PublicKey: "",
-		Balance:   ZERO,
-		TokenType: ZERO,
-		Nonce:     ZERO,
-		Path:      path,
-		Status:    STATUS_ACTIVE,
-		Type:      TYPE_NON_TERMINAL,
+		AccountID:     ZERO,
+		PublicKey:     "",
+		PublicKeyHash: pubkeyHash,
+		Balance:       ZERO,
+		TokenType:     ZERO,
+		Nonce:         ZERO,
+		Path:          path,
+		Status:        STATUS_ACTIVE,
+		Type:          TYPE_NON_TERMINAL,
 	}
 	newAcccount.UpdatePath(newAcccount.Path)
 	newAcccount.Hash = hash
@@ -140,7 +140,7 @@ func (acc *UserAccount) HashToByteArray() ByteArray {
 }
 
 func (acc *UserAccount) PubkeyHashToByteArray() ByteArray {
-	ba, err := HexToByteArray(acc.Hash)
+	ba, err := HexToByteArray(acc.PublicKeyHash)
 	if err != nil {
 		panic(err)
 	}
@@ -251,7 +251,6 @@ func (db *DB) InitBalancesTree(depth uint64, genesisAccounts []UserAccount) erro
 		if err != nil {
 			return err
 		}
-		db.Logger.Debug("Obtained adjacent node path", "adjacentNodePath", pathToAdjacentNode, "currentNodePath", prevNodePath)
 		genesisAccounts[i].UpdatePath(pathToAdjacentNode)
 		insertRecords = append(insertRecords, genesisAccounts[i])
 		prevNodePath = genesisAccounts[i].Path
@@ -275,13 +274,10 @@ func (db *DB) InitBalancesTree(depth uint64, genesisAccounts []UserAccount) erro
 		if err != nil {
 			return err
 		}
-		db.Logger.Info("Fetched nodes from DB", "depth", i, "count", len(accs))
-
 		var nextLevelAccounts []interface{}
 
 		// iterate over 2 at a time and create next level
 		for i := 0; i < len(accs); i += 2 {
-			db.Logger.Debug("Creating parent node", "leftAccount", accs[i].String(), "rightAccount", accs[i+1].String())
 			left, err := HexToByteArray(accs[i].Hash)
 			if err != nil {
 				return err
@@ -294,9 +290,20 @@ func (db *DB) InitBalancesTree(depth uint64, genesisAccounts []UserAccount) erro
 			if err != nil {
 				return err
 			}
+			left, err = HexToByteArray(accs[i].PublicKeyHash)
+			if err != nil {
+				return err
+			}
+			right, err = HexToByteArray(accs[i+1].PublicKeyHash)
+			if err != nil {
+				return err
+			}
+			parentPubkeyHash, err := GetParent(left, right)
+			if err != nil {
+				return err
+			}
 			parentPath := GetParentPath(accs[i].Path)
-			db.Logger.Debug("adding parent with path", "obtainedParentPath", parentPath, "child", accs[i].Path)
-			newAccNode := *NewAccountNode(parentPath, parentHash.String())
+			newAccNode := *NewAccountNode(parentPath, parentHash.String(), parentPubkeyHash.String())
 			nextLevelAccounts = append(nextLevelAccounts, newAccNode)
 		}
 
@@ -334,6 +341,7 @@ func (db *DB) UpdateAccount(account UserAccount) error {
 	}
 
 	db.Logger.Debug("Updating account", "Hash", account.Hash, "Path", account.Path, "siblings", siblings, "countOfSiblings", len(siblings))
+
 	return db.StoreLeaf(account, account.Path, siblings)
 }
 
@@ -357,6 +365,7 @@ func (db *DB) StoreLeaf(account UserAccount, path string, siblings []UserAccount
 			if err != nil {
 				return err
 			}
+
 			// Store the node!
 			err = db.StoreNode(parentHash, parentPubkeyHash, computedNode, sibling)
 			if err != nil {
@@ -367,11 +376,10 @@ func (db *DB) StoreLeaf(account UserAccount, path string, siblings []UserAccount
 			if err != nil {
 				return err
 			}
-			parentPubkeyHash, err = GetParent(computedNode.PubkeyHashToByteArray(), sibling.PubkeyHashToByteArray())
+			parentPubkeyHash, err = GetParent(sibling.PubkeyHashToByteArray(), computedNode.PubkeyHashToByteArray())
 			if err != nil {
 				return err
 			}
-
 			// Store the node!
 			err = db.StoreNode(parentHash, parentPubkeyHash, sibling, computedNode)
 			if err != nil {
@@ -467,7 +475,7 @@ func (db *DB) GetAccountByHash(hash string) (UserAccount, error) {
 
 func (db *DB) GetAccountByID(ID uint64) (UserAccount, error) {
 	var account UserAccount
-	if err := db.Instance.Where("account_id = ?", ID).Find(&account).Error; err != nil {
+	if err := db.Instance.Where("account_id = ? AND status = ?", ID, STATUS_ACTIVE).Find(&account).Error; err != nil {
 		return account, ErrRecordNotFound(fmt.Sprintf("unable to find record for ID: %v", ID))
 	}
 	return account, nil
@@ -508,11 +516,23 @@ func (db *DB) GetAccountCount() (int, error) {
 	return count, nil
 }
 
+func (db *DB) DeletePendingAccount(ID uint64) error {
+	var account UserAccount
+	if err := db.Instance.Where("account_id = ? AND status = ?", ID, STATUS_PENDING).Delete(&account).Error; err != nil {
+		return ErrRecordNotFound(fmt.Sprintf("unable to delete record for ID: %v", ID))
+	}
+	return nil
+}
+
 //
 // Pubkey related interactions
 //
 func ABIEncodePubkey(pubkey string) ([]byte, error) {
-	uint256Ty, err := abi.NewType("string", "uint256", nil)
+	pubkeyBytes, err := hex.DecodeString(pubkey)
+	if err != nil {
+		panic(err)
+	}
+	uint256Ty, err := abi.NewType("bytes", "bytes", nil)
 	if err != nil {
 		return []byte(""), err
 	}
@@ -524,7 +544,7 @@ func ABIEncodePubkey(pubkey string) ([]byte, error) {
 	}
 
 	bytes, err := arguments.Pack(
-		pubkey,
+		pubkeyBytes,
 	)
 
 	if err != nil {

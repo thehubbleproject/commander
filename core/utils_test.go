@@ -27,3 +27,8 @@ func TestBasicPathMutations(t *testing.T) {
 	data, err := StringToUint(newPath)
 	fmt.Println("path generated", newPath, "data", data)
 }
+
+func TestStringToBigInt(t *testing.T) {
+	path := "001"
+	fmt.Println(StringToBigInt(path).String())
+}

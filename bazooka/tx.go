@@ -22,6 +22,9 @@ func (b *Bazooka) FireDepositFinalisation(TBreplaced core.UserAccount, siblings 
 		"atDepth",
 		subTreeHeight,
 	)
+
+	// TODO check latest batch on-chain and if we need to push new batch
+
 	depositSubTreeHeight := big.NewInt(0)
 	depositSubTreeHeight.SetUint64(subTreeHeight)
 	var siblingData [][32]byte
@@ -35,18 +38,22 @@ func (b *Bazooka) FireDepositFinalisation(TBreplaced core.UserAccount, siblings 
 
 	accountProof := coordinatorproxy.TypesAccountMerkleProof{}
 	accountProof.AccountIP.PathToAccount = core.StringToBigInt(TBreplaced.Path)
+	accountProof.AccountIP.Account = TBreplaced.ToABIAccount()
 	accountProof.Siblings = siblingData
-	b.log.Debug("Account proof created", "accountProofPath", accountProof.AccountIP.PathToAccount, "siblings", accountProof.Siblings)
-	data, err := b.ContractABI[common.COORDINATOR_PROXY].Pack("finaliseDepositsAndSubmitBatch", depositSubTreeHeight, accountProof)
+	data, err := b.ContractABI[common.ROLLUP_CONTRACT_KEY].Pack("finaliseDepositsAndSubmitBatch", depositSubTreeHeight, accountProof)
 	if err != nil {
 		return err
 	}
 
 	coordinatorProxyAddr := ethCmn.HexToAddress(config.GlobalCfg.CoordinatorProxyAddress)
+	stakeAmount := big.NewInt(0)
+	stakeAmount.SetString("32000000000000000000", 10)
+
 	// generate call msg
 	callMsg := ethereum.CallMsg{
-		To:   &coordinatorProxyAddr,
-		Data: data,
+		To:    &coordinatorProxyAddr,
+		Data:  data,
+		Value: stakeAmount,
 	}
 
 	auth, err := b.GenerateAuthObj(b.EthClient, callMsg)
