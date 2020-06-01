@@ -57,7 +57,7 @@ type BatchModel struct {
 	StakeAmount          uint64
 	FinalisesOn          []byte
 	SubmissionHash       string
-	TransactionsIncluded json.RawMessage
+	TransactionsIncluded []byte `gorm:"size:10000"`
 }
 
 func (b *BatchModel) Batch() (Batch, error) {

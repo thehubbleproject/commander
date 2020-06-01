@@ -87,8 +87,8 @@ func (s *Simulator) sendTxsToAndFro() {
 
 	From := AlicePrivKey
 	To := BobPrivKey
-	FromID := uint64(1)
-	ToID := uint64(2)
+	FromID := uint64(2)
+	ToID := uint64(3)
 	for i := 0; i < 1; i++ {
 		privKeyBytes, err := hex.DecodeString(From)
 		if err != nil {

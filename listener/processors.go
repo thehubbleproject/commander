@@ -112,7 +112,6 @@ func (s *Syncer) processDepositFinalised(eventName string, abiObject *abi.ABI, v
 		fmt.Println("Error while finalising deposits", err)
 	}
 	fmt.Println("new root", newRoot)
-	// TODO update deposit tree
 }
 
 func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
