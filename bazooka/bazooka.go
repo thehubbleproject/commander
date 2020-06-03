@@ -8,7 +8,6 @@ import (
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 
-	"github.com/BOPR/contracts/coordinatorproxy"
 	"github.com/BOPR/contracts/logger"
 	"github.com/BOPR/contracts/merkleTree"
 	"github.com/BOPR/contracts/rollup"
@@ -41,11 +40,10 @@ type Bazooka struct {
 	ContractABI map[string]abi.ABI
 
 	// Rollup contract
-	RollupContract   *rollup.Rollup
-	BalanceTree      *merkleTree.MerkleTree
-	CoordinatorProxy *coordinatorproxy.Coordinatorproxy
-	EventLogger      *logger.Logger
-	DepositManager   *depositmanager.Depositmanager
+	RollupContract *rollup.Rollup
+	BalanceTree    *merkleTree.MerkleTree
+	EventLogger    *logger.Logger
+	DepositManager *depositmanager.Depositmanager
 }
 
 // NewContractCaller contract caller
@@ -101,14 +99,6 @@ func NewPreLoadedBazooka() (bazooka Bazooka, err error) {
 		return bazooka, err
 	}
 	if bazooka.ContractABI[common.DEPOSIT_MANAGER], err = abi.JSON(strings.NewReader(depositmanager.DepositmanagerABI)); err != nil {
-		return bazooka, err
-	}
-
-	coordinatorProxyAddr := ethCmn.HexToAddress(config.GlobalCfg.CoordinatorProxyAddress)
-	if bazooka.CoordinatorProxy, err = coordinatorproxy.NewCoordinatorproxy(coordinatorProxyAddr, bazooka.EthClient); err != nil {
-		return bazooka, err
-	}
-	if bazooka.ContractABI[common.COORDINATOR_PROXY], err = abi.JSON(strings.NewReader(coordinatorproxy.CoordinatorproxyABI)); err != nil {
 		return bazooka, err
 	}
 

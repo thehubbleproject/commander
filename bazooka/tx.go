@@ -6,7 +6,7 @@ import (
 
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
-	"github.com/BOPR/contracts/coordinatorproxy"
+	"github.com/BOPR/contracts/rollup"
 	"github.com/BOPR/core"
 	"github.com/ethereum/go-ethereum"
 	ethCmn "github.com/ethereum/go-ethereum/common"
@@ -36,7 +36,7 @@ func (b *Bazooka) FireDepositFinalisation(TBreplaced core.UserAccount, siblings 
 		siblingData = append(siblingData, data)
 	}
 
-	accountProof := coordinatorproxy.TypesAccountMerkleProof{}
+	accountProof := rollup.TypesAccountMerkleProof{}
 	accountProof.AccountIP.PathToAccount = core.StringToBigInt(TBreplaced.Path)
 	accountProof.AccountIP.Account = TBreplaced.ToABIAccount()
 	accountProof.Siblings = siblingData
@@ -45,13 +45,13 @@ func (b *Bazooka) FireDepositFinalisation(TBreplaced core.UserAccount, siblings 
 		return err
 	}
 
-	coordinatorProxyAddr := ethCmn.HexToAddress(config.GlobalCfg.CoordinatorProxyAddress)
+	rollupAddress := ethCmn.HexToAddress(config.GlobalCfg.RollupAddress)
 	stakeAmount := big.NewInt(0)
 	stakeAmount.SetString("32000000000000000000", 10)
 
 	// generate call msg
 	callMsg := ethereum.CallMsg{
-		To:    &coordinatorProxyAddr,
+		To:    &rollupAddress,
 		Data:  data,
 		Value: stakeAmount,
 	}
@@ -61,7 +61,7 @@ func (b *Bazooka) FireDepositFinalisation(TBreplaced core.UserAccount, siblings 
 		return err
 	}
 	b.log.Info("Broadcasting deposit finalisation transaction", "auth", auth)
-	tx, err := b.CoordinatorProxy.FinaliseDepositsAndSubmitBatch(auth, depositSubTreeHeight, accountProof)
+	tx, err := b.RollupContract.FinaliseDepositsAndSubmitBatch(auth, depositSubTreeHeight, accountProof)
 	if err != nil {
 		return err
 	}
@@ -93,7 +93,7 @@ func (b *Bazooka) SubmitBatch(updatedRoot core.ByteArray, txs []core.Tx) error {
 		return err
 	}
 
-	coordinatorProxyAddr := ethCmn.HexToAddress(config.GlobalCfg.CoordinatorProxyAddress)
+	coordinatorProxyAddr := ethCmn.HexToAddress(config.GlobalCfg.RollupAddress)
 
 	// generate call msg
 	callMsg := ethereum.CallMsg{
@@ -106,7 +106,7 @@ func (b *Bazooka) SubmitBatch(updatedRoot core.ByteArray, txs []core.Tx) error {
 		return err
 	}
 
-	tx, err := b.CoordinatorProxy.SubmitBatch(auth, compressedTxs, updatedRoot)
+	tx, err := b.RollupContract.SubmitBatch(auth, compressedTxs, updatedRoot)
 	if err != nil {
 		return err
 	}

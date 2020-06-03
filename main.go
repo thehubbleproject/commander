@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/hex"
 	"fmt"
 	"math"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 	"github.com/BOPR/core"
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 func main() {
@@ -34,9 +36,23 @@ func TestProcessTx() {
 		Nonce:   latestFromAcc.Nonce + 1,
 	}
 
+	signBytes, err := txCore.GetSignBytes()
+	if err != nil {
+		return
+	}
+
+	AlicePrivKey := "9b28f36fbd67381120752d6172ecdcf10e06ab2d9a1367aac00cdcd6ac7855d3"
+	privKeyBytes, err := hex.DecodeString(AlicePrivKey)
+	if err != nil {
+		fmt.Println("unable to decode string", err)
+		return
+	}
+	key := crypto.ToECDSAUnsafe(privKeyBytes)
+	signature, err := crypto.Sign(signBytes, key)
+	txCore.Signature = hex.EncodeToString(signature)
 	var txs []core.Tx
 	txs = append(txs, txCore)
-	_, _, PDA, err := db.GetTxVerificationData(txCore)
+	fromMerkleProof, _, PDA, err := db.GetTxVerificationData(txCore)
 	if err != nil {
 		fmt.Println("error", err)
 		panic(err)
@@ -56,6 +72,15 @@ func TestProcessTx() {
 	if err != nil {
 		panic(err)
 	}
+
+	// if err := a.LoadedBazooka.ValidateAccountMP(rootAcc.HashToByteArray(), fromMerkleProof); err != nil {
+	// 	panic(err)
+	// }
+
+	// if err := a.LoadedBazooka.ValidateSignature(txCore, PDA); err != nil {
+	// 	panic(err)
+	// }
+
 	fmt.Println(result)
 	// TODO start from checking the MP's manually before sending
 }
