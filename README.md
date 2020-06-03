@@ -36,6 +36,8 @@ In `config.toml` you need to change the key `db_url` with your correct password
 db_url="mysql://root:<your-password>@/testing?charset=utf8&parseTime=True&loc=Local"
 ```
 
+In `config.toml` you also have various params for entering ethereum RPC's and contract address, do check it out!
+
 ## Run migrations
 
 ```bash
