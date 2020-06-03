@@ -28,6 +28,12 @@ reset:
 	./build/hubble migration down --all
 	./build/hubble migration up
 
+migrate-up:
+	./build/hubble migration up
+
+migrate-down:
+	./build/hubble migration down --all
+
 start:
 	./build/hubble start
 	 
