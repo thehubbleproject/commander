@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/BOPR/contracts/coordinatorproxy"
+	"github.com/BOPR/contracts/rollup"
 )
 
 type AccountMerkleProof struct {
@@ -13,15 +13,15 @@ func NewAccountMerkleProof(account UserAccount, siblings []UserAccount) AccountM
 	return AccountMerkleProof{Account: account, Siblings: siblings}
 }
 
-func (m *AccountMerkleProof) ToABIVersion() coordinatorproxy.TypesAccountMerkleProof {
+func (m *AccountMerkleProof) ToABIVersion() rollup.TypesAccountMerkleProof {
 	// create siblings
 	var siblingNodes [][32]byte
 	for _, s := range m.Siblings {
 		siblingNodes = append(siblingNodes, s.HashToByteArray())
 	}
 
-	return coordinatorproxy.TypesAccountMerkleProof{
-		AccountIP: coordinatorproxy.TypesAccountInclusionProof{
+	return rollup.TypesAccountMerkleProof{
+		AccountIP: rollup.TypesAccountInclusionProof{
 			PathToAccount: StringToBigInt(m.Account.Path),
 			Account:       m.Account.ToABIAccount(),
 		},
@@ -39,17 +39,17 @@ func NewPDAProof(path string, publicKey string, siblings []UserAccount) PDAMerkl
 	return PDAMerkleProof{PublicKey: publicKey, Siblings: siblings, Path: path}
 }
 
-func (m *PDAMerkleProof) ToABIVersion() coordinatorproxy.TypesPDAMerkleProof {
+func (m *PDAMerkleProof) ToABIVersion() rollup.TypesPDAMerkleProof {
 	// create siblings
 	var siblingNodes [][32]byte
 	for _, s := range m.Siblings {
 		siblingNodes = append(siblingNodes, s.PubkeyHashToByteArray())
 	}
 	pubkey, _ := ABIEncodePubkey(m.PublicKey)
-	return coordinatorproxy.TypesPDAMerkleProof{
-		Pda: coordinatorproxy.TypesPDAInclusionProof{
+	return rollup.TypesPDAMerkleProof{
+		Pda: rollup.TypesPDAInclusionProof{
 			PathToPubkey: StringToBigInt(m.Path),
-			PubkeyLeaf:   coordinatorproxy.TypesPDALeaf{Pubkey: pubkey},
+			PubkeyLeaf:   rollup.TypesPDALeaf{Pubkey: pubkey},
 		},
 		Siblings: siblingNodes,
 	}

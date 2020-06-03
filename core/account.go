@@ -8,7 +8,7 @@ import (
 	"math/big"
 
 	"github.com/BOPR/common"
-	"github.com/BOPR/contracts/coordinatorproxy"
+	"github.com/BOPR/contracts/rollup"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/jinzhu/gorm"
 	gormbulk "github.com/t-tiger/gorm-bulk-insert"
@@ -122,8 +122,8 @@ func (acc *UserAccount) String() string {
 	return fmt.Sprintf("ID: %d Bal: %d Path: %v Nonce: %v TokenType:%v NodeType: %d %v", acc.AccountID, acc.Balance, acc.Path, acc.Nonce, acc.TokenType, acc.Type, acc.Hash)
 }
 
-func (acc *UserAccount) ToABIAccount() coordinatorproxy.TypesUserAccount {
-	return coordinatorproxy.TypesUserAccount{
+func (acc *UserAccount) ToABIAccount() rollup.TypesUserAccount {
+	return rollup.TypesUserAccount{
 		ID:        UintToBigInt(acc.AccountID),
 		Balance:   UintToBigInt(acc.Balance),
 		TokenType: UintToBigInt(acc.TokenType),
@@ -163,8 +163,8 @@ func (acc *UserAccount) IsCoordinator() bool {
 	return true
 }
 
-func (acc *UserAccount) AccountInclusionProof(path int64) coordinatorproxy.TypesAccountInclusionProof {
-	return coordinatorproxy.TypesAccountInclusionProof{
+func (acc *UserAccount) AccountInclusionProof(path int64) rollup.TypesAccountInclusionProof {
+	return rollup.TypesAccountInclusionProof{
 		PathToAccount: big.NewInt(path),
 		Account:       acc.ToABIAccount(),
 	}

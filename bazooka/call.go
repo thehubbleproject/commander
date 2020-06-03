@@ -71,7 +71,7 @@ func (b *Bazooka) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, err err
 func (b *Bazooka) ProcessTx(balanceTreeRoot, accountTreeRoot core.ByteArray, tx core.Tx, fromMerkleProof, toMerkleProof core.AccountMerkleProof, pdaProof core.PDAMerkleProof) (newBalanceRoot core.ByteArray, from, to core.UserAccount, err error) {
 	txABIVersion := tx.ToABIVersion(int64(tx.From), int64(tx.To))
 
-	updatedRoot, newBalFrom, newBalTo, IsValidTx, err := b.CoordinatorProxy.ProcessTx(nil,
+	updatedRoot, newBalFrom, newBalTo, IsValidTx, err := b.RollupContract.ProcessTx(nil,
 		balanceTreeRoot,
 		accountTreeRoot,
 		txABIVersion,
@@ -102,4 +102,12 @@ func (b *Bazooka) ProcessTx(balanceTreeRoot, accountTreeRoot core.ByteArray, tx 
 
 func (b *Bazooka) VerifyPDAProof(accountsRoot core.ByteArray, leaf core.ByteArray, proofpath *big.Int, siblings [][32]byte) (bool, error) {
 	return b.BalanceTree.VerifyLeaf(nil, accountsRoot, leaf, proofpath, siblings)
+}
+
+func (b *Bazooka) ValidateSignature(tx core.Tx, pdaProof core.PDAMerkleProof) error {
+	return b.RollupContract.ValidateSignature(nil, tx.ToABIVersion(int64(tx.From), int64(tx.To)), pdaProof.ToABIVersion())
+}
+
+func (b *Bazooka) ValidateAccountMP(root core.ByteArray, accountMP core.AccountMerkleProof) error {
+	return b.RollupContract.ValidateAccountMP(nil, root, accountMP.ToABIVersion())
 }
