@@ -1,6 +1,8 @@
 package core
 
 import (
+	"encoding/hex"
+
 	"github.com/BOPR/contracts/rollup"
 )
 
@@ -45,7 +47,10 @@ func (m *PDAMerkleProof) ToABIVersion() rollup.TypesPDAMerkleProof {
 	for _, s := range m.Siblings {
 		siblingNodes = append(siblingNodes, s.PubkeyHashToByteArray())
 	}
-	pubkey, _ := ABIEncodePubkey(m.PublicKey)
+	pubkey, err := hex.DecodeString(m.PublicKey)
+	if err != nil {
+		panic(err)
+	}
 	return rollup.TypesPDAMerkleProof{
 		Pda: rollup.TypesPDAInclusionProof{
 			PathToPubkey: StringToBigInt(m.Path),

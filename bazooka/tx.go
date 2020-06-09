@@ -1,7 +1,6 @@
 package bazooka
 
 import (
-	"fmt"
 	big "math/big"
 
 	"github.com/BOPR/common"
@@ -35,7 +34,6 @@ func (b *Bazooka) FireDepositFinalisation(TBreplaced core.UserAccount, siblings 
 		}
 		siblingData = append(siblingData, data)
 	}
-
 	accountProof := rollup.TypesAccountMerkleProof{}
 	accountProof.AccountIP.PathToAccount = core.StringToBigInt(TBreplaced.Path)
 	accountProof.AccountIP.Account = TBreplaced.ToABIAccount()
@@ -60,7 +58,7 @@ func (b *Bazooka) FireDepositFinalisation(TBreplaced core.UserAccount, siblings 
 	if err != nil {
 		return err
 	}
-	b.log.Info("Broadcasting deposit finalisation transaction", "auth", auth)
+	b.log.Info("Broadcasting deposit finalisation transaction")
 	tx, err := b.RollupContract.FinaliseDepositsAndSubmitBatch(auth, depositSubTreeHeight, accountProof)
 	if err != nil {
 		return err
@@ -88,16 +86,16 @@ func (b *Bazooka) SubmitBatch(updatedRoot core.ByteArray, txs []core.Tx) error {
 		compressedTxs = append(compressedTxs, compressedTx)
 	}
 
-	data, err := b.ContractABI[common.COORDINATOR_PROXY].Pack("submitBatch", compressedTxs, updatedRoot)
+	data, err := b.ContractABI[common.ROLLUP_CONTRACT_KEY].Pack("submitBatch", compressedTxs, updatedRoot)
 	if err != nil {
 		return err
 	}
 
-	coordinatorProxyAddr := ethCmn.HexToAddress(config.GlobalCfg.RollupAddress)
+	rollupAddress := ethCmn.HexToAddress(config.GlobalCfg.RollupAddress)
 
 	// generate call msg
 	callMsg := ethereum.CallMsg{
-		To:   &coordinatorProxyAddr,
+		To:   &rollupAddress,
 		Data: data,
 	}
 
@@ -110,6 +108,6 @@ func (b *Bazooka) SubmitBatch(updatedRoot core.ByteArray, txs []core.Tx) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Sent a new batch!", tx.Hash())
+	b.log.Info("Sent a new batch!", "txHash",tx.Hash().String())
 	return nil
 }

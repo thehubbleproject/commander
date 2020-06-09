@@ -2,12 +2,15 @@ package bazooka
 
 import (
 	"context"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	big "math/big"
 
 	"github.com/BOPR/common"
+	"github.com/BOPR/config"
 	"github.com/BOPR/core"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	ethCmn "github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 )
@@ -70,8 +73,8 @@ func (b *Bazooka) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, err err
 // returns the updated accounts and the new balance root
 func (b *Bazooka) ProcessTx(balanceTreeRoot, accountTreeRoot core.ByteArray, tx core.Tx, fromMerkleProof, toMerkleProof core.AccountMerkleProof, pdaProof core.PDAMerkleProof) (newBalanceRoot core.ByteArray, from, to core.UserAccount, err error) {
 	txABIVersion := tx.ToABIVersion(int64(tx.From), int64(tx.To))
-
-	updatedRoot, newBalFrom, newBalTo, IsValidTx, err := b.RollupContract.ProcessTx(nil,
+	opts := bind.CallOpts{From: config.OperatorAddress()}
+	updatedRoot, newBalFrom, newBalTo, IsValidTx, err := b.RollupContract.ProcessTx(&opts,
 		balanceTreeRoot,
 		accountTreeRoot,
 		txABIVersion,
@@ -100,14 +103,17 @@ func (b *Bazooka) ProcessTx(balanceTreeRoot, accountTreeRoot core.ByteArray, tx 
 	return newBalanceRoot, from, to, nil
 }
 
-func (b *Bazooka) VerifyPDAProof(accountsRoot core.ByteArray, leaf core.ByteArray, proofpath *big.Int, siblings [][32]byte) (bool, error) {
-	return b.BalanceTree.VerifyLeaf(nil, accountsRoot, leaf, proofpath, siblings)
+func (b *Bazooka) VerifyPDAProof(accountsRoot core.ByteArray, pdaProof core.PDAMerkleProof, byte)  error {
+	opts := bind.CallOpts{From: config.OperatorAddress()}
+	return b.RollupContract.ValidatePubkeyAvailability(&opts, accountsRoot, pdaProof.ToABIVersion(), big.NewInt(2))
 }
 
 func (b *Bazooka) ValidateSignature(tx core.Tx, pdaProof core.PDAMerkleProof) error {
-	return b.RollupContract.ValidateSignature(nil, tx.ToABIVersion(int64(tx.From), int64(tx.To)), pdaProof.ToABIVersion())
+	opts := bind.CallOpts{From: config.OperatorAddress()}
+	return b.RollupContract.ValidateSignature(&opts, tx.ToABIVersion(int64(tx.From), int64(tx.To)), pdaProof.ToABIVersion())
 }
 
 func (b *Bazooka) ValidateAccountMP(root core.ByteArray, accountMP core.AccountMerkleProof) error {
-	return b.RollupContract.ValidateAccountMP(nil, root, accountMP.ToABIVersion())
+	opts := bind.CallOpts{From: config.OperatorAddress()}
+	return b.RollupContract.ValidateAccountMP(&opts, root, accountMP.ToABIVersion())
 }

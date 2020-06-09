@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"math"
 
+	"crypto/ecdsa"
+
 	agg "github.com/BOPR/aggregator"
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
@@ -40,6 +42,7 @@ func TestProcessTx() {
 	if err != nil {
 		return
 	}
+	fmt.Println("sign bytes", hex.EncodeToString(signBytes))
 
 	AlicePrivKey := "9b28f36fbd67381120752d6172ecdcf10e06ab2d9a1367aac00cdcd6ac7855d3"
 	privKeyBytes, err := hex.DecodeString(AlicePrivKey)
@@ -49,7 +52,22 @@ func TestProcessTx() {
 	}
 	key := crypto.ToECDSAUnsafe(privKeyBytes)
 	signature, err := crypto.Sign(signBytes, key)
-	txCore.Signature = hex.EncodeToString(signature)
+
+	//	txCore.Signature = hex.EncodeToString(signature)
+	txCore.Signature = hex.EncodeToString(signature[:len(signature)-1])
+	isSignatureValid, err := crypto.Ecrecover(signBytes, signature)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("is sig valid", hex.EncodeToString(isSignatureValid))
+	publicKey := key.Public()
+	ecsdaPubKey, _ := publicKey.(*ecdsa.PublicKey)
+	fmt.Println("public key", hex.EncodeToString(crypto.FromECDSAPub(ecsdaPubKey)))
+
+	verified := crypto.VerifySignature(crypto.FromECDSAPub(ecsdaPubKey), signBytes, signature[:len(signature)-1])
+	fmt.Println(verified) // true
+	txCore.Signature += "1c"
+	fmt.Println("signature", txCore.Signature)
 	var txs []core.Tx
 	txs = append(txs, txCore)
 	fromMerkleProof, _, PDA, err := db.GetTxVerificationData(txCore)
@@ -57,6 +75,7 @@ func TestProcessTx() {
 		fmt.Println("error", err)
 		panic(err)
 	}
+	fmt.Println("fromMerkleProof", fromMerkleProof)
 	rootAcc, err := a.DB.GetRoot()
 	if err != nil {
 		panic(err)
@@ -64,24 +83,24 @@ func TestProcessTx() {
 
 	fromAccount, err := db.GetAccountByID(2)
 	PDAAbiVersion := PDA.ToABIVersion()
-	fmt.Println("pubkey", fromAccount.PubkeyHashToByteArray())
-	result, err := a.LoadedBazooka.VerifyPDAProof(rootAcc.PubkeyHashToByteArray(),
-		fromAccount.PubkeyHashToByteArray(),
-		PDAAbiVersion.Pda.PathToPubkey,
-		PDAAbiVersion.Siblings)
+	fmt.Println("PDA proof", PDAAbiVersion, rootAcc.PubkeyHashToByteArray().String(), fromAccount.PubkeyHashToByteArray().String())
+// result, err := a.LoadedBazooka.VerifyPDAProof(rootAcc.PubkeyHashToByteArray(),
+// 		fromAccount.PubkeyHashToByteArray(),
+// 		PDAAbiVersion.Pda.PathToPubkey,
+// 		PDAAbiVersion.Siblings)
+	err = a.LoadedBazooka.VerifyPDAProof(rootAcc.PubkeyHashToByteArray(),PDA)
 	if err != nil {
 		panic(err)
 	}
 
-	// if err := a.LoadedBazooka.ValidateAccountMP(rootAcc.HashToByteArray(), fromMerkleProof); err != nil {
-	// 	panic(err)
-	// }
+	if err := a.LoadedBazooka.ValidateAccountMP(rootAcc.HashToByteArray(), fromMerkleProof); err != nil {
+		panic(err)
+	}
 
 	// if err := a.LoadedBazooka.ValidateSignature(txCore, PDA); err != nil {
 	// 	panic(err)
 	// }
 
-	fmt.Println(result)
 	// TODO start from checking the MP's manually before sending
 }
 

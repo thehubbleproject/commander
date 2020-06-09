@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"math/big"
 
+	"encoding/hex"
+
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 	"github.com/BOPR/contracts/rollup"
@@ -148,12 +150,13 @@ func (t *Tx) String() string {
 
 // ToABIVersion converts a standard tx to the the DataTypesTransaction struct on the contract
 func (t *Tx) ToABIVersion(from, to int64) rollup.TypesTransaction {
+	decodedSignature, _ := hex.DecodeString(t.Signature)
 	return rollup.TypesTransaction{
 		ToIndex:   big.NewInt(to),
 		FromIndex: big.NewInt(from),
 		Amount:    uint32(t.Amount),
 		TokenType: big.NewInt(int64(t.TokenID)),
-		Signature: []byte(t.Signature),
+		Signature: decodedSignature,
 	}
 }
 
