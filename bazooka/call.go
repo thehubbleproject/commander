@@ -3,7 +3,6 @@ package bazooka
 import (
 	"context"
 	"errors"
-	"fmt"
 	big "math/big"
 
 	"github.com/BOPR/common"
