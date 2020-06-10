@@ -89,7 +89,7 @@ func (s *Simulator) sendTxsToAndFro() {
 	To := BobPrivKey
 	FromID := uint64(2)
 	ToID := uint64(3)
-	for i := 0; i < 1; i++ {
+	for i := 0; i < 2; i++ {
 		privKeyBytes, err := hex.DecodeString(From)
 		if err != nil {
 			fmt.Println("unable to decode string", err)

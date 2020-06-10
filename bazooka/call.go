@@ -55,7 +55,6 @@ func (b *Bazooka) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, err err
 
 	payload := tx.Data()
 	decodedPayload := payload[4:]
-	fmt.Println("decoded payload", decodedPayload)
 	inputDataMap := make(map[string]interface{})
 	method := b.ContractABI[common.ROLLUP_CONTRACT_KEY].Methods["submitBatch"]
 	err = method.Inputs.UnpackIntoMap(inputDataMap, decodedPayload)
@@ -63,7 +62,6 @@ func (b *Bazooka) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, err err
 		b.log.Error("Error unpacking payload", "Error", err)
 		return
 	}
-	b.log.Debug("Created input data map", "InputData", inputDataMap)
 
 	return GetTxsFromInput(inputDataMap), nil
 }
@@ -73,11 +71,6 @@ func (b *Bazooka) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, err err
 func (b *Bazooka) ProcessTx(balanceTreeRoot, accountTreeRoot core.ByteArray, tx core.Tx, fromMerkleProof, toMerkleProof core.AccountMerkleProof, pdaProof core.PDAMerkleProof) (newBalanceRoot core.ByteArray, from, to core.UserAccount, err error) {
 	txABIVersion := tx.ToABIVersion(int64(tx.From), int64(tx.To))
 	opts := bind.CallOpts{From: config.OperatorAddress()}
-	err =b.ValidateAccountMP(balanceTreeRoot, fromMerkleProof)
-	if err!=nil{
-		fmt.Println("error validating mp",err)
-		panic(err)
-	}
 	updatedRoot, newBalFrom, newBalTo, IsValidTx, err := b.RollupContract.ProcessTx(&opts,
 		balanceTreeRoot,
 		accountTreeRoot,

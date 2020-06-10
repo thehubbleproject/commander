@@ -158,6 +158,10 @@ func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *eth
 	// TODO run the transactions through ProcessTx present on-chain
 	// if any tx is fraud, challenge
 
+
+	// TODO apply transactions and match state root
+
+	
 	// create a new batch
 	newBatch := core.Batch{
 		Index:                event.Index.Uint64(),
