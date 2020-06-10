@@ -140,19 +140,16 @@ func (a *Aggregator) CheckTx(txs []core.Tx) error {
 		a.Logger.Debug("Fetched latest account proofs", "tx", tx.String(), "fromMP", fromAccProof, "toMP", toAccProof, "PDAProof", PDAproof)
 		updatedRoot, updatedFromAcc, updatedToAcc, err := a.LoadedBazooka.ProcessTx(currentRoot, currentAccountTreeRoot, tx, fromAccProof, toAccProof, PDAproof)
 		if err != nil {
-			fmt.Println("here2", err)
 			return err
 		}
 
 		err = a.DB.UpdateAccount(updatedFromAcc)
 		if err != nil {
-			fmt.Println("here3", err)
 			return err
 		}
 
 		err = a.DB.UpdateAccount(updatedToAcc)
 		if err != nil {
-			fmt.Println("here4", err)
 			return err
 		}
 

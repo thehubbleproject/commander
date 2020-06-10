@@ -6,7 +6,7 @@ import (
 	"math/big"
 
 	"encoding/hex"
-
+	
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 	"github.com/BOPR/contracts/rollup"
@@ -265,22 +265,35 @@ func (db *DB) GetTxVerificationData(tx Tx) (fromMerkleProof, toMerkleProof Accou
 		return
 	}
 	fmt.Println("got siblings", fromAcc.String())
-
 	fromMerkleProof = NewAccountMerkleProof(fromAcc, fromSiblings)
 	toAcc, err := db.GetAccountByID(tx.To)
 	if err != nil {
 		return
 	}
 	fmt.Println("got to account", toAcc.String())
-
-	toSiblings, err := db.GetSiblings(toAcc.Path)
+	var toSiblings []UserAccount
+	mysqlTx := db.Instance.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			mysqlTx.Rollback()
+		}
+	}()
+	dbCopy,_ := NewDB() 
+	dbCopy.Instance = mysqlTx
+	// STATE UPDATES TO BE REMOVED
+	fromAcc.Balance -= tx.Amount
+	fmt.Println("updated from account bal",fromAcc.Balance)
+	err=dbCopy.UpdateAccount(fromAcc)	
+	if err!=nil{
+		return	
+	}
+	toSiblings, err = dbCopy.GetSiblings(toAcc.Path)
 	if err != nil {
 		return
 	}
 	fmt.Println("got siblings", toSiblings)
-
+	mysqlTx.Rollback()
 	toMerkleProof = NewAccountMerkleProof(toAcc, toSiblings)
-
 	PDAProof = NewPDAProof(fromAcc.Path, fromAcc.PublicKey, fromSiblings)
 	return fromMerkleProof, toMerkleProof, PDAProof, nil
 }

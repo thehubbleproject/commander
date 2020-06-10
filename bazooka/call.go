@@ -2,7 +2,6 @@ package bazooka
 
 import (
 	"context"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	big "math/big"
@@ -74,6 +73,11 @@ func (b *Bazooka) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, err err
 func (b *Bazooka) ProcessTx(balanceTreeRoot, accountTreeRoot core.ByteArray, tx core.Tx, fromMerkleProof, toMerkleProof core.AccountMerkleProof, pdaProof core.PDAMerkleProof) (newBalanceRoot core.ByteArray, from, to core.UserAccount, err error) {
 	txABIVersion := tx.ToABIVersion(int64(tx.From), int64(tx.To))
 	opts := bind.CallOpts{From: config.OperatorAddress()}
+	err =b.ValidateAccountMP(balanceTreeRoot, fromMerkleProof)
+	if err!=nil{
+		fmt.Println("error validating mp",err)
+		panic(err)
+	}
 	updatedRoot, newBalFrom, newBalTo, IsValidTx, err := b.RollupContract.ProcessTx(&opts,
 		balanceTreeRoot,
 		accountTreeRoot,
@@ -103,7 +107,7 @@ func (b *Bazooka) ProcessTx(balanceTreeRoot, accountTreeRoot core.ByteArray, tx 
 	return newBalanceRoot, from, to, nil
 }
 
-func (b *Bazooka) VerifyPDAProof(accountsRoot core.ByteArray, pdaProof core.PDAMerkleProof, byte)  error {
+func (b *Bazooka) VerifyPDAProof(accountsRoot core.ByteArray, pdaProof core.PDAMerkleProof)  error {
 	opts := bind.CallOpts{From: config.OperatorAddress()}
 	return b.RollupContract.ValidatePubkeyAvailability(&opts, accountsRoot, pdaProof.ToABIVersion(), big.NewInt(2))
 }

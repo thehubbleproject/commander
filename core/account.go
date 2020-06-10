@@ -335,6 +335,7 @@ func (db *DB) UpdateAccount(account UserAccount) error {
 	}
 	account.PublicKeyHash = common.Keccak256(bz).String()
 	db.Logger.Info("Updated account pubkey", "ID", account.AccountID, "PubkeyHash", account.PublicKeyHash)
+	account.CreateAccountHash()
 	siblings, err := db.GetSiblings(account.Path)
 	if err != nil {
 		return err
@@ -552,4 +553,12 @@ func ABIEncodePubkey(pubkey string) ([]byte, error) {
 	}
 
 	return bytes, nil
+}
+
+//
+// Account changes post transaction processing
+//
+
+func (db *DB) TransactionProcessing(account *UserAccount, newBalance uint64) error {
+	return nil
 }

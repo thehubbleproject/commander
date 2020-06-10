@@ -70,19 +70,23 @@ func TestProcessTx() {
 	fmt.Println("signature", txCore.Signature)
 	var txs []core.Tx
 	txs = append(txs, txCore)
-	fromMerkleProof, _, PDA, err := db.GetTxVerificationData(txCore)
+	fromMerkleProof, toMerkleProof, PDA, err := db.GetTxVerificationData(txCore)
 	if err != nil {
 		fmt.Println("error", err)
 		panic(err)
 	}
-	fmt.Println("fromMerkleProof", fromMerkleProof)
+
+	fmt.Println("fromMerkleProof", fromMerkleProof) // false
+	fmt.Println("fromMerkleProof", toMerkleProof) // false
 	rootAcc, err := a.DB.GetRoot()
 	if err != nil {
 		panic(err)
 	}
 
 	fromAccount, err := db.GetAccountByID(2)
+	fmt.Println("data here", fromAccount,err)
 	PDAAbiVersion := PDA.ToABIVersion()
+	fmt.Println("data",rootAcc,fromAccount)
 	fmt.Println("PDA proof", PDAAbiVersion, rootAcc.PubkeyHashToByteArray().String(), fromAccount.PubkeyHashToByteArray().String())
 // result, err := a.LoadedBazooka.VerifyPDAProof(rootAcc.PubkeyHashToByteArray(),
 // 		fromAccount.PubkeyHashToByteArray(),
