@@ -35,6 +35,11 @@ migrate-down:
 	./build/hubble migration down --all
 
 start:
-	./build/hubble start
+	mkdir -p logs &
+	./build/hubble start > ./logs/node.log & 
+
+start-simulator:
+	mkdir -p logs &
+	./build/hubble start-simulating > ./logs/simulator.log & 
 	 
-.PHONY: contracts dep build clean start buidl
+.PHONY: contracts dep start-simulator build clean start buidl
