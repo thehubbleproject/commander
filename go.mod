@@ -9,8 +9,8 @@ require (
 	github.com/Workiva/go-datastructures v1.0.52 // indirect
 	github.com/aristanetworks/goarista v0.0.0-20191106175434-873d404c7f40 // indirect
 	github.com/btcsuite/btcd v0.20.1-beta // indirect
-	github.com/cbergoon/merkletree v0.2.0
-	github.com/cosmos/cosmos-sdk v0.37.4
+	github.com/cbergoon/merkletree v0.2.0 // indirect
+	github.com/cosmos/cosmos-sdk v0.37.4 // indirect
 	github.com/cosmos/ledger-cosmos-go v0.11.1 // indirect
 	github.com/deckarep/golang-set v1.7.1 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
@@ -22,7 +22,6 @@ require (
 	github.com/gballet/go-libpcsclite v0.0.0-20191108122812-4678299bea08 // indirect
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
 	github.com/go-kit/kit v0.10.0 // indirect
-	github.com/golang/protobuf v1.3.4 // indirect
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/gorilla/mux v1.7.3
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
@@ -30,7 +29,7 @@ require (
 	github.com/jackpal/go-nat-pmp v1.0.2 // indirect
 	github.com/jinzhu/gorm v1.9.12
 	github.com/karalabe/usb v0.0.0-20191104083709-911d15fe12a9 // indirect
-	github.com/maticnetwork/bor v0.0.0-20200101114234-36ff50845e90
+	github.com/maticnetwork/bor v0.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/miguelmota/go-solidity-sha3 v0.1.0 // indirect
 	github.com/olekukonko/tablewriter v0.0.3 // indirect
@@ -53,13 +52,11 @@ require (
 	github.com/tendermint/crypto v0.0.0-20191022145703-50d29ede1e15 // indirect
 	github.com/tendermint/go-amino v0.15.1 // indirect
 	github.com/tendermint/tendermint v0.32.7
-	github.com/tendermint/tm-db v0.5.0
+	github.com/tendermint/tm-db v0.5.0 // indirect
 	github.com/tinylib/msgp v1.1.1 // indirect
 	github.com/tyler-smith/go-bip39 v1.0.2 // indirect
 	github.com/willf/pad v0.0.0-20200313202418-172aa767f2a4
-	github.com/xsleonard/go-merkle v1.1.0 // indirect
-	golang.org/x/crypto v0.0.0-20200115085410-6d4e4cb37c7d
-	golang.org/x/net v0.0.0-20191126235420-ef20fe5d7933 // indirect
+	golang.org/x/crypto v0.0.0-20200311171314-f7b00557c8c4
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
