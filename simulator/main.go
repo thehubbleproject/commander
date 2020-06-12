@@ -5,8 +5,6 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -29,6 +27,8 @@ type Simulator struct {
 
 	// header listener subscription
 	cancelSimulator context.CancelFunc
+
+	toSwap bool
 }
 
 // NewSimulator returns new simulator object
@@ -53,6 +53,7 @@ func (s *Simulator) OnStart() error {
 
 	go s.SimulationStart(ctx, 10*time.Second)
 
+	s.toSwap = false
 	return nil
 }
 
@@ -84,22 +85,30 @@ func (s *Simulator) SimulationStart(ctx context.Context, interval time.Duration)
 func (s *Simulator) sendTxsToAndFro() {
 	AlicePrivKey := "9b28f36fbd67381120752d6172ecdcf10e06ab2d9a1367aac00cdcd6ac7855d3"
 	BobPrivKey := "c8deb0bea5c41afe8e37b4d1bd84e31adff11b09c8c96ff4b605003cce067cd9"
-
 	From := AlicePrivKey
 	To := BobPrivKey
 	FromID := uint64(2)
 	ToID := uint64(3)
+	if s.toSwap {
+		tempID := FromID
+		FromID = ToID
+		ToID = tempID
+		tempPrivKey := From
+		From = To
+		To = tempPrivKey
+		s.toSwap = !s.toSwap
+	}
 	for i := 0; i < 2; i++ {
 		privKeyBytes, err := hex.DecodeString(From)
 		if err != nil {
-			fmt.Println("unable to decode string", err)
+			s.Logger.Error("unable to decode string", "error", err)
 			return
 		}
 		key := crypto.ToECDSAUnsafe(privKeyBytes)
 
 		latestFromAcc, err := s.DB.GetAccountByID(FromID)
 		if err != nil {
-			fmt.Println("unable to fetch latest account", err)
+			s.Logger.Error("unable to fetch latest account", "error", err)
 			return
 		}
 
@@ -107,7 +116,7 @@ func (s *Simulator) sendTxsToAndFro() {
 			From:    FromID,
 			To:      ToID,
 			Amount:  1,
-			TokenID: 1,
+			TokenID: latestFromAcc.TokenType,
 			Nonce:   latestFromAcc.Nonce + 1,
 		}
 
@@ -122,7 +131,7 @@ func (s *Simulator) sendTxsToAndFro() {
 			From:      txCore.From,
 			To:        txCore.To,
 			Amount:    1,
-			TokenID:   1,
+			TokenID:   txCore.TokenID,
 			Nonce:     txCore.Nonce,
 			Signature: hex.EncodeToString(signature),
 		}
@@ -145,16 +154,12 @@ func (s *Simulator) sendTxsToAndFro() {
 
 		defer resp.Body.Close()
 
-		fmt.Println("response Status:", resp.Status)
-		fmt.Println("response Headers:", resp.Header)
-		body, _ := ioutil.ReadAll(resp.Body)
-		fmt.Println("response Body:", string(body))
-		tempID := FromID
-		FromID = ToID
-		ToID = tempID
-
-		tempPrivKey := From
-		From = To
-		To = tempPrivKey
+		if resp.StatusCode == 200 {
+			s.Logger.Info("Tx sent!", "TxData", txCore.String())
+		}
+		if txCore.From == uint64(2) {
+			s.toSwap = true
+		}
 	}
+
 }
