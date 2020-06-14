@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	"github.com/BOPR/core"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -16,21 +18,45 @@ func SendTransferTx() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			toIndex := viper.GetUint64(FlagToAccountID)
 			fromIndex := viper.GetUint64(FlagFromAccountID)
-
 			tokenID := viper.GetUint64(FlagTokenID)
-			nonce := viper.GetUint64(FlagNonce)
-
-			sig := viper.GetString(FlagSignature)
-
+			privKey := viper.GetString(FlagPrivKey)
 			amount := viper.GetUint64(FlagAmount)
-			tx := core.NewPendingTx(toIndex, fromIndex, amount, nonce, sig, tokenID)
-			tx.AssignHash()
 
 			db, err := core.NewDB()
 			if err != nil {
 				return err
 			}
 			defer db.Close()
+
+			fromAcc, err := db.GetAccountByID(fromIndex)
+			if err != nil {
+				return err
+			}
+
+			privKeyBytes, err := hex.DecodeString(privKey)
+			if err != nil {
+				return err
+			}
+			key := crypto.ToECDSAUnsafe(privKeyBytes)
+			var txCore = core.Tx{
+				From:    fromIndex,
+				To:      toIndex,
+				Amount:  1,
+				TokenID: fromAcc.TokenType,
+				Nonce:   fromAcc.Nonce + 1,
+			}
+			signBytes, err := txCore.GetSignBytes()
+			if err != nil {
+				return err
+			}
+			sig, err := crypto.Sign(signBytes, key)
+			if err != nil {
+				return err
+			}
+
+			tx := core.NewPendingTx(toIndex, fromIndex, amount, fromAcc.Nonce+1, hex.EncodeToString(sig), tokenID)
+			tx.AssignHash()
+
 			err = db.InsertTx(&tx)
 			if err != nil {
 				return err
@@ -41,21 +67,15 @@ func SendTransferTx() *cobra.Command {
 	}
 	cmd.Flags().StringP(FlagToAccountID, "", "", "--to=<to-account>")
 	cmd.Flags().StringP(FlagFromAccountID, "", "", "--from=<from-account>")
-
 	cmd.Flags().StringP(FlagTokenID, "", "", "--token=<token-id>")
-
-	cmd.Flags().StringP(FlagNonce, "", "", "--nonce=<nonce>")
-	cmd.Flags().StringP(FlagSignature, "", "", "--sig=<signature>")
-
+	cmd.Flags().StringP(FlagPrivKey, "", "", "--privkey=<privkey>")
 	cmd.Flags().StringP(FlagAmount, "", "", "--amount=<amount>")
-	cmd.MarkFlagRequired(FlagNonce)
-
 	cmd.MarkFlagRequired(FlagTokenID)
 	return cmd
 }
 
-//  SendTransferTx generated init command to initialise the config file
-func SendDummyTransfers() *cobra.Command {
+//  GetAccount generated init command to initialise the config file
+func GetAccount() *cobra.Command {
 	return &cobra.Command{
 		Use:   "dummy-transfer",
 		Short: "Transfers assets between 2 accounts",
