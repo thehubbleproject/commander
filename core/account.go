@@ -147,6 +147,23 @@ func (acc *UserAccount) PubkeyHashToByteArray() ByteArray {
 	return ba
 }
 
+func (acc *UserAccount) UpdateBalance(newBalance uint64) {
+	acc.Balance = newBalance
+}
+
+func (acc *UserAccount) UpdateNonce() {
+	acc.Nonce = acc.Nonce + 1
+}
+
+func (acc *UserAccount) ApplyTx(tx Tx) {
+	if acc.AccountID == tx.From {
+		// decrease balance
+		acc.UpdateBalance(acc.Balance - tx.Amount)
+	}
+
+	acc.UpdateNonce()
+}
+
 func (acc *UserAccount) IsCoordinator() bool {
 	if acc.Path != "" {
 		return false

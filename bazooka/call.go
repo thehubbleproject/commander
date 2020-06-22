@@ -90,6 +90,7 @@ func (b *Bazooka) ProcessTx(balanceTreeRoot, accountTreeRoot core.ByteArray, tx 
 
 	newBalanceRoot = core.BytesToByteArray(updatedRoot[:])
 
+	// TODO move to post procesTx function
 	fromMerkleProof.Account.Balance = newBalFrom.Uint64()
 	from = fromMerkleProof.Account
 
@@ -99,7 +100,7 @@ func (b *Bazooka) ProcessTx(balanceTreeRoot, accountTreeRoot core.ByteArray, tx 
 	return newBalanceRoot, from, to, nil
 }
 
-func (b *Bazooka) VerifyPDAProof(accountsRoot core.ByteArray, pdaProof core.PDAMerkleProof)  error {
+func (b *Bazooka) VerifyPDAProof(accountsRoot core.ByteArray, pdaProof core.PDAMerkleProof) error {
 	opts := bind.CallOpts{From: config.OperatorAddress()}
 	return b.RollupContract.ValidatePubkeyAvailability(&opts, accountsRoot, pdaProof.ToABIVersion(), big.NewInt(2))
 }

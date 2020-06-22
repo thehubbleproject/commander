@@ -93,7 +93,7 @@ func (a *Aggregator) pickBatch() {
 	}
 
 	// Step-2
-	err = a.CheckTx(txs)
+	err = a.ProcessTx(txs)
 	if err != nil {
 		fmt.Println("Error while processing tx", "error", err)
 		return
@@ -113,9 +113,9 @@ func (a *Aggregator) pickBatch() {
 	}
 }
 
-// CheckTx fetches all the data required to validate tx from smart contact
+// ProcessTx fetches all the data required to validate tx from smart contact
 // and calls the proccess tx function to return the updated balance root and accounts
-func (a *Aggregator) CheckTx(txs []core.Tx) error {
+func (a *Aggregator) ProcessTx(txs []core.Tx) error {
 	rootAcc, err := a.DB.GetRoot()
 	if err != nil {
 		return err
@@ -134,23 +134,17 @@ func (a *Aggregator) CheckTx(txs []core.Tx) error {
 	for _, tx := range txs {
 		fromAccProof, toAccProof, PDAproof, err := a.DB.GetTxVerificationData(tx)
 		if err != nil {
-			fmt.Println("here", err)
 			return err
 		}
 		a.Logger.Debug("Fetched latest account proofs", "tx", tx.String(), "fromMP", fromAccProof, "toMP", toAccProof, "PDAProof", PDAproof)
-		updatedRoot, updatedFromAcc, updatedToAcc, err := a.LoadedBazooka.ProcessTx(currentRoot, currentAccountTreeRoot, tx, fromAccProof, toAccProof, PDAproof)
+		updatedRoot, _, _, err := a.LoadedBazooka.ProcessTx(currentRoot, currentAccountTreeRoot, tx, fromAccProof, toAccProof, PDAproof)
 		if err != nil {
 			return err
 		}
 
-		err = a.DB.UpdateAccount(updatedFromAcc)
+		err = tx.Apply()
 		if err != nil {
-			return err
-		}
-
-		err = a.DB.UpdateAccount(updatedToAcc)
-		if err != nil {
-			return err
+			Return err
 		}
 
 		currentRoot = updatedRoot

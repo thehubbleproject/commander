@@ -6,7 +6,7 @@ import (
 	"math/big"
 
 	"encoding/hex"
-	
+
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 	"github.com/BOPR/contracts/rollup"
@@ -98,6 +98,59 @@ func (t *Tx) AssignHash() {
 	}
 	hash := rlpHash(t)
 	t.TxHash = hash.String()
+}
+
+func (tx *Tx) Apply() error {
+	// get fresh copy of database
+	db, err := NewDB()
+	if err != nil {
+		return err
+	}
+
+	// begin a transaction
+	mysqlTx := db.Instance.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			mysqlTx.Rollback()
+		}
+	}()
+
+	// post this perform all ops on transaction
+	db.Instance = mysqlTx
+
+	// apply transaction on from account
+	fromAcc, err := db.GetAccountByID(tx.From)
+	if err != nil {
+		mysqlTx.Rollback()
+		return err
+	}
+
+	fromAcc.ApplyTx(*tx)
+
+	err = db.UpdateAccount(fromAcc)
+	if err != nil {
+		mysqlTx.Rollback()
+		return err
+	}
+
+	// apply transaction on to account
+	toAcc, err := db.GetAccountByID(tx.To)
+	if err != nil {
+		mysqlTx.Rollback()
+		return err
+	}
+
+	toAcc.ApplyTx(*tx)
+
+	err = db.UpdateAccount(toAcc)
+	if err != nil {
+		mysqlTx.Rollback()
+		return err
+	}
+
+	// Or commit the transaction
+	mysqlTx.Commit()
+	return nil
 }
 
 // NewPendingTx creates a new transaction
@@ -259,18 +312,15 @@ func (db *DB) GetTxVerificationData(tx Tx) (fromMerkleProof, toMerkleProof Accou
 	if err != nil {
 		return
 	}
-	fmt.Println("got from account", fromAcc.String())
 	fromSiblings, err := db.GetSiblings(fromAcc.Path)
 	if err != nil {
 		return
 	}
-	fmt.Println("got siblings", fromAcc.String())
 	fromMerkleProof = NewAccountMerkleProof(fromAcc, fromSiblings)
 	toAcc, err := db.GetAccountByID(tx.To)
 	if err != nil {
 		return
 	}
-	fmt.Println("got to account", toAcc.String())
 	var toSiblings []UserAccount
 	mysqlTx := db.Instance.Begin()
 	defer func() {
@@ -278,20 +328,18 @@ func (db *DB) GetTxVerificationData(tx Tx) (fromMerkleProof, toMerkleProof Accou
 			mysqlTx.Rollback()
 		}
 	}()
-	dbCopy,_ := NewDB() 
+	dbCopy, _ := NewDB()
 	dbCopy.Instance = mysqlTx
 	// STATE UPDATES TO BE REMOVED
 	fromAcc.Balance -= tx.Amount
-	fmt.Println("updated from account bal",fromAcc.Balance)
-	err=dbCopy.UpdateAccount(fromAcc)	
-	if err!=nil{
-		return	
+	err = dbCopy.UpdateAccount(fromAcc)
+	if err != nil {
+		return
 	}
 	toSiblings, err = dbCopy.GetSiblings(toAcc.Path)
 	if err != nil {
 		return
 	}
-	fmt.Println("got siblings", toSiblings)
 	mysqlTx.Rollback()
 	toMerkleProof = NewAccountMerkleProof(toAcc, toSiblings)
 	PDAProof = NewPDAProof(fromAcc.Path, fromAcc.PublicKey, fromSiblings)
