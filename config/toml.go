@@ -33,12 +33,7 @@ confirmation_blocks = "{{ .ConfirmationBlocks }}"
 
 ##### Contract Addresses #####
 rollup_address = "{{ .RollupAddress }}"
-balance_tree_address = "{{ .BalanceTreeAddress }}"
-account_tree_address = "{{ .AccountTreeAddress }}"
-merkle_lib_address = "{{ .MerkleTreeLibAddress }}"
-token_registry_address = "{{ .TokenRegistryAddress }}"
 logger_address = "{{ .LoggerAddress }}"
-deposit_manager_address = "{{ .DepositManagerAddress }}"
 `
 
 var configTemplate *template.Template

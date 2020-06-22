@@ -2,7 +2,6 @@ package listener
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/BOPR/common"
@@ -55,9 +54,6 @@ func NewSyncer() Syncer {
 	}
 	var abis []abi.ABI
 	abis = append(abis, loadedBazooka.ContractABI[common.LOGGER_KEY])
-	// for _, v := range loadedBazooka.ContractABI {
-	// 	abis = append(abis, &v)
-	// }
 
 	// abis for all the events
 	syncerService.abis = abis
@@ -188,11 +184,6 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 		},
 	}
 
-	err = s.DBInstance.UpdateSyncStatusWithBlockNumber(header.Number.Uint64())
-	if err != nil {
-		s.Logger.Error("Unable to update listener log", "error", err)
-	}
-
 	// get all logs
 	logs, err := s.loadedBazooka.EthClient.FilterLogs(context.Background(), query)
 	if err != nil {
@@ -201,24 +192,13 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 	} else if len(logs) > 0 {
 		s.Logger.Debug("New logs found", "numberOfLogs", len(logs))
 	}
-	fmt.Println("logs", logs)
 
-	/* We search for the following events in the blockchain
-	1. Token Registration request
-	2. Token Finalisation declaration
-	3. New Batch created
-	4. New Deposit Queued
-	5. Deposit Leaf merged
-	6. Deposit Finalisation declaration
-	7. Param variable updates ( see types/param.go)
-	*/
-	// TODO test if this works if one block has more than one log
+	// TODO add a mutex to lock processing of events if an update is in progress
+	// already
 	for _, vLog := range logs {
 		topic := vLog.Topics[0].Bytes()
-
 		for _, abiObject := range s.abis {
 			selectedEvent := EventByID(&abiObject, topic)
-			fmt.Println("selected event", selectedEvent)
 			if selectedEvent != nil {
 				s.Logger.Debug("Found an event", "name", selectedEvent.Name)
 				switch selectedEvent.Name {
@@ -233,9 +213,16 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 				case "DepositsFinalised":
 					s.processDepositFinalised(selectedEvent.Name, &abiObject, &vLog)
 				}
-				// break the inner loop
 				break
+			} else {
+				s.Logger.Debug("Unable to match with any event", "topics", topic)
 			}
 		}
 	}
+
+	err = s.DBInstance.UpdateSyncStatusWithBlockNumber(header.Number.Uint64())
+	if err != nil {
+		s.Logger.Error("Unable to update listener log", "error", err)
+	}
+
 }

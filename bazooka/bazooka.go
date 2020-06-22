@@ -9,10 +9,7 @@ import (
 	"github.com/BOPR/config"
 
 	"github.com/BOPR/contracts/logger"
-	"github.com/BOPR/contracts/merkleTree"
 	"github.com/BOPR/contracts/rollup"
-
-	"github.com/BOPR/contracts/depositmanager"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	ethCmn "github.com/ethereum/go-ethereum/common"
@@ -41,9 +38,7 @@ type Bazooka struct {
 
 	// Rollup contract
 	RollupContract *rollup.Rollup
-	BalanceTree    *merkleTree.MerkleTree
 	EventLogger    *logger.Logger
-	DepositManager *depositmanager.Depositmanager
 }
 
 // NewContractCaller contract caller
@@ -77,13 +72,6 @@ func NewPreLoadedBazooka() (bazooka Bazooka, err error) {
 	}
 
 	// initialise all variables for merkle tree contract
-	balanceTreeContractAddress := ethCmn.HexToAddress(config.GlobalCfg.BalanceTreeAddress)
-	if bazooka.BalanceTree, err = merkleTree.NewMerkleTree(balanceTreeContractAddress, bazooka.EthClient); err != nil {
-		return bazooka, err
-	}
-	if bazooka.ContractABI[common.BALANCE_TREE_KEY], err = abi.JSON(strings.NewReader(merkleTree.MerkleTreeABI)); err != nil {
-		return bazooka, err
-	}
 
 	// initialise all variables for event logger contract
 	loggerAddress := ethCmn.HexToAddress(config.GlobalCfg.LoggerAddress)
@@ -91,14 +79,6 @@ func NewPreLoadedBazooka() (bazooka Bazooka, err error) {
 		return bazooka, err
 	}
 	if bazooka.ContractABI[common.LOGGER_KEY], err = abi.JSON(strings.NewReader(logger.LoggerABI)); err != nil {
-		return bazooka, err
-	}
-
-	depositAddress := ethCmn.HexToAddress(config.GlobalCfg.DepositManagerAddress)
-	if bazooka.DepositManager, err = depositmanager.NewDepositmanager(depositAddress, bazooka.EthClient); err != nil {
-		return bazooka, err
-	}
-	if bazooka.ContractABI[common.DEPOSIT_MANAGER], err = abi.JSON(strings.NewReader(depositmanager.DepositmanagerABI)); err != nil {
 		return bazooka, err
 	}
 

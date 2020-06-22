@@ -112,6 +112,15 @@ func (s *Simulator) sendTxsToAndFro() {
 			return
 		}
 
+		if latestFromAcc.Balance < 3 {
+			tempID := FromID
+			FromID = ToID
+			ToID = tempID
+			tempPrivKey := From
+			From = To
+			To = tempPrivKey
+		}
+
 		var txCore = core.Tx{
 			From:    FromID,
 			To:      ToID,

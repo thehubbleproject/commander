@@ -2,10 +2,12 @@ package core
 
 import (
 	"fmt"
+	"math"
 	"math/big"
 	"testing"
 
 	"github.com/BOPR/common"
+	"github.com/BOPR/config"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/stretchr/testify/require"
 )
@@ -16,6 +18,7 @@ func TestEmptyAccount(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, ZERO_VALUE_LEAF.String(), common.Keccak256(acc).Hex(), "The root leaves should match")
 }
+
 func TestNonEmptyAccount(t *testing.T) {
 	acc := NewPendingUserAccount(1, 10, 1, "0x914873c8d5935837ade39cbdabd6efb3d3d4064c5918da11e555bba0ab2c58fee95974a3222830cf73d257bdc18cfcd01765482108a48e68bc0b657618acb40e")
 	acc.CreateAccountHash()
@@ -52,4 +55,51 @@ func TestPubkeyHashCreation(t *testing.T) {
 	hash := common.Keccak256(bz)
 
 	fmt.Println(hash.String())
+}
+
+func TestInitBalanceTree(t *testing.T) {
+	db, err := NewDB()
+	if err != nil {
+		panic(err)
+	}
+	var genesisAccounts []UserAccount
+
+	genesis, err := config.ReadGenesisFile()
+	common.PanicIfError(err)
+
+	err = genesis.Validate()
+	if err != nil {
+		common.PanicIfError(err)
+	}
+
+	diff := int(math.Exp2(float64(genesis.MaxTreeDepth))) - len(genesis.GenesisAccounts.Accounts)
+	var allAccounts []UserAccount
+
+	// convert genesis accounts to user accounts
+	for _, account := range genesis.GenesisAccounts.Accounts {
+		pubkeyHash := ZERO_VALUE_LEAF.String()
+		allAccounts = append(
+			allAccounts,
+			UserAccount{
+				AccountID:     account.ID,
+				Balance:       account.Balance,
+				TokenType:     account.TokenType,
+				Nonce:         account.Nonce,
+				Status:        account.Status,
+				PublicKey:     account.PublicKey,
+				PublicKeyHash: pubkeyHash,
+			},
+		)
+	}
+
+	// fill the tree with zero leaves
+	for diff > 0 {
+		newAcc := EmptyAccount()
+		newAcc.Hash = ZERO_VALUE_LEAF.String()
+		newAcc.PublicKeyHash = ZERO_VALUE_LEAF.String()
+		allAccounts = append(allAccounts, newAcc)
+		diff--
+	}
+	err = db.InitBalancesTree(2, genesisAccounts)
+	require.Nil(t, err, "Error creating init balance tree")
 }
