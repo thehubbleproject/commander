@@ -257,6 +257,47 @@ func (tx *Tx) Compress() ([]byte, error) {
 	return bytes, nil
 }
 
+// DeCompress decompresses the bytes to transaction
+func DeCompress(txBytes []byte) (tx Tx, err error) {
+	uint256Ty, err := abi.NewType("uint256", "uint256", nil)
+	if err != nil {
+		return
+	}
+
+	bytesTy, err := abi.NewType("bytes", "bytes", nil)
+	if err != nil {
+		return
+	}
+
+	arguments := abi.Arguments{
+		{
+			Type: uint256Ty,
+		},
+		{
+			Type: uint256Ty,
+		},
+		{
+			Type: uint256Ty,
+		},
+		{
+			Type: uint256Ty,
+		},
+		{
+			Type: bytesTy,
+		},
+	}
+
+	data, err := arguments.UnpackValues(txBytes)
+	fmt.Println("Data", data, err)
+
+	err = arguments.Unpack(&tx, txBytes)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 // Insert tx into the DB
 func (db *DB) InsertTx(t *Tx) error {
 	return db.Instance.Create(t).Error
