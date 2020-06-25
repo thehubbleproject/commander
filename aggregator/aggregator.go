@@ -144,7 +144,7 @@ func (a *Aggregator) ProcessTx(txs []core.Tx) error {
 
 		err = tx.Apply()
 		if err != nil {
-			Return err
+			return err
 		}
 
 		currentRoot = updatedRoot

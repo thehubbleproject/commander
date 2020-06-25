@@ -52,27 +52,27 @@ func TestProcessTx() {
 	txCore.Signature = hex.EncodeToString(signature)
 	var txs []core.Tx
 	txs = append(txs, txCore)
-	fromMerkleProof, _, PDA, err := db.GetTxVerificationData(txCore)
-	if err != nil {
-		fmt.Println("error", err)
-		panic(err)
-	}
-	fmt.Println("fromMerkleProof", fromMerkleProof)
-	rootAcc, err := a.DB.GetRoot()
-	if err != nil {
-		panic(err)
-	}
+	// fromMerkleProof, _, PDA, err := db.GetTxVerificationData(txCore)
+	// if err != nil {
+	// 	fmt.Println("error", err)
+	// 	panic(err)
+	// }
+	// fmt.Println("fromMerkleProof", fromMerkleProof)
+	// rootAcc, err := a.DB.GetRoot()
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	fromAccount, err := db.GetAccountByID(2)
-	PDAAbiVersion := PDA.ToABIVersion()
-	fmt.Println("pubkey", fromAccount.PubkeyHashToByteArray())
-	result, err := a.LoadedBazooka.VerifyPDAProof(rootAcc.PubkeyHashToByteArray(),
-		fromAccount.PubkeyHashToByteArray(),
-		PDAAbiVersion.Pda.PathToPubkey,
-		PDAAbiVersion.Siblings)
-	if err != nil {
-		panic(err)
-	}
+	// fromAccount, err := db.GetAccountByID(2)
+	// PDAAbiVersion := PDA.ToABIVersion()
+	// fmt.Println("pubkey", fromAccount.PubkeyHashToByteArray())
+	// result, err := a.LoadedBazooka.VerifyPDAProof(rootAcc.PubkeyHashToByteArray(),
+	// 	fromAccount.PubkeyHashToByteArray(),
+	// 	PDAAbiVersion.Pda.PathToPubkey,
+	// 	PDAAbiVersion.Siblings)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	// if err := a.LoadedBazooka.ValidateAccountMP(rootAcc.HashToByteArray(), fromMerkleProof); err != nil {
 	// 	panic(err)
@@ -82,7 +82,6 @@ func TestProcessTx() {
 	// 	panic(err)
 	// }
 
-	fmt.Println(result)
 	// TODO start from checking the MP's manually before sending
 }
 
