@@ -36,8 +36,6 @@ func StartCmd() *cobra.Command {
 
 			InitGlobalBazooka()
 
-			InitDepositTree()
-
 			logger := common.Logger.With("module", "hubble")
 
 			//
@@ -197,16 +195,8 @@ func LoadGenesisData(genesis config.Genesis) {
 	newParams := core.Params{StakeAmount: genesis.StakeAmount, MaxDepth: genesis.MaxTreeDepth, MaxDepositSubTreeHeight: genesis.MaxDepositSubTreeHeight}
 	core.DBInstance.UpdateStakeAmount(newParams.StakeAmount)
 	core.DBInstance.UpdateMaxDepth(newParams.MaxDepth)
-	core.DBInstance.UpdateDepositSubTreeHeight(newParams.MaxDepositSubTreeHeight)
 
 	// load sync status
 	core.DBInstance.UpdateSyncStatusWithBlockNumber(genesis.StartEthBlock)
 	core.DBInstance.UpdateSyncStatusWithBatchNumber(0)
-}
-
-func InitDepositTree() {
-	err := core.DBInstance.InitEmptyDepositTree()
-	if err != nil {
-		common.PanicIfError(err)
-	}
 }

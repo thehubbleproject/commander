@@ -1,7 +1,7 @@
 {
     "startEthBlock": 0,
     "maxTreeDepth": 2,
-    "maxDepositSubTreeHeight": 1,
+    "maxDepositSubTreeHeight": 2,
     "stakeAmount": 32,
     "genesisAccounts": {
         "gen_accounts": [

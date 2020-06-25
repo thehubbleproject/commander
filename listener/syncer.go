@@ -208,8 +208,8 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 					s.processNewBatch(selectedEvent.Name, &abiObject, &vLog)
 				case "DepositQueued":
 					s.processDepositQueued(selectedEvent.Name, &abiObject, &vLog)
-				case "DepositLeafMerged":
-					s.processDepositLeafMerged(selectedEvent.Name, &abiObject, &vLog)
+				case "DepositSubTreeReady":
+					s.processDepositSubtreeCreated(selectedEvent.Name, &abiObject, &vLog)
 				case "DepositsFinalised":
 					s.processDepositFinalised(selectedEvent.Name, &abiObject, &vLog)
 				}
