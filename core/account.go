@@ -20,15 +20,16 @@ type UserAccount struct {
 	// Cannot be changed once created
 	AccountID uint64 `gorm:"not null;index:AccountID"`
 
-	// Token type of the user account
-	// Cannot be changed once creation
-	TokenType uint64 `gorm:"not null;default:0"`
+	Data []byte `gorm:"not null;index:data"`
+	// // Token type of the user account
+	// // Cannot be changed once creation
+	// TokenType uint64 `gorm:"not null;default:0"`
 
-	// Balance of the user account
-	Balance uint64 `gorm:"not null;"`
+	// // Balance of the user account
+	// Balance uint64 `gorm:"not null;"`
 
-	// Nonce of the account
-	Nonce uint64 `gorm:"not null;"`
+	// // Nonce of the account
+	// Nonce uint64 `gorm:"not null;"`
 
 	// Public key for the user
 	PublicKey string `gorm:"size:1000"`
@@ -359,7 +360,6 @@ func (db *DB) UpdateAccount(account UserAccount) error {
 	}
 
 	db.Logger.Debug("Updating account", "Hash", account.Hash, "Path", account.Path, "siblings", siblings, "countOfSiblings", len(siblings))
-
 	return db.StoreLeaf(account, account.Path, siblings)
 }
 

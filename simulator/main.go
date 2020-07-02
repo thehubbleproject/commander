@@ -89,6 +89,7 @@ func (s *Simulator) sendTxsToAndFro() {
 	To := BobPrivKey
 	FromID := uint64(2)
 	ToID := uint64(3)
+
 	if s.toSwap {
 		tempID := FromID
 		FromID = ToID
@@ -98,12 +99,14 @@ func (s *Simulator) sendTxsToAndFro() {
 		To = tempPrivKey
 		s.toSwap = !s.toSwap
 	}
+
 	for i := 0; i < 2; i++ {
 		privKeyBytes, err := hex.DecodeString(From)
 		if err != nil {
 			s.Logger.Error("unable to decode string", "error", err)
 			return
 		}
+
 		key := crypto.ToECDSAUnsafe(privKeyBytes)
 
 		latestFromAcc, err := s.DB.GetAccountByID(FromID)
@@ -170,5 +173,4 @@ func (s *Simulator) sendTxsToAndFro() {
 			s.toSwap = true
 		}
 	}
-
 }

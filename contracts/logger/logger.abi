@@ -110,6 +110,19 @@
         {
           "indexed": false,
           "internalType": "bytes32",
+          "name": "root",
+          "type": "bytes32"
+        }
+      ],
+      "name": "DepositSubTreeReady",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "bytes32",
           "name": "depositSubTreeRoot",
           "type": "bytes32"
         },
@@ -424,6 +437,21 @@
         }
       ],
       "name": "logDepositLeafMerged",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "root",
+          "type": "bytes32"
+        }
+      ],
+      "name": "logDepositSubTreeReady",
       "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
