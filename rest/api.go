@@ -2,7 +2,6 @@ package rest
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -15,20 +14,10 @@ type (
 	TxReceiver struct {
 		From      uint64 `json:"from"`
 		To        uint64 `json:"to"`
-		Amount    uint64 `json:"amount"`
-		Nonce     uint64 `json:"nonce"`
-		TokenID   uint64 `json:"token"`
+		Message   []byte `json:"message"`
 		Signature string `json:"sig"`
 	}
 )
-
-func (tx *TxReceiver) Validate() error {
-	if tx.Amount == 0 {
-		return errors.New("amount in the transaction cannot be 0")
-	}
-
-	return nil
-}
 
 // TxReceiverHandler handles user txs
 func TxReceiverHandler(w http.ResponseWriter, r *http.Request) {
@@ -38,24 +27,14 @@ func TxReceiverHandler(w http.ResponseWriter, r *http.Request) {
 		WriteErrorResponse(w, http.StatusBadRequest, "Cannot read request")
 	}
 
-	if err := tx.Validate(); err != nil {
-		WriteErrorResponse(w, http.StatusBadRequest, "Bad input data for transation")
-	}
-
 	// create a new pending transaction
-	userTx := core.NewPendingTx(tx.To, tx.From, tx.Amount, tx.Nonce, tx.Signature, tx.TokenID)
+	userTx := core.NewPendingTx(tx.From, tx.To, tx.Signature, tx.Message)
 
 	// assign the transaction a HASH
 	userTx.AssignHash()
 
-	// do basic input validations
-	err := userTx.ValidateBasic()
-	if err != nil {
-		WriteErrorResponse(w, http.StatusBadRequest, "Cannot read request")
-	}
-
 	// add the transaction to pool
-	err = core.DBInstance.InsertTx(&userTx)
+	err := core.DBInstance.InsertTx(&userTx)
 	if err != nil {
 		WriteErrorResponse(w, http.StatusBadRequest, "Cannot read request")
 	}

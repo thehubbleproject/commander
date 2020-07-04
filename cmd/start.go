@@ -170,9 +170,6 @@ func LoadGenesisData(genesis config.Genesis) {
 			allAccounts,
 			core.UserAccount{
 				AccountID:     account.ID,
-				Balance:       account.Balance,
-				TokenType:     account.TokenType,
-				Nonce:         account.Nonce,
 				Status:        account.Status,
 				PublicKey:     account.PublicKey,
 				PublicKeyHash: pubkeyHash,

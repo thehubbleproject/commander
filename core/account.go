@@ -21,15 +21,6 @@ type UserAccount struct {
 	AccountID uint64 `gorm:"not null;index:AccountID"`
 
 	Data []byte `gorm:"not null;index:data"`
-	// // Token type of the user account
-	// // Cannot be changed once creation
-	// TokenType uint64 `gorm:"not null;default:0"`
-
-	// // Balance of the user account
-	// Balance uint64 `gorm:"not null;"`
-
-	// // Nonce of the account
-	// Nonce uint64 `gorm:"not null;"`
 
 	// Public key for the user
 	PublicKey string `gorm:"size:1000"`
@@ -61,13 +52,10 @@ type UserAccount struct {
 }
 
 // NewUserAccount creates a new user account
-func NewUserAccount(id, balance, tokenType, nonce, status uint64, pubkey, path string) *UserAccount {
+func NewUserAccount(id, status uint64, pubkey, path string) *UserAccount {
 	newAcccount := &UserAccount{
 		AccountID: id,
 		PublicKey: pubkey,
-		Balance:   balance,
-		TokenType: tokenType,
-		Nonce:     nonce,
 		Path:      path,
 		Status:    status,
 		Type:      TYPE_TERMINAL,
@@ -84,9 +72,6 @@ func NewAccountNode(path, hash, pubkeyHash string) *UserAccount {
 		AccountID:     ZERO,
 		PublicKey:     "",
 		PublicKeyHash: pubkeyHash,
-		Balance:       ZERO,
-		TokenType:     ZERO,
-		Nonce:         ZERO,
 		Path:          path,
 		Status:        STATUS_ACTIVE,
 		Type:          TYPE_NON_TERMINAL,
@@ -98,12 +83,9 @@ func NewAccountNode(path, hash, pubkeyHash string) *UserAccount {
 
 // NewAccountNode creates a new terminal user account but in pending state
 // It is to be used while adding new deposits while they are not finalised
-func NewPendingUserAccount(id, balance, tokenType uint64, _pubkey string) *UserAccount {
+func NewPendingUserAccount(id uint64, _pubkey string) *UserAccount {
 	newAcccount := &UserAccount{
 		AccountID: id,
-		TokenType: tokenType,
-		Balance:   balance,
-		Nonce:     NONCE_ZERO,
 		Path:      UNINITIALIZED_PATH,
 		Status:    STATUS_PENDING,
 		PublicKey: _pubkey,
@@ -120,16 +102,13 @@ func (acc *UserAccount) UpdatePath(path string) {
 }
 
 func (acc *UserAccount) String() string {
-	return fmt.Sprintf("ID: %d Bal: %d Path: %v Nonce: %v TokenType:%v NodeType: %d %v", acc.AccountID, acc.Balance, acc.Path, acc.Nonce, acc.TokenType, acc.Type, acc.Hash)
+	// TODO [apply-tx] TYPE the data bytes and print
+	return fmt.Sprintf("ID: %d Bal: %d Path: %v Nonce: %v TokenType:%v NodeType: %d %v", acc.AccountID, acc.Path, acc.Type, acc.Hash)
 }
 
 func (acc *UserAccount) ToABIAccount() rollup.TypesUserAccount {
-	return rollup.TypesUserAccount{
-		ID:        UintToBigInt(acc.AccountID),
-		Balance:   UintToBigInt(acc.Balance),
-		TokenType: UintToBigInt(acc.TokenType),
-		Nonce:     UintToBigInt(acc.Nonce),
-	}
+	// TODO [apply-tx] call bytes to typed account here
+	return rollup.TypesUserAccount{}
 }
 
 func (acc *UserAccount) HashToByteArray() ByteArray {
@@ -148,21 +127,9 @@ func (acc *UserAccount) PubkeyHashToByteArray() ByteArray {
 	return ba
 }
 
-func (acc *UserAccount) UpdateBalance(newBalance uint64) {
-	acc.Balance = newBalance
-}
-
-func (acc *UserAccount) UpdateNonce() {
-	acc.Nonce = acc.Nonce + 1
-}
-
 func (acc *UserAccount) ApplyTx(tx Tx) {
-	if acc.AccountID == tx.From {
-		// decrease balance
-		acc.UpdateBalance(acc.Balance - tx.Amount)
-	}
-
-	acc.UpdateNonce()
+	// TODO: [apply-tx] call apply tx from contract
+	// and update the account bytes
 }
 
 func (acc *UserAccount) IsCoordinator() bool {
@@ -189,35 +156,8 @@ func (acc *UserAccount) AccountInclusionProof(path int64) rollup.TypesAccountInc
 }
 
 func (acc *UserAccount) ABIEncode() ([]byte, error) {
-	uint256Ty, err := abi.NewType("uint256", "uint256", nil)
-	if err != nil {
-		return []byte(""), err
-	}
-
-	arguments := abi.Arguments{
-		{
-			Type: uint256Ty,
-		},
-		{
-			Type: uint256Ty,
-		},
-		{
-			Type: uint256Ty,
-		},
-		{
-			Type: uint256Ty,
-		},
-	}
-	bytes, err := arguments.Pack(
-		big.NewInt(int64(acc.AccountID)),
-		big.NewInt(int64(acc.Balance)),
-		big.NewInt(int64(acc.Nonce)),
-		big.NewInt(int64(acc.TokenType)),
-	)
-	if err != nil {
-		return []byte(""), err
-	}
-
+	// TODO: [apply-tx] call encoding function from contract
+	var bytes []byte
 	return bytes, nil
 }
 
@@ -236,7 +176,7 @@ func (acc *UserAccount) CreateAccountHash() {
 
 // EmptyAcccount creates a new account which has the same hash as ZERO_VALUE_LEAF
 func EmptyAccount() UserAccount {
-	return *NewUserAccount(ZERO, ZERO, ZERO, ZERO, STATUS_ACTIVE, "", "")
+	return *NewUserAccount(ZERO, STATUS_ACTIVE, "", "")
 }
 
 //

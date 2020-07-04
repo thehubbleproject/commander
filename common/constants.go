@@ -24,6 +24,8 @@ const (
 	MERKLE_TREE_LIB_KEY      = "mktlibk"
 	TOKEN_REGISTRY_KEY       = "tkk"
 	LOGGER_KEY               = "logger"
+	ROLLUP_UTILS             = "rollup-utils"
+	FRAUD_PROOF              = "fraud"
 	DEPOSIT_MANAGER          = "depositmanager"
 	COORDINATOR_PROXY        = "coordinator"
 )

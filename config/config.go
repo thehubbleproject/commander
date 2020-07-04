@@ -46,8 +46,10 @@ type Configuration struct {
 	ServerPort         string        `mapstructure:"server_port"`
 	ConfirmationBlocks uint64        `mapstructure:"confirmation_blocks"` // Number of blocks for confirmation
 
-	RollupAddress string `mapstructure:"rollup_address"`
-	LoggerAddress string `mapstructure:"logger_address"`
+	RollupAddress      string `mapstructure:"rollup_address"`
+	LoggerAddress      string `mapstructure:"logger_address"`
+	FraudProofAddress  string `mapstructure:"fraud_proof_address"`
+	RollupUtilsAddress string `mapstructure:"rollup_utils_address"`
 
 	OperatorKey       string `mapstructure:"operator_key"`
 	OperatorAddress   string `mapstructure:"operator_address"`
@@ -68,6 +70,8 @@ func GetDefaultConfig() Configuration {
 		ConfirmationBlocks: DefaultConfirmationBlocks,
 		RollupAddress:      ethCmn.Address{}.String(),
 		LoggerAddress:      ethCmn.Address{}.String(),
+		FraudProofAddress:  ethCmn.Address{}.String(),
+		RollupUtilsAddress: ethCmn.Address{}.String(),
 		OperatorKey:        "",
 		OperatorAddress:    "",
 		LastRecordedBlock:  "0",

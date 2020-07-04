@@ -1,17 +1,11 @@
 package simulator
 
 import (
-	"bytes"
 	"context"
-	"encoding/hex"
-	"encoding/json"
-	"net/http"
 	"time"
 
 	"github.com/BOPR/common"
 	"github.com/BOPR/core"
-	"github.com/BOPR/rest"
-	"github.com/ethereum/go-ethereum/crypto"
 )
 
 const (
@@ -101,76 +95,76 @@ func (s *Simulator) sendTxsToAndFro() {
 	}
 
 	for i := 0; i < 2; i++ {
-		privKeyBytes, err := hex.DecodeString(From)
-		if err != nil {
-			s.Logger.Error("unable to decode string", "error", err)
-			return
-		}
+		// privKeyBytes, err := hex.DecodeString(From)
+		// if err != nil {
+		// 	s.Logger.Error("unable to decode string", "error", err)
+		// 	return
+		// }
 
-		key := crypto.ToECDSAUnsafe(privKeyBytes)
+		// key := crypto.ToECDSAUnsafe(privKeyBytes)
 
-		latestFromAcc, err := s.DB.GetAccountByID(FromID)
-		if err != nil {
-			s.Logger.Error("unable to fetch latest account", "error", err)
-			return
-		}
+		// latestFromAcc, err := s.DB.GetAccountByID(FromID)
+		// if err != nil {
+		// 	s.Logger.Error("unable to fetch latest account", "error", err)
+		// 	return
+		// }
 
-		if latestFromAcc.Balance < 3 {
-			tempID := FromID
-			FromID = ToID
-			ToID = tempID
-			tempPrivKey := From
-			From = To
-			To = tempPrivKey
-		}
+		// if latestFromAcc.Balance < 3 {
+		// 	tempID := FromID
+		// 	FromID = ToID
+		// 	ToID = tempID
+		// 	tempPrivKey := From
+		// 	From = To
+		// 	To = tempPrivKey
+		// }
 
-		var txCore = core.Tx{
-			From:    FromID,
-			To:      ToID,
-			Amount:  1,
-			TokenID: latestFromAcc.TokenType,
-			Nonce:   latestFromAcc.Nonce + 1,
-		}
+		// var txCore = core.Tx{
+		// 	From:    FromID,
+		// 	To:      ToID,
+		// 	Amount:  1,
+		// 	TokenID: latestFromAcc.TokenType,
+		// 	Nonce:   latestFromAcc.Nonce + 1,
+		// }
 
-		signBytes, err := txCore.GetSignBytes()
-		if err != nil {
-			return
-		}
+		// signBytes, err := txCore.GetSignBytes()
+		// if err != nil {
+		// 	return
+		// }
 
-		signature, err := crypto.Sign(signBytes, key)
+		// signature, err := crypto.Sign(signBytes, key)
 
-		var tx = rest.TxReceiver{
-			From:      txCore.From,
-			To:        txCore.To,
-			Amount:    1,
-			TokenID:   txCore.TokenID,
-			Nonce:     txCore.Nonce,
-			Signature: hex.EncodeToString(signature),
-		}
+		// var tx = rest.TxReceiver{
+		// 	From:      txCore.From,
+		// 	To:        txCore.To,
+		// 	Amount:    1,
+		// 	TokenID:   txCore.TokenID,
+		// 	Nonce:     txCore.Nonce,
+		// 	Signature: hex.EncodeToString(signature),
+		// }
 
-		payload, err := json.Marshal(tx)
-		if err != nil {
-			return
-		}
+		// payload, err := json.Marshal(tx)
+		// if err != nil {
+		// 	return
+		// }
 
-		request, err := http.NewRequest("POST", "http://localhost:3000/tx", bytes.NewBuffer(payload))
-		if err != nil {
-			return
-		}
+		// request, err := http.NewRequest("POST", "http://localhost:3000/tx", bytes.NewBuffer(payload))
+		// if err != nil {
+		// 	return
+		// }
 
-		client := &http.Client{}
-		resp, err := client.Do(request)
-		if err != nil {
-			panic(err)
-		}
+		// client := &http.Client{}
+		// resp, err := client.Do(request)
+		// if err != nil {
+		// 	panic(err)
+		// }
 
-		defer resp.Body.Close()
+		// defer resp.Body.Close()
 
-		if resp.StatusCode == 200 {
-			s.Logger.Info("Tx sent!", "TxData", txCore.String())
-		}
-		if txCore.From == uint64(2) {
-			s.toSwap = true
-		}
+		// if resp.StatusCode == 200 {
+		// 	s.Logger.Info("Tx sent!", "TxData", txCore.String())
+		// }
+		// if txCore.From == uint64(2) {
+		// 	s.toSwap = true
+		// }
 	}
 }

@@ -1,13 +1,8 @@
 package main
 
 import (
-	"encoding/hex"
-	"fmt"
-
 	"github.com/BOPR/core"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 //  SendTransferTx generated init command to initialise the config file
@@ -16,11 +11,11 @@ func SendTransferTx() *cobra.Command {
 		Use:   "transfer",
 		Short: "Transfers assets between 2 accounts",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			toIndex := viper.GetUint64(FlagToAccountID)
-			fromIndex := viper.GetUint64(FlagFromAccountID)
-			tokenID := viper.GetUint64(FlagTokenID)
-			privKey := viper.GetString(FlagPrivKey)
-			amount := viper.GetUint64(FlagAmount)
+			// toIndex := viper.GetUint64(FlagToAccountID)
+			// fromIndex := viper.GetUint64(FlagFromAccountID)
+			// tokenID := viper.GetUint64(FlagTokenID)
+			// privKey := viper.GetString(FlagPrivKey)
+			// amount := viper.GetUint64(FlagAmount)
 
 			db, err := core.NewDB()
 			if err != nil {
@@ -28,40 +23,38 @@ func SendTransferTx() *cobra.Command {
 			}
 			defer db.Close()
 
-			fromAcc, err := db.GetAccountByID(fromIndex)
-			if err != nil {
-				return err
-			}
+			// fromAcc, err := db.GetAccountByID(fromIndex)
+			// if err != nil {
+			// 	return err
+			// }
 
-			privKeyBytes, err := hex.DecodeString(privKey)
-			if err != nil {
-				return err
-			}
-			key := crypto.ToECDSAUnsafe(privKeyBytes)
-			var txCore = core.Tx{
-				From:    fromIndex,
-				To:      toIndex,
-				Amount:  1,
-				TokenID: fromAcc.TokenType,
-				Nonce:   fromAcc.Nonce + 1,
-			}
-			signBytes, err := txCore.GetSignBytes()
-			if err != nil {
-				return err
-			}
-			sig, err := crypto.Sign(signBytes, key)
-			if err != nil {
-				return err
-			}
+			// privKeyBytes, err := hex.DecodeString(privKey)
+			// if err != nil {
+			// 	return err
+			// }
+			// key := crypto.ToECDSAUnsafe(privKeyBytes)
+			// var txCore = core.Tx{
+			// 	From:   fromIndex,
+			// 	To:     toIndex,
+			// 	Amount: 1,
+			// }
+			// signBytes, err := txCore.GetSignBytes()
+			// if err != nil {
+			// 	return err
+			// }
+			// sig, err := crypto.Sign(signBytes, key)
+			// if err != nil {
+			// 	return err
+			// }
 
-			tx := core.NewPendingTx(toIndex, fromIndex, amount, fromAcc.Nonce+1, hex.EncodeToString(sig), tokenID)
-			tx.AssignHash()
+			// tx := core.NewPendingTx(toIndex, fromIndex, amount, 1, hex.EncodeToString(sig), tokenID)
+			// tx.AssignHash()
 
-			err = db.InsertTx(&tx)
-			if err != nil {
-				return err
-			}
-			fmt.Println("Transaction submitted successfully", "hash", tx.TxHash)
+			// err = db.InsertTx(&tx)
+			// if err != nil {
+			// 	return err
+			// }
+			// fmt.Println("Transaction submitted successfully", "hash", tx.TxHash)
 			return nil
 		},
 	}

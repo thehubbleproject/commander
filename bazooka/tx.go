@@ -108,6 +108,6 @@ func (b *Bazooka) SubmitBatch(updatedRoot core.ByteArray, txs []core.Tx) error {
 	if err != nil {
 		return err
 	}
-	b.log.Info("Sent a new batch!", "txHash",tx.Hash().String())
+	b.log.Info("Sent a new batch!", "txHash", tx.Hash().String())
 	return nil
 }

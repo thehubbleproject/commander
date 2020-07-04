@@ -526,9 +526,19 @@
               "type": "uint256"
             },
             {
-              "internalType": "uint32",
+              "internalType": "uint256",
+              "name": "nonce",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "txType",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
               "name": "amount",
-              "type": "uint32"
+              "type": "uint256"
             },
             {
               "internalType": "bytes",
@@ -771,9 +781,19 @@
               "type": "uint256"
             },
             {
-              "internalType": "uint32",
+              "internalType": "uint256",
+              "name": "nonce",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "txType",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
               "name": "amount",
-              "type": "uint32"
+              "type": "uint256"
             },
             {
               "internalType": "bytes",
@@ -789,31 +809,9 @@
       "name": "ApplyTx",
       "outputs": [
         {
-          "components": [
-            {
-              "internalType": "uint256",
-              "name": "ID",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "tokenType",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "balance",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "nonce",
-              "type": "uint256"
-            }
-          ],
-          "internalType": "struct Types.UserAccount",
-          "name": "updatedAccount",
-          "type": "tuple"
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
         },
         {
           "internalType": "bytes32",
@@ -856,9 +854,19 @@
               "type": "uint256"
             },
             {
-              "internalType": "uint32",
+              "internalType": "uint256",
+              "name": "nonce",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "txType",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
               "name": "amount",
-              "type": "uint32"
+              "type": "uint256"
             },
             {
               "internalType": "bytes",
@@ -1024,9 +1032,14 @@
           "type": "bytes32"
         },
         {
-          "internalType": "uint256",
+          "internalType": "bytes",
           "name": "",
-          "type": "uint256"
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
         },
         {
           "internalType": "uint256",
@@ -1074,9 +1087,19 @@
               "type": "uint256"
             },
             {
-              "internalType": "uint32",
+              "internalType": "uint256",
+              "name": "nonce",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "txType",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
               "name": "amount",
-              "type": "uint32"
+              "type": "uint256"
             },
             {
               "internalType": "bytes",

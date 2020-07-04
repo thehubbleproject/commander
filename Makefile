@@ -7,6 +7,8 @@ dep:
 contracts:
 	abigen --abi=contracts/rollup/rollup.abi --pkg=rollup --out=contracts/rollup/rollup.go
 	abigen --abi=contracts/logger/logger.abi --pkg=logger --out=contracts/logger/logger.go
+	abigen --abi=contracts/rolluputils/rolluputils.abi --pkg=rolluputils --out=contracts/rolluputils/rolluputils.go
+	abigen --abi=contracts/fraudproof/fraudproof.abi --pkg=fraudproof --out=contracts/fraudproof/fraudproof.go
 
 clean:
 	rm -rf build

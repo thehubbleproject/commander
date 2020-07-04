@@ -1,16 +1,13 @@
 package core
 
 import (
-	"errors"
 	"fmt"
 	"math/big"
 
 	"encoding/hex"
 
-	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 	"github.com/BOPR/contracts/rollup"
-	"github.com/ethereum/go-ethereum/accounts/abi"
 	ethCmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/rlp"
 	"golang.org/x/crypto/sha3"
@@ -21,74 +18,37 @@ type Tx struct {
 	DBModel
 	To        uint64 `json:"to"`
 	From      uint64 `json:"from"`
-	Amount    uint64 `json:"amount"`
-	Nonce     uint64 `json:"nonce"`
-	TokenID   uint64 `json:"tokenID"`
+	Data      []byte `json:"data"`
 	Signature string `json:"sig" gorm:"not null"`
 	TxHash    string `json:"hash" gorm:"not null"`
-
-	// 100 Pending
-	// 200 Processing
-	// 300 Processed
-	// 400 reverted
-	Status uint `json:"status"`
+	Status    uint64 `json:"status"`
 }
 
 // NewTx creates a new transaction
-func NewTx(to uint64, from uint64, amount uint64, nonce uint64, sig string, tokenID uint64) Tx {
+func NewTx(from, to uint64, message []byte, sig string) Tx {
+	return Tx{
+		From:      from,
+		To:        to,
+		Data:      message,
+		Signature: sig,
+	}
+}
+
+// NewPendingTx creates a new transaction
+func NewPendingTx(from, to uint64, sig string, message []byte) Tx {
 	return Tx{
 		To:        to,
 		From:      from,
-		Amount:    amount,
-		Nonce:     nonce,
-		TokenID:   tokenID,
+		Data:      message,
 		Signature: sig,
+		Status:    TX_STATUS_PENDING,
 	}
 }
 
 // GetSignBytes returns the transaction data that has to be signed
 func (tx Tx) GetSignBytes() (signBytes []byte, err error) {
-	data, err := tx.Bytes()
-	if err != nil {
-		return signBytes, err
-	}
-	return common.Keccak256(data).Bytes(), nil
-}
-
-// Bytes just contains the tx apart from the bytes
-func (tx *Tx) Bytes() ([]byte, error) {
-	uint256Ty, err := abi.NewType("uint256", "uint256", nil)
-	if err != nil {
-		return []byte(""), err
-	}
-
-	arguments := abi.Arguments{
-		{
-			Type: uint256Ty,
-		},
-		{
-			Type: uint256Ty,
-		},
-		{
-			Type: uint256Ty,
-		},
-		{
-			Type: uint256Ty,
-		},
-	}
-
-	bytes, err := arguments.Pack(
-		big.NewInt(int64(tx.From)),
-		big.NewInt(int64(tx.To)),
-		big.NewInt(int64(tx.TokenID)),
-		big.NewInt(int64(tx.Amount)),
-	)
-
-	if err != nil {
-		return []byte(""), err
-	}
-
-	return bytes, nil
+	// TODO: [apply-tx] call bazooka
+	return
 }
 
 // AssignHash creates a tx hash and add it to the tx
@@ -100,7 +60,7 @@ func (t *Tx) AssignHash() {
 	t.TxHash = hash.String()
 }
 
-func (tx *Tx) Apply() error {
+func (tx *Tx) Apply(updatedFrom, updatedTo []byte) error {
 	// get fresh copy of database
 	db, err := NewDB()
 	if err != nil {
@@ -125,7 +85,7 @@ func (tx *Tx) Apply() error {
 		return err
 	}
 
-	fromAcc.ApplyTx(*tx)
+	fromAcc.Data = updatedFrom
 
 	err = db.UpdateAccount(fromAcc)
 	if err != nil {
@@ -140,7 +100,7 @@ func (tx *Tx) Apply() error {
 		return err
 	}
 
-	toAcc.ApplyTx(*tx)
+	toAcc.Data = updatedTo
 
 	err = db.UpdateAccount(toAcc)
 	if err != nil {
@@ -148,112 +108,32 @@ func (tx *Tx) Apply() error {
 		return err
 	}
 
+	tx.UpdateStatus(TX_STATUS_PROCESSED)
+
 	// Or commit the transaction
 	mysqlTx.Commit()
 	return nil
 }
 
-// NewPendingTx creates a new transaction
-func NewPendingTx(to uint64, from uint64, amount uint64, nonce uint64, sig string, tokenID uint64) Tx {
-	return Tx{
-		To:        to,
-		From:      from,
-		Amount:    amount,
-		Nonce:     nonce,
-		TokenID:   tokenID,
-		Signature: sig,
-		Status:    TX_STATUS_PENDING,
-	}
-}
-
-// ValidateTx validates a transaction
-// NOTE: This is a stateless op, should be run before adding txs to mempool
-func (t *Tx) ValidateBasic() error {
-	// check status is within the permissible status codes
-	if t.Status < TX_STATUS_PENDING {
-		return errors.New("Invalid status code for the transaction found")
-	}
-
-	// check amount is greater than 0
-	if t.Amount == 0 {
-		return errors.New("Invalid amount. Cannot be less than 0")
-	}
-
-	// Check nonce is greater than 0
-	if t.Nonce < 0 {
-		return errors.New("Invalid nonce for the transaction found. Cannot be less than 0")
-	}
-
-	// check the ID's are greater than 0
-	if t.From == 0 {
-		return errors.New("Invalid from address found. From cannot be 0")
-	}
-
-	// check the ID's are greater than 0
-	if t.From < 0 || t.To < 0 {
-		return errors.New("Invalid To or From found. Cannot be less than 0")
-	}
-
-	return nil
-}
-
 func (t *Tx) String() string {
-	return fmt.Sprintf("To: %v From: %v Amount: %v Nonce: %v Type:%v Status:%v Hash: %v", t.To, t.From, t.Amount, t.Nonce, t.TokenID, t.Status, t.TxHash)
+	return fmt.Sprintf("To: %v From: %v Status:%v Hash: %v Data: %v", t.To, t.From, t.Status, t.TxHash, hex.EncodeToString(t.Data))
 }
 
 // ToABIVersion converts a standard tx to the the DataTypesTransaction struct on the contract
 func (t *Tx) ToABIVersion(from, to int64) rollup.TypesTransaction {
 	decodedSignature, _ := hex.DecodeString(t.Signature)
+	// TODO call decode transaction with bazooka
 	return rollup.TypesTransaction{
 		ToIndex:   big.NewInt(to),
 		FromIndex: big.NewInt(from),
-		Amount:    uint32(t.Amount),
-		TokenType: big.NewInt(int64(t.TokenID)),
 		Signature: decodedSignature,
 	}
 }
 
 func (tx *Tx) Compress() ([]byte, error) {
-	uint256Ty, err := abi.NewType("uint256", "uint256", nil)
-	if err != nil {
-		return []byte(""), err
-	}
+	// TODO : [apply-tx] call bazooka
 
-	bytesTy, err := abi.NewType("bytes", "bytes", nil)
-	if err != nil {
-		return []byte(""), err
-	}
-
-	arguments := abi.Arguments{
-		{
-			Type: uint256Ty,
-		},
-		{
-			Type: uint256Ty,
-		},
-		{
-			Type: uint256Ty,
-		},
-		{
-			Type: uint256Ty,
-		},
-		{
-			Type: bytesTy,
-		},
-	}
-
-	bytes, err := arguments.Pack(
-		big.NewInt(int64(tx.From)),
-		big.NewInt(int64(tx.To)),
-		big.NewInt(int64(tx.TokenID)),
-		big.NewInt(int64(tx.Amount)),
-		[]byte(tx.Signature),
-	)
-
-	if err != nil {
-		return []byte(""), err
-	}
-
+	var bytes []byte
 	return bytes, nil
 }
 
@@ -306,44 +186,8 @@ func (db *DB) GetTx() (tx []Tx, err error) {
 	return
 }
 
-// GetTxVerificationData fetches all the data required to prove validity fo transaction
-func (db *DB) GetTxVerificationData(tx Tx) (fromMerkleProof, toMerkleProof AccountMerkleProof, PDAProof PDAMerkleProof, err error) {
-	fromAcc, err := db.GetAccountByID(tx.From)
-	if err != nil {
-		return
-	}
-	fromSiblings, err := db.GetSiblings(fromAcc.Path)
-	if err != nil {
-		return
-	}
-	fromMerkleProof = NewAccountMerkleProof(fromAcc, fromSiblings)
-	toAcc, err := db.GetAccountByID(tx.To)
-	if err != nil {
-		return
-	}
-	var toSiblings []UserAccount
-	mysqlTx := db.Instance.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			mysqlTx.Rollback()
-		}
-	}()
-	dbCopy, _ := NewDB()
-	dbCopy.Instance = mysqlTx
-	// STATE UPDATES TO BE REMOVED
-	fromAcc.Balance -= tx.Amount
-	err = dbCopy.UpdateAccount(fromAcc)
-	if err != nil {
-		return
-	}
-	toSiblings, err = dbCopy.GetSiblings(toAcc.Path)
-	if err != nil {
-		return
-	}
-	mysqlTx.Rollback()
-	toMerkleProof = NewAccountMerkleProof(toAcc, toSiblings)
-	PDAProof = NewPDAProof(fromAcc.Path, fromAcc.PublicKey, fromSiblings)
-	return fromMerkleProof, toMerkleProof, PDAProof, nil
+func (tx *Tx) UpdateStatus(status uint64) error {
+	return DBInstance.Instance.Model(&tx).Update("status", status).Error
 }
 
 func rlpHash(x interface{}) (h ethCmn.Hash) {
