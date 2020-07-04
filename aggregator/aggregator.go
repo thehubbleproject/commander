@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/BOPR/bazooka"
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 	"github.com/BOPR/core"
@@ -26,7 +25,7 @@ type Aggregator struct {
 	core.BaseService
 
 	// contract caller to interact with contracts
-	LoadedBazooka bazooka.Bazooka
+	LoadedBazooka core.Bazooka
 
 	// DB instance
 	DB core.DB
@@ -39,7 +38,7 @@ type Aggregator struct {
 func NewAggregator(db core.DB) *Aggregator {
 	// create logger
 	logger := common.Logger.With("module", AggregatingService)
-	LoadedBazooka, err := bazooka.NewPreLoadedBazooka()
+	LoadedBazooka, err := core.NewPreLoadedBazooka()
 	if err != nil {
 		panic(err)
 	}

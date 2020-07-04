@@ -8,7 +8,6 @@ import (
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 	"github.com/BOPR/contracts/rollup"
-	"github.com/BOPR/core"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	ethCmn "github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
@@ -32,10 +31,10 @@ func (b *Bazooka) TotalBatches() (uint64, error) {
 	return totalBatches.Uint64(), nil
 }
 
-func (b *Bazooka) FetchBalanceTreeRoot() (core.ByteArray, error) {
+func (b *Bazooka) FetchBalanceTreeRoot() (ByteArray, error) {
 	root, err := b.RollupContract.GetLatestBalanceTreeRoot(nil)
 	if err != nil {
-		return core.ByteArray{}, err
+		return ByteArray{}, err
 	}
 	return root, nil
 }
@@ -68,9 +67,9 @@ func (b *Bazooka) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, err err
 
 // ProcessTx calls the ProcessTx function on the contract to verify the tx
 // returns the updated accounts and the new balance root
-func (b *Bazooka) ProcessTx(balanceTreeRoot, accountTreeRoot core.ByteArray, tx core.Tx, fromMerkleProof, toMerkleProof core.AccountMerkleProof, pdaProof core.PDAMerkleProof) (newBalanceRoot core.ByteArray, from, to []byte, err error) {
+func (b *Bazooka) ProcessTx(balanceTreeRoot, accountTreeRoot ByteArray, tx Tx, fromMerkleProof, toMerkleProof AccountMerkleProof, pdaProof PDAMerkleProof) (newBalanceRoot ByteArray, from, to []byte, err error) {
 	txABIVersion := tx.ToABIVersion(int64(tx.From), int64(tx.To))
-	opts := bind.CallOpts{From: config.OperatorAddress()}
+	opts := bind.CallOpts{From: config.OperatorAddress}
 	typesAccountProofs := rollup.TypesAccountProofs{From: fromMerkleProof.ToABIVersion(), To: toMerkleProof.ToABIVersion()}
 	updatedRoot, newFromAccount, newToAccount, err_code, IsValidTx, err := b.RollupContract.ProcessTx(&opts,
 		balanceTreeRoot,
@@ -89,11 +88,11 @@ func (b *Bazooka) ProcessTx(balanceTreeRoot, accountTreeRoot core.ByteArray, tx 
 		b.log.Error("Invalid transaction", "error_code", err_code)
 		return newBalanceRoot, from, to, errors.New("Tx is invalid")
 	}
-	newBalanceRoot = core.BytesToByteArray(updatedRoot[:])
+	newBalanceRoot = BytesToByteArray(updatedRoot[:])
 	return newBalanceRoot, newFromAccount, newToAccount, nil
 }
 
-func (b *Bazooka) ApplyTransferTx(account core.AccountMerkleProof, tx core.Tx) ([]byte, core.ByteArray, error) {
+func (b *Bazooka) ApplyTransferTx(account AccountMerkleProof, tx Tx) ([]byte, ByteArray, error) {
 	txABIVersion := tx.ToABIVersion(int64(tx.From), int64(tx.To))
 	updatedAccountBytes, updatedRoot, err := b.RollupContract.ApplyTx(nil, account.ToABIVersion(), txABIVersion)
 	if err != nil {
@@ -103,7 +102,7 @@ func (b *Bazooka) ApplyTransferTx(account core.AccountMerkleProof, tx core.Tx) (
 	return updatedAccountBytes, updatedRoot, nil
 }
 
-// func (b *Bazooka) CompressTx(tx core.Tx) ([]byte, core.ByteArray, error) {
+// func (b *Bazooka) CompressTx(tx Tx) ([]byte, ByteArray, error) {
 // 	txABIVersion := tx.ToABIVersion(int64(tx.From), int64(tx.To))
 
 // 	b.RollupUtils.CompressTx(nil, txABIVersion)

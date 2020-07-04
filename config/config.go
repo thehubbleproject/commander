@@ -31,6 +31,7 @@ const (
 var GlobalCfg Configuration
 var OperatorKey *ecdsa.PrivateKey
 var OperatorPubKey *ecdsa.PublicKey
+var OperatorAddress ethCmn.Address
 
 // Configuration represents heimdall config
 type Configuration struct {
@@ -134,12 +135,8 @@ func SetOperatorKeys(privKeyStr string) error {
 		return errors.New("cannot assert type: publicKey is not of type *ecdsa.PublicKey")
 	}
 	OperatorPubKey = ecsdaPubKey
+	OperatorAddress = crypto.PubkeyToAddress(*OperatorPubKey)
 	return nil
-}
-
-func OperatorAddress() ethCmn.Address {
-	address := crypto.PubkeyToAddress(*OperatorPubKey)
-	return address
 }
 
 func GenOperatorKey() ([]byte, error) {

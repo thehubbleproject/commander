@@ -12,7 +12,6 @@ import (
 	"github.com/BOPR/config"
 
 	agg "github.com/BOPR/aggregator"
-	"github.com/BOPR/bazooka"
 	"github.com/BOPR/core"
 	"github.com/BOPR/listener"
 	"github.com/BOPR/rest"
@@ -145,7 +144,7 @@ func InitGlobalDBInstance() {
 func InitGlobalBazooka() {
 	var err error
 	// create and init global config object
-	bazooka.LoadedBazooka, err = bazooka.NewPreLoadedBazooka()
+	core.LoadedBazooka, err = core.NewPreLoadedBazooka()
 	common.PanicIfError(err)
 }
 

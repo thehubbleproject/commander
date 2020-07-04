@@ -1,4 +1,4 @@
-package bazooka
+package core
 
 import (
 	"strings"
