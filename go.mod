@@ -29,7 +29,7 @@ require (
 	github.com/jackpal/go-nat-pmp v1.0.2 // indirect
 	github.com/jinzhu/gorm v1.9.12
 	github.com/karalabe/usb v0.0.0-20191104083709-911d15fe12a9 // indirect
-	github.com/maticnetwork/bor v0.2.0
+	// github.com/maticnetwork/bor v0.2.0
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/miguelmota/go-solidity-sha3 v0.1.0 // indirect
 	github.com/olekukonko/tablewriter v0.0.3 // indirect

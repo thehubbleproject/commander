@@ -6,12 +6,12 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/ethereum/go-ethereum"
-	"github.com/ethereum/go-ethereum/rpc"
-	"github.com/maticnetwork/bor/accounts/abi/bind"
-
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
+	"github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	ethTypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/rpc"
 
 	"github.com/BOPR/contracts/fraudproof"
 	"github.com/BOPR/contracts/logger"
