@@ -20,7 +20,7 @@ type UserAccount struct {
 	// Cannot be changed once created
 	AccountID uint64 `gorm:"not null;index:AccountID"`
 
-	Data []byte `gorm:"not null;index:data"`
+	Data []byte `gorm:"index:data"`
 
 	// Public key for the user
 	PublicKey string `gorm:"size:1000"`
