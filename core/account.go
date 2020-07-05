@@ -52,13 +52,14 @@ type UserAccount struct {
 }
 
 // NewUserAccount creates a new user account
-func NewUserAccount(id, status uint64, pubkey, path string) *UserAccount {
+func NewUserAccount(id, status uint64, pubkey, path string, data []byte) *UserAccount {
 	newAcccount := &UserAccount{
 		AccountID: id,
 		PublicKey: pubkey,
 		Path:      path,
 		Status:    status,
 		Type:      TYPE_TERMINAL,
+		Data:      data,
 	}
 	newAcccount.UpdatePath(newAcccount.Path)
 	newAcccount.CreateAccountHash()
@@ -127,11 +128,6 @@ func (acc *UserAccount) PubkeyHashToByteArray() ByteArray {
 	return ba
 }
 
-func (acc *UserAccount) ApplyTx(tx Tx) {
-	// TODO: [apply-tx] call apply tx from contract
-	// and update the account bytes
-}
-
 func (acc *UserAccount) IsCoordinator() bool {
 	if acc.Path != "" {
 		return false
@@ -162,11 +158,7 @@ func (acc *UserAccount) ABIEncode() ([]byte, error) {
 }
 
 func (acc *UserAccount) CreateAccountHash() {
-	data, err := acc.ABIEncode()
-	if err != nil {
-		return
-	}
-	accountHash := common.Keccak256(data)
+	accountHash := common.Keccak256(acc.Data)
 	acc.Hash = accountHash.String()
 }
 
@@ -176,7 +168,7 @@ func (acc *UserAccount) CreateAccountHash() {
 
 // EmptyAcccount creates a new account which has the same hash as ZERO_VALUE_LEAF
 func EmptyAccount() UserAccount {
-	return *NewUserAccount(ZERO, STATUS_ACTIVE, "", "")
+	return *NewUserAccount(ZERO, STATUS_ACTIVE, "", "", []byte(""))
 }
 
 //

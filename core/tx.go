@@ -47,9 +47,8 @@ func NewPendingTx(from, to uint64, sig string, message []byte) Tx {
 }
 
 // GetSignBytes returns the transaction data that has to be signed
-func (tx Tx) GetSignBytes() (signBytes []byte, err error) {
-	// TODO: [apply-tx] call bazooka
-	return
+func (tx Tx) GetSignBytes() (signBytes []byte) {
+	return tx.Data
 }
 
 // AssignHash creates a tx hash and add it to the tx
@@ -132,10 +131,7 @@ func (t *Tx) ToABIVersion(from, to int64) rollup.TypesTransaction {
 }
 
 func (tx *Tx) Compress() ([]byte, error) {
-	// TODO : [apply-tx] call bazooka
-
-	var bytes []byte
-	return bytes, nil
+	return LoadedBazooka.CompressTx(*tx)
 }
 
 // Insert tx into the DB

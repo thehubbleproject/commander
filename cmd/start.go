@@ -155,24 +155,20 @@ func LoadGenesisData(genesis config.Genesis) {
 		common.PanicIfError(err)
 	}
 
-	diff := int(math.Exp2(float64(genesis.MaxTreeDepth))) - len(genesis.GenesisAccounts.Accounts)
+	genesisAccounts, err := core.LoadedBazooka.GetGenesisAccounts()
+	common.PanicIfError(err)
+
+	diff := int(math.Exp2(float64(genesis.MaxTreeDepth))) - len(genesisAccounts)
+
 	var allAccounts []core.UserAccount
 
 	// convert genesis accounts to user accounts
-	for _, account := range genesis.GenesisAccounts.Accounts {
-		// bz, err := core.ABIEncodePubkey(account.PublicKey)
-		// if err != nil {
-		// 	common.PanicIfError(err)
-		// }
+	for _, account := range genesisAccounts {
 		pubkeyHash := core.ZERO_VALUE_LEAF.String()
+		account.PublicKeyHash = pubkeyHash
 		allAccounts = append(
 			allAccounts,
-			core.UserAccount{
-				AccountID:     account.ID,
-				Status:        account.Status,
-				PublicKey:     account.PublicKey,
-				PublicKeyHash: pubkeyHash,
-			},
+			account,
 		)
 	}
 

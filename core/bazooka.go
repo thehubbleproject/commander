@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"encoding/hex"
 	"errors"
 	"math/big"
 	"strings"
@@ -192,7 +193,9 @@ func (b *Bazooka) ProcessTx(balanceTreeRoot, accountTreeRoot ByteArray, tx Tx, f
 
 func (b *Bazooka) ApplyTransferTx(account AccountMerkleProof, tx Tx) ([]byte, ByteArray, error) {
 	txABIVersion := tx.ToABIVersion(int64(tx.From), int64(tx.To))
-	updatedAccountBytes, updatedRoot, err := b.RollupContract.ApplyTx(nil, account.ToABIVersion(), txABIVersion)
+	opts := bind.CallOpts{From: config.OperatorAddress}
+
+	updatedAccountBytes, updatedRoot, err := b.RollupContract.ApplyTx(&opts, account.ToABIVersion(), txABIVersion)
 	if err != nil {
 		return updatedAccountBytes, updatedRoot, err
 	}
@@ -200,31 +203,54 @@ func (b *Bazooka) ApplyTransferTx(account AccountMerkleProof, tx Tx) ([]byte, By
 	return updatedAccountBytes, updatedRoot, nil
 }
 
-// func (b *Bazooka) CompressTx(tx Tx) ([]byte, ByteArray, error) {
-// 	txABIVersion := tx.ToABIVersion(int64(tx.From), int64(tx.To))
+func (b *Bazooka) CompressTx(tx Tx) ([]byte, error) {
+	opts := bind.CallOpts{From: config.OperatorAddress}
+	sigBytes, err := hex.DecodeString(tx.Signature)
+	if err != nil {
+		return nil, err
+	}
+	return b.RollupUtils.CompressTxWithMessage(&opts, tx.Data, sigBytes)
+}
 
-// 	b.RollupUtils.CompressTx(nil, txABIVersion)
-// }
+func (b *Bazooka) EncodeTx(from, to, token, nonce, amount, txType int64) ([]byte, error) {
+	opts := bind.CallOpts{From: config.OperatorAddress}
+	return b.RollupUtils.BytesFromTxDeconstructed(&opts, big.NewInt(from), big.NewInt(to), big.NewInt(token), big.NewInt(nonce), big.NewInt(txType), big.NewInt(amount))
+}
 
-// func (b *Bazooka) EncodeTx(from, to, token, amount int64) ([]byte, error) {
-// 	return b.RollupUtils.BytesFromTxDeconstructed(nil, big.NewInt(from), big.NewInt(to), big.NewInt(token), big.NewInt(amount))
-// }
-
-// func (b *Bazooka) DecodeTx(txBytes []byte) (rolluputils.TypesTransaction, error) {
-// 	tx, err := b.RollupUtils.TxFromBytes(nil, txBytes)
-// 	return tx, err
-// }
+func (b *Bazooka) DecodeTx(txBytes []byte) (interface{}, error) {
+	opts := bind.CallOpts{From: config.OperatorAddress}
+	txData, err := b.RollupUtils.TxFromBytes(&opts, txBytes)
+	return txData, err
+}
 
 func (b *Bazooka) EncodeAccount(id, balance, nonce, token int64) (accountBytes []byte, err error) {
-	accountBytes, err = b.RollupUtils.BytesFromAccountDeconstructed(nil, big.NewInt(id), big.NewInt(balance), big.NewInt(nonce), big.NewInt(token))
+	opts := bind.CallOpts{From: config.OperatorAddress}
+
+	accountBytes, err = b.RollupUtils.BytesFromAccountDeconstructed(&opts, big.NewInt(id), big.NewInt(balance), big.NewInt(nonce), big.NewInt(token))
 	if err != nil {
 		return
 	}
 	return accountBytes, nil
 }
 
+func (b *Bazooka) GetGenesisAccounts() (genesisAccount []UserAccount, err error) {
+	opts := bind.CallOpts{From: config.OperatorAddress}
+	// get genesis accounts
+	accounts, err := b.RollupUtils.GetGenesisDataBlocks(&opts)
+	if err != nil {
+		return
+	}
+	for _, account := range accounts {
+		ID, _, _, _, _ := b.DecodeAccount(account)
+		genesisAccount = append(genesisAccount, *NewUserAccount(ID, STATUS_ACTIVE, "", UintToString(ID), account))
+	}
+	return
+}
+
 func (b *Bazooka) DecodeAccount(accountBytes []byte) (ID, balance, nonce, token uint64, err error) {
-	account, err := b.RollupUtils.AccountFromBytes(nil, accountBytes)
+	opts := bind.CallOpts{From: config.OperatorAddress}
+
+	account, err := b.RollupUtils.AccountFromBytes(&opts, accountBytes)
 	if err != nil {
 		return
 	}
@@ -244,7 +270,6 @@ func (b *Bazooka) FireDepositFinalisation(TBreplaced UserAccount, siblings []Use
 	)
 
 	// TODO check latest batch on-chain and if we need to push new batch
-
 	depositSubTreeHeight := big.NewInt(0)
 	depositSubTreeHeight.SetUint64(subTreeHeight)
 	var siblingData [][32]byte
@@ -362,6 +387,5 @@ func (b *Bazooka) GenerateAuthObj(client *ethclient.Client, callMsg ethereum.Cal
 	auth.GasPrice = gasprice
 	auth.Nonce = big.NewInt(int64(nonce))
 	auth.GasLimit = uint64(gasLimit) // uint64(gasLimit)
-
 	return
 }
