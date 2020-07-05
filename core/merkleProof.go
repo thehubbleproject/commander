@@ -15,20 +15,27 @@ func NewAccountMerkleProof(account UserAccount, siblings []UserAccount) AccountM
 	return AccountMerkleProof{Account: account, Siblings: siblings}
 }
 
-func (m *AccountMerkleProof) ToABIVersion() rollup.TypesAccountMerkleProof {
+func (m *AccountMerkleProof) ToABIVersion() (AccMP rollup.TypesAccountMerkleProof, err error) {
 	// create siblings
 	var siblingNodes [][32]byte
 	for _, s := range m.Siblings {
 		siblingNodes = append(siblingNodes, s.HashToByteArray())
 	}
 
-	return rollup.TypesAccountMerkleProof{
+	account, err := m.Account.ToABIAccount()
+	if err != nil {
+		return
+	}
+
+	AccMP = rollup.TypesAccountMerkleProof{
 		AccountIP: rollup.TypesAccountInclusionProof{
 			PathToAccount: StringToBigInt(m.Account.Path),
-			Account:       m.Account.ToABIAccount(),
+			Account:       account,
 		},
 		Siblings: siblingNodes,
 	}
+
+	return AccMP, nil
 }
 
 type PDAMerkleProof struct {

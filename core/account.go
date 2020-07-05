@@ -103,13 +103,20 @@ func (acc *UserAccount) UpdatePath(path string) {
 }
 
 func (acc *UserAccount) String() string {
-	// TODO [apply-tx] TYPE the data bytes and print
-	return fmt.Sprintf("ID: %d Bal: %d Path: %v Nonce: %v TokenType:%v NodeType: %d %v", acc.AccountID, acc.Path, acc.Type, acc.Hash)
+	_, balance, nonce, token, _ := LoadedBazooka.DecodeAccount(acc.Data)
+	return fmt.Sprintf("ID: %d Bal: %d Nonce: %d Token: %v Path: %v Nonce: %v TokenType:%v NodeType: %d %v", acc.AccountID, balance, nonce, token, acc.Path, acc.Type, acc.Hash)
 }
 
-func (acc *UserAccount) ToABIAccount() rollup.TypesUserAccount {
-	// TODO [apply-tx] call bytes to typed account here
-	return rollup.TypesUserAccount{}
+func (acc *UserAccount) ToABIAccount() (rollupTx rollup.TypesUserAccount, err error) {
+	ID, balance, nonce, token, err := LoadedBazooka.DecodeAccount(acc.Data)
+	if err != nil {
+		return
+	}
+	rollupTx.ID = ID
+	rollupTx.Balance = balance
+	rollupTx.Nonce = nonce
+	rollupTx.TokenType = token
+	return
 }
 
 func (acc *UserAccount) HashToByteArray() ByteArray {
@@ -144,17 +151,16 @@ func (acc *UserAccount) IsCoordinator() bool {
 	return true
 }
 
-func (acc *UserAccount) AccountInclusionProof(path int64) rollup.TypesAccountInclusionProof {
-	return rollup.TypesAccountInclusionProof{
-		PathToAccount: big.NewInt(path),
-		Account:       acc.ToABIAccount(),
+func (acc *UserAccount) AccountInclusionProof(path int64) (accInclusionProof rollup.TypesAccountInclusionProof, err error) {
+	accABI, err := acc.ToABIAccount()
+	if err != nil {
+		return
 	}
-}
-
-func (acc *UserAccount) ABIEncode() ([]byte, error) {
-	// TODO: [apply-tx] call encoding function from contract
-	var bytes []byte
-	return bytes, nil
+	accInclusionProof = rollup.TypesAccountInclusionProof{
+		PathToAccount: big.NewInt(path),
+		Account:       accABI,
+	}
+	return accInclusionProof, nil
 }
 
 func (acc *UserAccount) CreateAccountHash() {

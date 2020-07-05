@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"math/big"
 
 	"encoding/hex"
 
@@ -120,14 +119,22 @@ func (t *Tx) String() string {
 }
 
 // ToABIVersion converts a standard tx to the the DataTypesTransaction struct on the contract
-func (t *Tx) ToABIVersion(from, to int64) rollup.TypesTransaction {
+func (t *Tx) ToABIVersion() (rollupTx rollup.TypesTransaction, err error) {
 	decodedSignature, _ := hex.DecodeString(t.Signature)
-	// TODO call decode transaction with bazooka
-	return rollup.TypesTransaction{
-		ToIndex:   big.NewInt(to),
-		FromIndex: big.NewInt(from),
+	from, to, token, nonce, txType, amount, err := LoadedBazooka.DecodeTx(t.Data)
+	if err != nil {
+		return
+	}
+	rollupTx = rollup.TypesTransaction{
+		FromIndex: from,
+		ToIndex:   to,
+		TokenType: token,
+		Amount:    amount,
+		Nonce:     nonce,
+		TxType:    txType,
 		Signature: decodedSignature,
 	}
+	return rollupTx, nil
 }
 
 func (tx *Tx) Compress() ([]byte, error) {
