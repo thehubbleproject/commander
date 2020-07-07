@@ -8,4 +8,5 @@ const (
 	FlagSignature     = "sig"
 	FlagNonce         = "nonce"
 	FlagTokenID       = "token"
+	FlagDatabaseName  = "dbname"
 )

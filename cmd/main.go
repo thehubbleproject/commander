@@ -1,10 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
@@ -49,8 +51,8 @@ func main() {
 	rootCmd.AddCommand(ResetCmd())
 	rootCmd.AddCommand(StartSimulatorCmd())
 	rootCmd.AddCommand(AddGenesisAcccountsCmd())
-
 	rootCmd.AddCommand(SendTransferTx())
+	rootCmd.AddCommand(CreateDatabase())
 	rootCmd.AddCommand(migrationCmd)
 
 	executor := Executor{rootCmd, os.Exit}
@@ -101,16 +103,36 @@ func AddGenesisAcccountsCmd() *cobra.Command {
 			}
 			// init global config
 			config.GlobalCfg = cfg
-			// genAccs, err := config.ReadGenesisFile()
-			// common.PanicIfError(err)
-			// contractCaller, err := types.NewContractCaller()
-			// for _, genAcc := range genAccs.Accounts {
-			// 	err := contractCaller.AddAccount(types.NewUserAccount(genAcc.Path, genAcc.Balance, genAcc.TokenType, genAcc.Nonce))
-			// 	common.PanicIfError(err)
-			// }
-			// common.PanicIfError(err)
 		},
 	}
+}
+
+// CreateDatabase creates the database
+func CreateDatabase() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "create-database",
+		Short: "Create a new database",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := config.ParseAndInitGlobalConfig(); err != nil {
+				return err
+			}
+			splitStrings := strings.Split(config.GlobalCfg.FormattedDBURL(), "/")
+			connectionString := []string{splitStrings[0], "/"}
+			dbNew, err := sql.Open("mysql", strings.Join(connectionString, ""))
+			if err != nil {
+				return err
+			}
+			defer dbNew.Close()
+			_, err = dbNew.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %v", "hubble"))
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+	}
+	cmd.Flags().StringP(FlagDatabaseName, "", "", "--dbname=<database-name>")
+	// cmd.MarkFlagRequired(FlagDatabaseName)
+	return cmd
 }
 
 // StartSimulatorCmd starts the simulator

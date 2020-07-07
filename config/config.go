@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	DATABASENAME                = "BOPR"
+	DATABASENAME                = "hubble"
 	DefaultMongoDB              = "mongodb://localhost:27017"
 	DefaultDB                   = "mysql"
 	DefaultDbUrlPrefix          = "mysql://root:root@(localhost:3306)"
