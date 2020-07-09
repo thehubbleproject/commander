@@ -157,9 +157,8 @@ func LoadGenesisData(genesis config.Genesis) {
 
 	genesisAccounts, err := core.LoadedBazooka.GetGenesisAccounts()
 	common.PanicIfError(err)
-
+	zeroAccount := genesisAccounts[0]
 	diff := int(math.Exp2(float64(genesis.MaxTreeDepth))) - len(genesisAccounts)
-
 	var allAccounts []core.UserAccount
 
 	// convert genesis accounts to user accounts
@@ -175,6 +174,7 @@ func LoadGenesisData(genesis config.Genesis) {
 	// fill the tree with zero leaves
 	for diff > 0 {
 		newAcc := core.EmptyAccount()
+		newAcc.Data = zeroAccount.Data
 		newAcc.Hash = core.ZERO_VALUE_LEAF.String()
 		newAcc.PublicKeyHash = core.ZERO_VALUE_LEAF.String()
 		allAccounts = append(allAccounts, newAcc)

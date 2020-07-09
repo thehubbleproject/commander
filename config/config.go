@@ -81,11 +81,16 @@ func GetDefaultConfig() Configuration {
 
 // ParseConfig retrieves the default environment configuration for the
 // application.
-func ParseConfig() (*Configuration, error) {
+func ParseConfig(path string) (*Configuration, error) {
 	conf := new(Configuration)
 	v := viper.New()
 	v.SetConfigName("config")
-	v.AddConfigPath(".")
+	if path == "" {
+		v.AddConfigPath(".")
+	} else {
+		v.AddConfigPath(path)
+	}
+
 	if err := v.ReadInConfig(); err != nil {
 		return conf, err
 	}
@@ -94,8 +99,8 @@ func ParseConfig() (*Configuration, error) {
 	return conf, err
 }
 
-func ParseAndInitGlobalConfig() error {
-	conf, err := ParseConfig()
+func ParseAndInitGlobalConfig(path string) error {
+	conf, err := ParseConfig(path)
 	if err != nil {
 		return err
 	}

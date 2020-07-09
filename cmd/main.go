@@ -69,7 +69,7 @@ func ResetCmd() *cobra.Command {
 		Short: "reset database",
 		Run: func(cmd *cobra.Command, args []string) {
 
-			err := config.ParseAndInitGlobalConfig()
+			err := config.ParseAndInitGlobalConfig("")
 			common.PanicIfError(err)
 			// TODO fix this command for mysql database
 			// create new DB instance
@@ -113,7 +113,7 @@ func CreateDatabase() *cobra.Command {
 		Use:   "create-database",
 		Short: "Create a new database",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := config.ParseAndInitGlobalConfig(); err != nil {
+			if err := config.ParseAndInitGlobalConfig(""); err != nil {
 				return err
 			}
 			splitStrings := strings.Split(config.GlobalCfg.FormattedDBURL(), "/")

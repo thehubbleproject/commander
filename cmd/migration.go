@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"database/sql"
 	"fmt"
 	"html/template"
 	"path"
@@ -11,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/BOPR/config"
 	db "github.com/BOPR/core"
 	"github.com/BOPR/migrations"
 	"github.com/spf13/cobra"
@@ -69,28 +67,6 @@ var upMigrateCmd = &cobra.Command{
 		allMigrations := migrations.GetMigrations()
 		m := migrations.NewGormigrate(db.Instance, migrations.DefaultOptions, allMigrations)
 		return m.Migrate()
-	},
-}
-
-// upMigrateCmd represents the up migrate command
-var createDBCmb = &cobra.Command{
-	Use:   "create",
-	Short: "Create a new database",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		splitStrings := strings.Split(config.GlobalCfg.FormattedDBURL(), "/")
-		fmt.Println("split string", splitStrings)
-		dbNew, err := sql.Open("mysql", splitStrings[0])
-		if err != nil {
-			return err
-		}
-		defer dbNew.Close()
-
-		_, err = dbNew.Exec("CREATE DATABASE IF NOT EXISTS testing")
-		if err != nil {
-			return err
-		}
-
-		return nil
 	},
 }
 

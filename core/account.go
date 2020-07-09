@@ -84,13 +84,14 @@ func NewAccountNode(path, hash, pubkeyHash string) *UserAccount {
 
 // NewAccountNode creates a new terminal user account but in pending state
 // It is to be used while adding new deposits while they are not finalised
-func NewPendingUserAccount(id uint64, _pubkey string) *UserAccount {
+func NewPendingUserAccount(id uint64, _pubkey string, data []byte) *UserAccount {
 	newAcccount := &UserAccount{
 		AccountID: id,
 		Path:      UNINITIALIZED_PATH,
 		Status:    STATUS_PENDING,
 		PublicKey: _pubkey,
 		Type:      TYPE_TERMINAL,
+		Data:      data,
 	}
 	newAcccount.UpdatePath(newAcccount.Path)
 	newAcccount.CreateAccountHash()
@@ -104,13 +105,18 @@ func (acc *UserAccount) UpdatePath(path string) {
 
 func (acc *UserAccount) String() string {
 	_, balance, nonce, token, _ := LoadedBazooka.DecodeAccount(acc.Data)
-	return fmt.Sprintf("ID: %d Bal: %d Nonce: %d Token: %v Path: %v Nonce: %v TokenType:%v NodeType: %d %v", acc.AccountID, balance, nonce, token, acc.Path, acc.Type, acc.Hash)
+	return fmt.Sprintf("ID: %d Bal: %d Nonce: %d Token: %v Path: %v TokenType:%v NodeType: %v", acc.AccountID, balance, nonce, token, acc.Path, acc.Type, acc.Hash)
 }
 
 func (acc *UserAccount) ToABIAccount() (rollupTx rollup.TypesUserAccount, err error) {
-	ID, balance, nonce, token, err := LoadedBazooka.DecodeAccount(acc.Data)
-	if err != nil {
-		return
+	fmt.Println("accountData", acc.Type)
+	var ID, balance, nonce, token *big.Int = big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0)
+	if acc.Type == TYPE_TERMINAL {
+		ID, balance, nonce, token, err = LoadedBazooka.DecodeAccount(acc.Data)
+		if err != nil {
+			fmt.Println("unable to convert", err)
+			return
+		}
 	}
 	rollupTx.ID = ID
 	rollupTx.Balance = balance
@@ -174,7 +180,7 @@ func (acc *UserAccount) CreateAccountHash() {
 
 // EmptyAcccount creates a new account which has the same hash as ZERO_VALUE_LEAF
 func EmptyAccount() UserAccount {
-	return *NewUserAccount(ZERO, STATUS_ACTIVE, "", "", []byte(""))
+	return *NewUserAccount(ZERO, STATUS_INACTIVE, "", "", []byte(""))
 }
 
 //

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"math/big"
 	"strings"
 
@@ -54,11 +55,12 @@ type Bazooka struct {
 // NOTE: Reads configration from the config.toml file
 func NewPreLoadedBazooka() (bazooka Bazooka, err error) {
 	// TODO remove
+
+	// err = config.ParseAndInitGlobalConfig()
+	// if err != nil {
+	// 	return
+	// }
 	err = config.SetOperatorKeys(config.GlobalCfg.OperatorKey)
-	if err != nil {
-		return
-	}
-	err = config.ParseAndInitGlobalConfig()
 	if err != nil {
 		return
 	}
@@ -273,9 +275,22 @@ func (b *Bazooka) GetGenesisAccounts() (genesisAccount []UserAccount, err error)
 	return
 }
 
+func (b *Bazooka) GetZeroValue() (genesisAccount []UserAccount, err error) {
+	opts := bind.CallOpts{From: config.OperatorAddress}
+	// get genesis accounts
+	accounts, err := b.RollupUtils.GetGenesisDataBlocks(&opts)
+	if err != nil {
+		return
+	}
+	for _, account := range accounts {
+		ID, _, _, _, _ := b.DecodeAccount(account)
+		genesisAccount = append(genesisAccount, *NewUserAccount(ID.Uint64(), STATUS_ACTIVE, "", UintToString(ID.Uint64()), account))
+	}
+	return
+}
+
 func (b *Bazooka) DecodeAccount(accountBytes []byte) (ID, balance, nonce, token *big.Int, err error) {
 	opts := bind.CallOpts{From: config.OperatorAddress}
-
 	account, err := b.RollupUtils.AccountFromBytes(&opts, accountBytes)
 	if err != nil {
 		return
@@ -302,6 +317,7 @@ func (b *Bazooka) FireDepositFinalisation(TBreplaced UserAccount, siblings []Use
 	for _, sibling := range siblings {
 		data, err := HexToByteArray(sibling.Hash)
 		if err != nil {
+			fmt.Println("unable to convert HexToByteArray", err)
 			return err
 		}
 		siblingData = append(siblingData, data)
@@ -311,18 +327,21 @@ func (b *Bazooka) FireDepositFinalisation(TBreplaced UserAccount, siblings []Use
 	accountProof.AccountIP.PathToAccount = StringToBigInt(TBreplaced.Path)
 	accountProof.AccountIP.Account, err = TBreplaced.ToABIAccount()
 	if err != nil {
+		fmt.Println("unable to convert", "error", err)
 		return
 	}
 
 	accountProof.Siblings = siblingData
 	data, err := b.ContractABI[common.ROLLUP_CONTRACT_KEY].Pack("finaliseDepositsAndSubmitBatch", depositSubTreeHeight, accountProof)
 	if err != nil {
+		fmt.Println("Unable to craete data", err)
 		return
 	}
 
 	rollupAddress := ethCmn.HexToAddress(config.GlobalCfg.RollupAddress)
 	stakeAmount := big.NewInt(0)
 	stakeAmount.SetString("32000000000000000000", 10)
+	fmt.Println("Stake committed", stakeAmount)
 
 	// generate call msg
 	callMsg := ethereum.CallMsg{
@@ -333,6 +352,7 @@ func (b *Bazooka) FireDepositFinalisation(TBreplaced UserAccount, siblings []Use
 
 	auth, err := b.GenerateAuthObj(b.EthClient, callMsg)
 	if err != nil {
+		fmt.Println("here", err)
 		return err
 	}
 	b.log.Info("Broadcasting deposit finalisation transaction")
@@ -369,11 +389,15 @@ func (b *Bazooka) SubmitBatch(updatedRoot ByteArray, txs []Tx) error {
 	}
 
 	rollupAddress := ethCmn.HexToAddress(config.GlobalCfg.RollupAddress)
+	stakeAmount := big.NewInt(0)
+	stakeAmount.SetString("32000000000000000000", 10)
+	fmt.Println("Stake committed", stakeAmount)
 
 	// generate call msg
 	callMsg := ethereum.CallMsg{
-		To:   &rollupAddress,
-		Data: data,
+		To:    &rollupAddress,
+		Data:  data,
+		Value: stakeAmount,
 	}
 
 	auth, err := b.GenerateAuthObj(b.EthClient, callMsg)
