@@ -36,13 +36,15 @@ func NewTx(from, to uint64, message []byte, sig string) Tx {
 
 // NewPendingTx creates a new transaction
 func NewPendingTx(from, to uint64, sig string, message []byte) Tx {
-	return Tx{
+	tx := Tx{
 		To:        to,
 		From:      from,
 		Data:      message,
 		Signature: sig,
 		Status:    TX_STATUS_PENDING,
 	}
+	tx.AssignHash()
+	return tx
 }
 
 // GetSignBytes returns the transaction data that has to be signed
@@ -160,7 +162,7 @@ func (db *DB) PopTxs() (txs []Tx, err error) {
 	var pendingTxs []Tx
 
 	// select N number of transactions which are pending in mempool and
-	if err := tx.Limit(config.GlobalCfg.TxsPerBatch).Where(&Tx{Status: 100}).Find(&pendingTxs).Error; err != nil {
+	if err := tx.Limit(config.GlobalCfg.TxsPerBatch).Where(&Tx{Status: TX_STATUS_PENDING}).Find(&pendingTxs).Error; err != nil {
 		db.Logger.Error("error while fetching pending transactions", err)
 		return txs, err
 	}
@@ -173,7 +175,7 @@ func (db *DB) PopTxs() (txs []Tx, err error) {
 	}
 
 	// update the transactions from pending to processing
-	errs := tx.Table("txes").Where("id IN (?)", ids).Updates(map[string]interface{}{"status": 200}).GetErrors()
+	errs := tx.Table("txes").Where("id IN (?)", ids).Updates(map[string]interface{}{"status": TX_STATUS_PROCESSING}).GetErrors()
 	if err != nil {
 		db.Logger.Error("errors while processing transactions", errs)
 		return

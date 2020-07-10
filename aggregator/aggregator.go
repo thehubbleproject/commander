@@ -1,4 +1,4 @@
-package poller
+package aggregator
 
 import (
 	"context"
@@ -115,7 +115,6 @@ func (a *Aggregator) pickBatch() {
 // ProcessTx fetches all the data required to validate tx from smart contact
 // and calls the proccess tx function to return the updated balance root and accounts
 func (a *Aggregator) ProcessTx(txs []core.Tx) error {
-
 	for _, tx := range txs {
 		rootAcc, err := a.DB.GetRoot()
 		if err != nil {
@@ -207,8 +206,9 @@ func (a *Aggregator) GetTxVerificationData(tx core.Tx) (fromMerkleProof, toMerkl
 	if err != nil {
 		return
 	}
-	mysqlTx.Rollback()
+
 	toMerkleProof = core.NewAccountMerkleProof(toAcc, toSiblings)
 	PDAProof = core.NewPDAProof(fromAcc.Path, fromAcc.PublicKey, fromSiblings)
+	mysqlTx.Rollback()
 	return fromMerkleProof, toMerkleProof, PDAProof, nil
 }
