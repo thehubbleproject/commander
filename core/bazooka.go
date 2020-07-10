@@ -230,7 +230,7 @@ func (b *Bazooka) ApplyTransferTx(accountMP AccountMerkleProof, tx Tx) ([]byte, 
 
 func (b *Bazooka) CompressTx(tx Tx) ([]byte, error) {
 	opts := bind.CallOpts{From: config.OperatorAddress}
-	sigBytes, err := hex.DecodeString(tx.Signature)
+	sigBytes, err := hex.DecodeString(tx.Signature[2:])
 	if err != nil {
 		return nil, err
 	}
@@ -391,7 +391,6 @@ func (b *Bazooka) SubmitBatch(updatedRoot ByteArray, txs []Tx) error {
 	rollupAddress := ethCmn.HexToAddress(config.GlobalCfg.RollupAddress)
 	stakeAmount := big.NewInt(0)
 	stakeAmount.SetString("32000000000000000000", 10)
-	fmt.Println("Stake committed", stakeAmount)
 
 	// generate call msg
 	callMsg := ethereum.CallMsg{

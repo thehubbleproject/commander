@@ -366,10 +366,6 @@ github.com/lyft/protoc-gen-validate v0.0.13/go.mod h1:XbGvPuh87YZc5TdIa2/I4pLk0Q
 github.com/magiconair/properties v1.8.0/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
 github.com/magiconair/properties v1.8.1 h1:ZC2Vc7/ZFkGmsVC9KvOjumD+G5lXy2RtTKyzRKO2BQ4=
 github.com/magiconair/properties v1.8.1/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
-github.com/maticnetwork/bor v0.0.0-20200101114234-36ff50845e90 h1:2SYyqq0o4Xs1mrYg8dN2le/DSMeK/jl9gT565Xbw9EQ=
-github.com/maticnetwork/bor v0.0.0-20200101114234-36ff50845e90/go.mod h1:Bdz1Wi8GdWw8sXeXhUhQtTFMi+jolJdyjejdXc5fks4=
-github.com/maticnetwork/bor v0.2.0 h1:S+tSgFIgHPo0g9KyEXEmpeCvfATlOW0LacNyl/+19ic=
-github.com/maticnetwork/bor v0.2.0/go.mod h1:c76dXbEJU7pBRO6p5gztfwECkeBB3ruiLM9J/aksmYU=
 github.com/mattn/go-colorable v0.0.9/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaOChaDxuIBZU=
 github.com/mattn/go-colorable v0.1.0 h1:v2XXALHHh6zHfYTJ+cSkwtyffnaOyR1MXaA91mTrb8o=
 github.com/mattn/go-colorable v0.1.0/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaOChaDxuIBZU=
