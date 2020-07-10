@@ -97,7 +97,7 @@ func (s *Simulator) sendTxsToAndFro() {
 		s.toSwap = !s.toSwap
 	}
 
-	for i := 0; i < 2; i++ {
+	for i := 0; i < 7; i++ {
 		latestFromAcc, err := s.DB.GetAccountByID(FromID)
 		if err != nil {
 			s.Logger.Error("unable to fetch latest account", "error", err)
