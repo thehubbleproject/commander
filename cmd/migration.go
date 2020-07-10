@@ -64,7 +64,6 @@ var upMigrateCmd = &cobra.Command{
 			return err
 		}
 		defer db.Close()
-
 		allMigrations := migrations.GetMigrations()
 		m := migrations.NewGormigrate(db.Instance, migrations.DefaultOptions, allMigrations)
 		return m.Migrate()
@@ -130,20 +129,6 @@ var createMigrateCmd = &cobra.Command{
 		})
 	},
 }
-
-// func getDB() (*gorm.DB, error) {
-// 	dbConf := config.GlobalCfg
-// 	db, err := gorm.Open(dbConf.DB, dbConf.FormattedDBURL())
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	db.LogMode(true)
-// 	return db, nil
-// }
-
-// func closeDB(db *gorm.DB) {
-// 	db.Close()
-// }
 
 func writeMigrationFile(filePath string, m *MigrationTemplate) error {
 	var buffer bytes.Buffer

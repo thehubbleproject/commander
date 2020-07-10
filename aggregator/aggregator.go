@@ -1,11 +1,10 @@
-package poller
+package aggregator
 
 import (
 	"context"
 	"fmt"
 	"time"
 
-	"github.com/BOPR/bazooka"
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 	"github.com/BOPR/core"
@@ -26,7 +25,7 @@ type Aggregator struct {
 	core.BaseService
 
 	// contract caller to interact with contracts
-	LoadedBazooka bazooka.Bazooka
+	LoadedBazooka core.Bazooka
 
 	// DB instance
 	DB core.DB
@@ -39,7 +38,7 @@ type Aggregator struct {
 func NewAggregator(db core.DB) *Aggregator {
 	// create logger
 	logger := common.Logger.With("module", AggregatingService)
-	LoadedBazooka, err := bazooka.NewPreLoadedBazooka()
+	LoadedBazooka, err := core.NewPreLoadedBazooka()
 	if err != nil {
 		panic(err)
 	}
@@ -116,33 +115,42 @@ func (a *Aggregator) pickBatch() {
 // ProcessTx fetches all the data required to validate tx from smart contact
 // and calls the proccess tx function to return the updated balance root and accounts
 func (a *Aggregator) ProcessTx(txs []core.Tx) error {
-	rootAcc, err := a.DB.GetRoot()
-	if err != nil {
-		return err
-	}
-	a.Logger.Debug("Latest root", "root", rootAcc.Hash)
-
-	currentRoot, err := core.HexToByteArray(rootAcc.Hash)
-	if err != nil {
-		return err
-	}
-	currentAccountTreeRoot, err := core.HexToByteArray(rootAcc.PublicKeyHash)
-	if err != nil {
-		return err
-	}
-
 	for _, tx := range txs {
-		fromAccProof, toAccProof, PDAproof, err := a.DB.GetTxVerificationData(tx)
-		if err != nil {
-			return err
-		}
-		a.Logger.Debug("Fetched latest account proofs", "tx", tx.String(), "fromMP", fromAccProof, "toMP", toAccProof, "PDAProof", PDAproof)
-		updatedRoot, _, _, err := a.LoadedBazooka.ProcessTx(currentRoot, currentAccountTreeRoot, tx, fromAccProof, toAccProof, PDAproof)
+		rootAcc, err := a.DB.GetRoot()
 		if err != nil {
 			return err
 		}
 
-		err = tx.Apply()
+		a.Logger.Debug("Latest root", "root", rootAcc.Hash)
+
+		currentRoot, err := core.HexToByteArray(rootAcc.Hash)
+		if err != nil {
+			return err
+		}
+
+		currentAccountTreeRoot, err := core.HexToByteArray(rootAcc.PublicKeyHash)
+		if err != nil {
+			return err
+		}
+
+		fromAccProof, toAccProof, PDAproof, err := a.GetTxVerificationData(tx)
+		if err != nil {
+			return err
+		}
+
+		a.Logger.Debug("Fetched latest account proofs", "tx", tx.String(), "fromMP", fromAccProof, "toMP", toAccProof, "PDAProof", PDAproof)
+
+		updatedRoot, updatedFrom, updatedTo, err := a.LoadedBazooka.ProcessTx(currentRoot, currentAccountTreeRoot, tx, fromAccProof, toAccProof, PDAproof)
+		if err != nil {
+			err := tx.UpdateStatus(core.TX_STATUS_REVERTED)
+			if err != nil {
+				a.Logger.Error("Unable to update transaction status", "tx", tx.String())
+				return err
+			}
+		}
+
+		// if the transactions is valid, apply it
+		err = tx.Apply(updatedFrom, updatedTo)
 		if err != nil {
 			return err
 		}
@@ -151,4 +159,56 @@ func (a *Aggregator) ProcessTx(txs []core.Tx) error {
 	}
 
 	return nil
+}
+
+// GetTxVerificationData fetches all the data required to prove validity fo transaction
+func (a *Aggregator) GetTxVerificationData(tx core.Tx) (fromMerkleProof, toMerkleProof core.AccountMerkleProof, PDAProof core.PDAMerkleProof, err error) {
+	fromAcc, err := a.DB.GetAccountByID(tx.From)
+	if err != nil {
+		return
+	}
+
+	fromSiblings, err := a.DB.GetSiblings(fromAcc.Path)
+	if err != nil {
+		return
+	}
+	fromMerkleProof = core.NewAccountMerkleProof(fromAcc, fromSiblings)
+
+	toAcc, err := a.DB.GetAccountByID(tx.To)
+	if err != nil {
+		return
+	}
+	var toSiblings []core.UserAccount
+
+	mysqlTx := a.DB.Instance.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			mysqlTx.Rollback()
+		}
+	}()
+	dbCopy, _ := core.NewDB()
+	dbCopy.Instance = mysqlTx
+
+	updatedFromAccountBytes, _, err := a.LoadedBazooka.ApplyTransferTx(fromMerkleProof, tx)
+	if err != nil {
+		return
+	}
+
+	fromAcc.Data = updatedFromAccountBytes
+	err = dbCopy.UpdateAccount(fromAcc)
+	if err != nil {
+		return
+	}
+
+	// TODO add a check to ensure that DB copy of state matches the one returned by ApplyTransferTx
+
+	toSiblings, err = dbCopy.GetSiblings(toAcc.Path)
+	if err != nil {
+		return
+	}
+
+	toMerkleProof = core.NewAccountMerkleProof(toAcc, toSiblings)
+	PDAProof = core.NewPDAProof(fromAcc.Path, fromAcc.PublicKey, fromSiblings)
+	mysqlTx.Rollback()
+	return fromMerkleProof, toMerkleProof, PDAProof, nil
 }

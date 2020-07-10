@@ -28,7 +28,7 @@ var (
 )
 
 // LoggerABI is the input ABI used to generate the binding from.
-const LoggerABI = "[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"batch_id\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"committer\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"stateRoot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txRoot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"stakeSlashed\",\"type\":\"uint256\"}],\"name\":\"BatchRollback\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"left\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"right\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"newRoot\",\"type\":\"bytes32\"}],\"name\":\"DepositLeafMerged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"AccountID\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"destination\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"token\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"accountHash\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"pubkey\",\"type\":\"bytes\"}],\"name\":\"DepositQueued\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"depositSubTreeRoot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"pathToSubTree\",\"type\":\"uint256\"}],\"name\":\"DepositsFinalised\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"committer\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txroot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"updatedRoot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"NewBatch\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"tokenContract\",\"type\":\"address\"}],\"name\":\"RegisteredToken\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"tokenContract\",\"type\":\"address\"}],\"name\":\"RegistrationRequest\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"totalBatchesSlashed\",\"type\":\"uint256\"}],\"name\":\"RollbackFinalisation\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"committed\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"batch_id\",\"type\":\"uint256\"}],\"name\":\"StakeWithdraw\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"committer\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"txroot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"updatedRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"logNewBatch\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"committed\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"batch_id\",\"type\":\"uint256\"}],\"name\":\"logStakeWithdraw\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"batch_id\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"committer\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"stateRoot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"txRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"stakeSlashed\",\"type\":\"uint256\"}],\"name\":\"logBatchRollback\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"totalBatchesSlashed\",\"type\":\"uint256\"}],\"name\":\"logRollbackFinalisation\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"tokenContract\",\"type\":\"address\"}],\"name\":\"logRegisteredToken\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenContract\",\"type\":\"address\"}],\"name\":\"logRegistrationRequest\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"accountID\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"destination\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"token\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"accountHash\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"pubkey\",\"type\":\"bytes\"}],\"name\":\"logDepositQueued\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"left\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"right\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"newRoot\",\"type\":\"bytes32\"}],\"name\":\"logDepositLeafMerged\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"depositSubTreeRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"pathToSubTree\",\"type\":\"uint256\"}],\"name\":\"logDepositFinalised\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+const LoggerABI = "[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"batch_id\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"committer\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"stateRoot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txRoot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"stakeSlashed\",\"type\":\"uint256\"}],\"name\":\"BatchRollback\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"left\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"right\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"newRoot\",\"type\":\"bytes32\"}],\"name\":\"DepositLeafMerged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"AccountID\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"pubkey\",\"type\":\"bytes\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"DepositQueued\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"root\",\"type\":\"bytes32\"}],\"name\":\"DepositSubTreeReady\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"depositSubTreeRoot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"pathToSubTree\",\"type\":\"uint256\"}],\"name\":\"DepositsFinalised\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"committer\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txroot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"updatedRoot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"NewBatch\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"tokenContract\",\"type\":\"address\"}],\"name\":\"RegisteredToken\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"tokenContract\",\"type\":\"address\"}],\"name\":\"RegistrationRequest\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"totalBatchesSlashed\",\"type\":\"uint256\"}],\"name\":\"RollbackFinalisation\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"committed\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"batch_id\",\"type\":\"uint256\"}],\"name\":\"StakeWithdraw\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"committer\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"txroot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"updatedRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"logNewBatch\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"committed\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"batch_id\",\"type\":\"uint256\"}],\"name\":\"logStakeWithdraw\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"batch_id\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"committer\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"stateRoot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"txRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"stakeSlashed\",\"type\":\"uint256\"}],\"name\":\"logBatchRollback\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"totalBatchesSlashed\",\"type\":\"uint256\"}],\"name\":\"logRollbackFinalisation\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenType\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"tokenContract\",\"type\":\"address\"}],\"name\":\"logRegisteredToken\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenContract\",\"type\":\"address\"}],\"name\":\"logRegistrationRequest\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"accountID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"pubkey\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"logDepositQueued\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"left\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"right\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"newRoot\",\"type\":\"bytes32\"}],\"name\":\"logDepositLeafMerged\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"root\",\"type\":\"bytes32\"}],\"name\":\"logDepositSubTreeReady\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"depositSubTreeRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"pathToSubTree\",\"type\":\"uint256\"}],\"name\":\"logDepositFinalised\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
 
 // Logger is an auto generated Go binding around an Ethereum contract.
 type Logger struct {
@@ -235,25 +235,46 @@ func (_Logger *LoggerTransactorSession) LogDepositLeafMerged(left [32]byte, righ
 	return _Logger.Contract.LogDepositLeafMerged(&_Logger.TransactOpts, left, right, newRoot)
 }
 
-// LogDepositQueued is a paid mutator transaction binding the contract method 0x56901d5a.
+// LogDepositQueued is a paid mutator transaction binding the contract method 0x00a60b9e.
 //
-// Solidity: function logDepositQueued(uint256 accountID, address destination, uint256 amount, uint256 token, bytes32 accountHash, bytes pubkey) returns()
-func (_Logger *LoggerTransactor) LogDepositQueued(opts *bind.TransactOpts, accountID *big.Int, destination common.Address, amount *big.Int, token *big.Int, accountHash [32]byte, pubkey []byte) (*types.Transaction, error) {
-	return _Logger.contract.Transact(opts, "logDepositQueued", accountID, destination, amount, token, accountHash, pubkey)
+// Solidity: function logDepositQueued(uint256 accountID, bytes pubkey, bytes data) returns()
+func (_Logger *LoggerTransactor) LogDepositQueued(opts *bind.TransactOpts, accountID *big.Int, pubkey []byte, data []byte) (*types.Transaction, error) {
+	return _Logger.contract.Transact(opts, "logDepositQueued", accountID, pubkey, data)
 }
 
-// LogDepositQueued is a paid mutator transaction binding the contract method 0x56901d5a.
+// LogDepositQueued is a paid mutator transaction binding the contract method 0x00a60b9e.
 //
-// Solidity: function logDepositQueued(uint256 accountID, address destination, uint256 amount, uint256 token, bytes32 accountHash, bytes pubkey) returns()
-func (_Logger *LoggerSession) LogDepositQueued(accountID *big.Int, destination common.Address, amount *big.Int, token *big.Int, accountHash [32]byte, pubkey []byte) (*types.Transaction, error) {
-	return _Logger.Contract.LogDepositQueued(&_Logger.TransactOpts, accountID, destination, amount, token, accountHash, pubkey)
+// Solidity: function logDepositQueued(uint256 accountID, bytes pubkey, bytes data) returns()
+func (_Logger *LoggerSession) LogDepositQueued(accountID *big.Int, pubkey []byte, data []byte) (*types.Transaction, error) {
+	return _Logger.Contract.LogDepositQueued(&_Logger.TransactOpts, accountID, pubkey, data)
 }
 
-// LogDepositQueued is a paid mutator transaction binding the contract method 0x56901d5a.
+// LogDepositQueued is a paid mutator transaction binding the contract method 0x00a60b9e.
 //
-// Solidity: function logDepositQueued(uint256 accountID, address destination, uint256 amount, uint256 token, bytes32 accountHash, bytes pubkey) returns()
-func (_Logger *LoggerTransactorSession) LogDepositQueued(accountID *big.Int, destination common.Address, amount *big.Int, token *big.Int, accountHash [32]byte, pubkey []byte) (*types.Transaction, error) {
-	return _Logger.Contract.LogDepositQueued(&_Logger.TransactOpts, accountID, destination, amount, token, accountHash, pubkey)
+// Solidity: function logDepositQueued(uint256 accountID, bytes pubkey, bytes data) returns()
+func (_Logger *LoggerTransactorSession) LogDepositQueued(accountID *big.Int, pubkey []byte, data []byte) (*types.Transaction, error) {
+	return _Logger.Contract.LogDepositQueued(&_Logger.TransactOpts, accountID, pubkey, data)
+}
+
+// LogDepositSubTreeReady is a paid mutator transaction binding the contract method 0x346300bc.
+//
+// Solidity: function logDepositSubTreeReady(bytes32 root) returns()
+func (_Logger *LoggerTransactor) LogDepositSubTreeReady(opts *bind.TransactOpts, root [32]byte) (*types.Transaction, error) {
+	return _Logger.contract.Transact(opts, "logDepositSubTreeReady", root)
+}
+
+// LogDepositSubTreeReady is a paid mutator transaction binding the contract method 0x346300bc.
+//
+// Solidity: function logDepositSubTreeReady(bytes32 root) returns()
+func (_Logger *LoggerSession) LogDepositSubTreeReady(root [32]byte) (*types.Transaction, error) {
+	return _Logger.Contract.LogDepositSubTreeReady(&_Logger.TransactOpts, root)
+}
+
+// LogDepositSubTreeReady is a paid mutator transaction binding the contract method 0x346300bc.
+//
+// Solidity: function logDepositSubTreeReady(bytes32 root) returns()
+func (_Logger *LoggerTransactorSession) LogDepositSubTreeReady(root [32]byte) (*types.Transaction, error) {
+	return _Logger.Contract.LogDepositSubTreeReady(&_Logger.TransactOpts, root)
 }
 
 // LogNewBatch is a paid mutator transaction binding the contract method 0xcea4592f.
@@ -702,18 +723,15 @@ func (it *LoggerDepositQueuedIterator) Close() error {
 
 // LoggerDepositQueued represents a DepositQueued event raised by the Logger contract.
 type LoggerDepositQueued struct {
-	AccountID   *big.Int
-	Destination common.Address
-	Amount      *big.Int
-	Token       *big.Int
-	AccountHash [32]byte
-	Pubkey      []byte
-	Raw         types.Log // Blockchain specific contextual infos
+	AccountID *big.Int
+	Pubkey    []byte
+	Data      []byte
+	Raw       types.Log // Blockchain specific contextual infos
 }
 
-// FilterDepositQueued is a free log retrieval operation binding the contract event 0x5e3c736713ea7acda22f3939c97804d64b57ea194c562d8e5359eda538c7ebfa.
+// FilterDepositQueued is a free log retrieval operation binding the contract event 0x1720b8e88c4efeb19a0a3a5527684d80a8a280efdf032467bc50d604912d8c65.
 //
-// Solidity: event DepositQueued(uint256 AccountID, address destination, uint256 amount, uint256 token, bytes32 accountHash, bytes pubkey)
+// Solidity: event DepositQueued(uint256 AccountID, bytes pubkey, bytes data)
 func (_Logger *LoggerFilterer) FilterDepositQueued(opts *bind.FilterOpts) (*LoggerDepositQueuedIterator, error) {
 
 	logs, sub, err := _Logger.contract.FilterLogs(opts, "DepositQueued")
@@ -723,9 +741,9 @@ func (_Logger *LoggerFilterer) FilterDepositQueued(opts *bind.FilterOpts) (*Logg
 	return &LoggerDepositQueuedIterator{contract: _Logger.contract, event: "DepositQueued", logs: logs, sub: sub}, nil
 }
 
-// WatchDepositQueued is a free log subscription operation binding the contract event 0x5e3c736713ea7acda22f3939c97804d64b57ea194c562d8e5359eda538c7ebfa.
+// WatchDepositQueued is a free log subscription operation binding the contract event 0x1720b8e88c4efeb19a0a3a5527684d80a8a280efdf032467bc50d604912d8c65.
 //
-// Solidity: event DepositQueued(uint256 AccountID, address destination, uint256 amount, uint256 token, bytes32 accountHash, bytes pubkey)
+// Solidity: event DepositQueued(uint256 AccountID, bytes pubkey, bytes data)
 func (_Logger *LoggerFilterer) WatchDepositQueued(opts *bind.WatchOpts, sink chan<- *LoggerDepositQueued) (event.Subscription, error) {
 
 	logs, sub, err := _Logger.contract.WatchLogs(opts, "DepositQueued")
@@ -760,12 +778,145 @@ func (_Logger *LoggerFilterer) WatchDepositQueued(opts *bind.WatchOpts, sink cha
 	}), nil
 }
 
-// ParseDepositQueued is a log parse operation binding the contract event 0x5e3c736713ea7acda22f3939c97804d64b57ea194c562d8e5359eda538c7ebfa.
+// ParseDepositQueued is a log parse operation binding the contract event 0x1720b8e88c4efeb19a0a3a5527684d80a8a280efdf032467bc50d604912d8c65.
 //
-// Solidity: event DepositQueued(uint256 AccountID, address destination, uint256 amount, uint256 token, bytes32 accountHash, bytes pubkey)
+// Solidity: event DepositQueued(uint256 AccountID, bytes pubkey, bytes data)
 func (_Logger *LoggerFilterer) ParseDepositQueued(log types.Log) (*LoggerDepositQueued, error) {
 	event := new(LoggerDepositQueued)
 	if err := _Logger.contract.UnpackLog(event, "DepositQueued", log); err != nil {
+		return nil, err
+	}
+	return event, nil
+}
+
+// LoggerDepositSubTreeReadyIterator is returned from FilterDepositSubTreeReady and is used to iterate over the raw logs and unpacked data for DepositSubTreeReady events raised by the Logger contract.
+type LoggerDepositSubTreeReadyIterator struct {
+	Event *LoggerDepositSubTreeReady // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *LoggerDepositSubTreeReadyIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(LoggerDepositSubTreeReady)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(LoggerDepositSubTreeReady)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *LoggerDepositSubTreeReadyIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *LoggerDepositSubTreeReadyIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// LoggerDepositSubTreeReady represents a DepositSubTreeReady event raised by the Logger contract.
+type LoggerDepositSubTreeReady struct {
+	Root [32]byte
+	Raw  types.Log // Blockchain specific contextual infos
+}
+
+// FilterDepositSubTreeReady is a free log retrieval operation binding the contract event 0x4744f3a44c5716c9fa423a71cdaa806771a8bf469f4c007ca338b8e8e202a8b5.
+//
+// Solidity: event DepositSubTreeReady(bytes32 root)
+func (_Logger *LoggerFilterer) FilterDepositSubTreeReady(opts *bind.FilterOpts) (*LoggerDepositSubTreeReadyIterator, error) {
+
+	logs, sub, err := _Logger.contract.FilterLogs(opts, "DepositSubTreeReady")
+	if err != nil {
+		return nil, err
+	}
+	return &LoggerDepositSubTreeReadyIterator{contract: _Logger.contract, event: "DepositSubTreeReady", logs: logs, sub: sub}, nil
+}
+
+// WatchDepositSubTreeReady is a free log subscription operation binding the contract event 0x4744f3a44c5716c9fa423a71cdaa806771a8bf469f4c007ca338b8e8e202a8b5.
+//
+// Solidity: event DepositSubTreeReady(bytes32 root)
+func (_Logger *LoggerFilterer) WatchDepositSubTreeReady(opts *bind.WatchOpts, sink chan<- *LoggerDepositSubTreeReady) (event.Subscription, error) {
+
+	logs, sub, err := _Logger.contract.WatchLogs(opts, "DepositSubTreeReady")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(LoggerDepositSubTreeReady)
+				if err := _Logger.contract.UnpackLog(event, "DepositSubTreeReady", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseDepositSubTreeReady is a log parse operation binding the contract event 0x4744f3a44c5716c9fa423a71cdaa806771a8bf469f4c007ca338b8e8e202a8b5.
+//
+// Solidity: event DepositSubTreeReady(bytes32 root)
+func (_Logger *LoggerFilterer) ParseDepositSubTreeReady(log types.Log) (*LoggerDepositSubTreeReady, error) {
+	event := new(LoggerDepositSubTreeReady)
+	if err := _Logger.contract.UnpackLog(event, "DepositSubTreeReady", log); err != nil {
 		return nil, err
 	}
 	return event, nil

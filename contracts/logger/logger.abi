@@ -72,36 +72,31 @@
         },
         {
           "indexed": false,
-          "internalType": "address",
-          "name": "destination",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "token",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "bytes32",
-          "name": "accountHash",
-          "type": "bytes32"
+          "internalType": "bytes",
+          "name": "pubkey",
+          "type": "bytes"
         },
         {
           "indexed": false,
           "internalType": "bytes",
-          "name": "pubkey",
+          "name": "data",
           "type": "bytes"
         }
       ],
       "name": "DepositQueued",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "root",
+          "type": "bytes32"
+        }
+      ],
+      "name": "DepositSubTreeReady",
       "type": "event"
     },
     {
@@ -373,28 +368,13 @@
           "type": "uint256"
         },
         {
-          "internalType": "address",
-          "name": "destination",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "token",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "accountHash",
-          "type": "bytes32"
+          "internalType": "bytes",
+          "name": "pubkey",
+          "type": "bytes"
         },
         {
           "internalType": "bytes",
-          "name": "pubkey",
+          "name": "data",
           "type": "bytes"
         }
       ],
@@ -424,6 +404,21 @@
         }
       ],
       "name": "logDepositLeafMerged",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "root",
+          "type": "bytes32"
+        }
+      ],
+      "name": "logDepositSubTreeReady",
       "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",

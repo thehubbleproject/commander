@@ -30,14 +30,12 @@ func (s *Syncer) processDepositQueued(eventName string, abiObject *abi.ABI, vLog
 		"⬜ New event found",
 		"event", eventName,
 		"accountID", event.AccountID.String(),
-		"Amount", event.Amount.String(),
-		"TokenID", event.Token.String(),
-		"AccountHash", event.AccountHash,
+		"Amount", hex.EncodeToString(event.Data),
 		"pubkey", event.Pubkey,
 	)
 
 	// add new account in pending state to DB and
-	newAccount := core.NewPendingUserAccount(event.AccountID.Uint64(), event.Amount.Uint64(), event.Token.Uint64(), hex.EncodeToString(event.Pubkey))
+	newAccount := core.NewPendingUserAccount(event.AccountID.Uint64(), hex.EncodeToString(event.Pubkey), event.Data)
 	if err := s.DBInstance.AddNewPendingAccount(*newAccount); err != nil {
 		panic(err)
 	}
@@ -47,7 +45,6 @@ func (s *Syncer) processDepositLeafMerged(eventName string, abiObject *abi.ABI, 
 	s.Logger.Info("Deposit Leaf merged")
 	// unpack event
 	event := new(logger.LoggerDepositLeafMerged)
-
 	err := common.UnpackLog(abiObject, event, eventName, vLog)
 	if err != nil {
 		// TODO do something with this error
@@ -158,10 +155,8 @@ func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *eth
 	// TODO run the transactions through ProcessTx present on-chain
 	// if any tx is fraud, challenge
 
-
 	// TODO apply transactions and match state root
 
-	
 	// create a new batch
 	newBatch := core.Batch{
 		Index:                event.Index.Uint64(),
