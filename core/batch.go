@@ -17,6 +17,7 @@ type Batch struct {
 	FinalisesOn          big.Int
 	SubmissionHash       string
 	TransactionsIncluded [][]byte
+	BatchType            uint64
 }
 
 func (b *Batch) DBModel() (BatchModel, error) {
