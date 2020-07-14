@@ -37,7 +37,7 @@ func TxReceiverHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create a new pending transaction
-	userTx := core.NewPendingTx(tx.From, tx.To, tx.Signature, tx.Message)
+	userTx := core.NewPendingTx(tx.From, tx.To, core.TX_TRANSFER_TYPE, tx.Signature, tx.Message)
 
 	// add the transaction to pool
 	err := core.DBInstance.InsertTx(&userTx)

@@ -113,7 +113,7 @@ func (s *Simulator) sendTxsToAndFro() {
 			s.Logger.Error("unable to encode tx", "error", err)
 			return
 		}
-		txCore := core.NewPendingTx(FromID, ToID, "0x1ad4773ace8ee65b8f1d94a3ca7adba51ee2ca0bdb550907715b3b65f1e3ad9f69e610383dc9ceb8a50c882da4b1b98b96500bdf308c1bdce2187cb23b7d736f1b", txBytes)
+		txCore := core.NewPendingTx(FromID, ToID, core.TX_TRANSFER_TYPE, "0x1ad4773ace8ee65b8f1d94a3ca7adba51ee2ca0bdb550907715b3b65f1e3ad9f69e610383dc9ceb8a50c882da4b1b98b96500bdf308c1bdce2187cb23b7d736f1b", txBytes)
 
 		err = s.DB.InsertTx(&txCore)
 		if err != nil {

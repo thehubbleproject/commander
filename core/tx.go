@@ -22,26 +22,29 @@ type Tx struct {
 	Signature string `json:"sig" gorm:"not null"`
 	TxHash    string `json:"hash" gorm:"not null"`
 	Status    uint64 `json:"status"`
+	Type      uint64 `json:"type"`
 }
 
 // NewTx creates a new transaction
-func NewTx(from, to uint64, message []byte, sig string) Tx {
+func NewTx(from, to, txType uint64, message []byte, sig string) Tx {
 	return Tx{
 		From:      from,
 		To:        to,
 		Data:      message,
 		Signature: sig,
+		Type:      txType,
 	}
 }
 
 // NewPendingTx creates a new transaction
-func NewPendingTx(from, to uint64, sig string, message []byte) Tx {
+func NewPendingTx(from, to, txType uint64, sig string, message []byte) Tx {
 	tx := Tx{
 		To:        to,
 		From:      from,
 		Data:      message,
 		Signature: sig,
 		Status:    TX_STATUS_PENDING,
+		Type:      txType,
 	}
 	tx.AssignHash()
 	return tx
@@ -162,7 +165,7 @@ func (db *DB) PopTxs() (txs []Tx, err error) {
 	var pendingTxs []Tx
 
 	// select N number of transactions which are pending in mempool and
-	if err := tx.Limit(config.GlobalCfg.TxsPerBatch).Where(&Tx{Status: TX_STATUS_PENDING}).Find(&pendingTxs).Error; err != nil {
+	if err := tx.Limit(config.GlobalCfg.TxsPerBatch).Where(&Tx{Status: TX_STATUS_PENDING, Type: TX_TRANSFER_TYPE}).Find(&pendingTxs).Error; err != nil {
 		db.Logger.Error("error while fetching pending transactions", err)
 		return txs, err
 	}
