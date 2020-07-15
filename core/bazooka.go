@@ -169,28 +169,32 @@ func (b *Bazooka) FetchBatchInputData(txHash ethCmn.Hash) (txs [][]byte, err err
 // ProcessTx calls the ProcessTx function on the contract to verify the tx
 // returns the updated accounts and the new balance root
 func (b *Bazooka) ProcessTx(balanceTreeRoot, accountTreeRoot ByteArray, tx Tx, fromMerkleProof, toMerkleProof AccountMerkleProof, pdaProof PDAMerkleProof) (newBalanceRoot ByteArray, from, to []byte, err error) {
-	txABIVersion, err := tx.ToABIVersion()
-	if err != nil {
+	switch txType := tx.Type; txType {
+	case TX_TRANSFER_TYPE:
+		return b.processTransferTx(balanceTreeRoot, accountTreeRoot, tx, fromMerkleProof, toMerkleProof, pdaProof)
+	default:
+		fmt.Println("TxType didnt match any options", tx.Type)
 		return
 	}
+}
 
+func (b *Bazooka) processTransferTx(balanceTreeRoot, accountTreeRoot ByteArray, tx Tx, fromMerkleProof, toMerkleProof AccountMerkleProof, pdaProof PDAMerkleProof) (newBalanceRoot ByteArray, from, to []byte, err error) {
+	decodedSignature, _ := hex.DecodeString(tx.Signature)
 	opts := bind.CallOpts{From: config.OperatorAddress}
 	fromMP, err := fromMerkleProof.ToABIVersion()
 	if err != nil {
 		return
 	}
-
 	toMP, err := toMerkleProof.ToABIVersion()
 	if err != nil {
 		return
 	}
-
 	typesAccountProofs := rollup.TypesAccountProofs{From: fromMP, To: toMP}
-
 	updatedRoot, newFromAccount, newToAccount, errCode, IsValidTx, err := b.RollupContract.ProcessTx(&opts,
 		balanceTreeRoot,
 		accountTreeRoot,
-		txABIVersion,
+		decodedSignature,
+		tx.Data,
 		pdaProof.ToABIVersion(),
 		typesAccountProofs,
 	)
@@ -208,23 +212,26 @@ func (b *Bazooka) ProcessTx(balanceTreeRoot, accountTreeRoot ByteArray, tx Tx, f
 	return newBalanceRoot, newFromAccount, newToAccount, nil
 }
 
-func (b *Bazooka) ApplyTransferTx(accountMP AccountMerkleProof, tx Tx) ([]byte, ByteArray, error) {
-	txABIVersion, err := tx.ToABIVersion()
-	if err != nil {
-		return nil, ByteArray{}, err
+func (b *Bazooka) ApplyTx(accountMP AccountMerkleProof, tx Tx) (updatedAccount []byte, updatedRoot ByteArray, err error) {
+	switch txType := tx.Type; txType {
+	case TX_TRANSFER_TYPE:
+		return b.applyTransferTx(accountMP, tx)
+	default:
+		fmt.Println("TxType didnt match any options", tx.Type)
+		return updatedAccount, updatedRoot, errors.New("Didn't match any options")
 	}
+}
 
+func (b *Bazooka) applyTransferTx(accountMP AccountMerkleProof, tx Tx) ([]byte, ByteArray, error) {
 	opts := bind.CallOpts{From: config.OperatorAddress}
-
 	accMP, err := accountMP.ToABIVersion()
 	if err != nil {
 		return nil, ByteArray{}, err
 	}
-	updatedAccountBytes, updatedRoot, err := b.RollupContract.ApplyTx(&opts, accMP, txABIVersion)
+	updatedAccountBytes, updatedRoot, err := b.RollupContract.ApplyTx(&opts, accMP, tx.Data)
 	if err != nil {
 		return updatedAccountBytes, updatedRoot, err
 	}
-
 	return updatedAccountBytes, updatedRoot, nil
 }
 

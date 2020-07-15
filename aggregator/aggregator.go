@@ -189,7 +189,7 @@ func (a *Aggregator) GetTxVerificationData(tx core.Tx) (fromMerkleProof, toMerkl
 	dbCopy, _ := core.NewDB()
 	dbCopy.Instance = mysqlTx
 
-	updatedFromAccountBytes, _, err := a.LoadedBazooka.ApplyTransferTx(fromMerkleProof, tx)
+	updatedFromAccountBytes, _, err := a.LoadedBazooka.ApplyTx(fromMerkleProof, tx)
 	if err != nil {
 		return
 	}
@@ -201,7 +201,6 @@ func (a *Aggregator) GetTxVerificationData(tx core.Tx) (fromMerkleProof, toMerkl
 	}
 
 	// TODO add a check to ensure that DB copy of state matches the one returned by ApplyTransferTx
-
 	toSiblings, err = dbCopy.GetSiblings(toAcc.Path)
 	if err != nil {
 		return

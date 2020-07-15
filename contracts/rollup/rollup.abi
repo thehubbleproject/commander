@@ -17,96 +17,6 @@
       "type": "constructor"
     },
     {
-      "constant": true,
-      "inputs": [],
-      "name": "ERR_FROM_TOKEN_TYPE",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "ERR_TOKEN_ADDR_INVAILD",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "ERR_TOKEN_AMT_INVAILD",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "ERR_TOKEN_NOT_ENOUGH_BAL",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "ERR_TO_TOKEN_TYPE",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "NO_ERR",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
       "constant": false,
       "inputs": [],
       "name": "SlashAndRollback",
@@ -764,46 +674,9 @@
           "type": "tuple"
         },
         {
-          "components": [
-            {
-              "internalType": "uint256",
-              "name": "fromIndex",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "toIndex",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "tokenType",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "nonce",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "txType",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "amount",
-              "type": "uint256"
-            },
-            {
-              "internalType": "bytes",
-              "name": "signature",
-              "type": "bytes"
-            }
-          ],
-          "internalType": "struct Types.Transaction",
-          "name": "transaction",
-          "type": "tuple"
+          "internalType": "bytes",
+          "name": "txBytes",
+          "type": "bytes"
         }
       ],
       "name": "ApplyTx",
@@ -837,46 +710,14 @@
           "type": "bytes32"
         },
         {
-          "components": [
-            {
-              "internalType": "uint256",
-              "name": "fromIndex",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "toIndex",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "tokenType",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "nonce",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "txType",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "amount",
-              "type": "uint256"
-            },
-            {
-              "internalType": "bytes",
-              "name": "signature",
-              "type": "bytes"
-            }
-          ],
-          "internalType": "struct Types.Transaction",
-          "name": "_tx",
-          "type": "tuple"
+          "internalType": "bytes",
+          "name": "sig",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "txBytes",
+          "type": "bytes"
         },
         {
           "components": [
@@ -1042,9 +883,9 @@
           "type": "bytes"
         },
         {
-          "internalType": "uint256",
+          "internalType": "enum Types.ErrorCode",
           "name": "",
-          "type": "uint256"
+          "type": "uint8"
         },
         {
           "internalType": "bool",

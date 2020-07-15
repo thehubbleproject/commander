@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 
 	"github.com/BOPR/config"
-	"github.com/BOPR/contracts/rollup"
 	ethCmn "github.com/ethereum/go-ethereum/common"
 
 	"github.com/ethereum/go-ethereum/rlp"
@@ -121,25 +120,6 @@ func (tx *Tx) Apply(updatedFrom, updatedTo []byte) error {
 
 func (t *Tx) String() string {
 	return fmt.Sprintf("To: %v From: %v Status:%v Hash: %v Data: %v", t.To, t.From, t.Status, t.TxHash, hex.EncodeToString(t.Data))
-}
-
-// ToABIVersion converts a standard tx to the the DataTypesTransaction struct on the contract
-func (t *Tx) ToABIVersion() (rollupTx rollup.TypesTransaction, err error) {
-	decodedSignature, _ := hex.DecodeString(t.Signature)
-	from, to, token, nonce, txType, amount, err := LoadedBazooka.DecodeTx(t.Data)
-	if err != nil {
-		return
-	}
-	rollupTx = rollup.TypesTransaction{
-		FromIndex: from,
-		ToIndex:   to,
-		TokenType: token,
-		Amount:    amount,
-		Nonce:     nonce,
-		TxType:    txType,
-		Signature: decodedSignature,
-	}
-	return rollupTx, nil
 }
 
 func (tx *Tx) Compress() ([]byte, error) {
