@@ -108,7 +108,7 @@ func (s *Simulator) sendTxsToAndFro() {
 			s.Logger.Error("unable to decode account", "error", err)
 			return
 		}
-		txBytes, err := s.LoadedBazooka.EncodeTx(int64(FromID), int64(ToID), int64(token.Uint64()), int64(nonce.Uint64())+1, int64(transferAmount), 1)
+		txBytes, err := s.LoadedBazooka.EncodeTransferTx(int64(FromID), int64(ToID), int64(token.Uint64()), int64(nonce.Uint64())+1, int64(transferAmount), 1)
 		if err != nil {
 			s.Logger.Error("unable to encode tx", "error", err)
 			return

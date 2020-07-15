@@ -235,7 +235,7 @@ func (b *Bazooka) applyTransferTx(accountMP AccountMerkleProof, tx Tx) ([]byte, 
 	return updatedAccountBytes, updatedRoot, nil
 }
 
-func (b *Bazooka) CompressTx(tx Tx) ([]byte, error) {
+func (b *Bazooka) CompressTransferTx(tx Tx) ([]byte, error) {
 	opts := bind.CallOpts{From: config.OperatorAddress}
 	sigBytes, err := hex.DecodeString(tx.Signature[2:])
 	if err != nil {
@@ -244,12 +244,12 @@ func (b *Bazooka) CompressTx(tx Tx) ([]byte, error) {
 	return b.RollupUtils.CompressTxWithMessage(&opts, tx.Data, sigBytes)
 }
 
-func (b *Bazooka) EncodeTx(from, to, token, nonce, amount, txType int64) ([]byte, error) {
+func (b *Bazooka) EncodeTransferTx(from, to, token, nonce, amount, txType int64) ([]byte, error) {
 	opts := bind.CallOpts{From: config.OperatorAddress}
 	return b.RollupUtils.BytesFromTxDeconstructed(&opts, big.NewInt(from), big.NewInt(to), big.NewInt(token), big.NewInt(nonce), big.NewInt(txType), big.NewInt(amount))
 }
 
-func (b *Bazooka) DecodeTx(txBytes []byte) (from, to, token, nonce, txType, amount *big.Int, err error) {
+func (b *Bazooka) DecodeTransferTx(txBytes []byte) (from, to, token, nonce, txType, amount *big.Int, err error) {
 	opts := bind.CallOpts{From: config.OperatorAddress}
 	tx, err := b.RollupUtils.TxFromBytesDeconstructed(&opts, txBytes)
 	if err != nil {
