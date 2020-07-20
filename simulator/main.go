@@ -37,7 +37,6 @@ func NewSimulator() *Simulator {
 	if err != nil {
 		panic(err)
 	}
-
 	sim.LoadedBazooka, err = core.NewPreLoadedBazooka()
 	if err != nil {
 		panic(err)
@@ -63,7 +62,7 @@ func (s *Simulator) OnStart() error {
 // OnStop stops all necessary go routines
 func (s *Simulator) OnStop() {
 	s.BaseService.OnStop() // Always call the overridden method.
-
+	s.DB.Close()
 	s.cancelSimulator()
 }
 
@@ -97,7 +96,7 @@ func (s *Simulator) sendTxsToAndFro() {
 		s.toSwap = !s.toSwap
 	}
 
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 3; i++ {
 		latestFromAcc, err := s.DB.GetAccountByID(FromID)
 		if err != nil {
 			s.Logger.Error("unable to fetch latest account", "error", err)

@@ -35,7 +35,7 @@ type Aggregator struct {
 }
 
 // NewAggregator returns new aggregator object
-func NewAggregator(db core.DB) *Aggregator {
+func NewAggregator() *Aggregator {
 	// create logger
 	logger := common.Logger.With("module", AggregatingService)
 	LoadedBazooka, err := core.NewPreLoadedBazooka()
@@ -44,7 +44,11 @@ func NewAggregator(db core.DB) *Aggregator {
 	}
 	aggregator := &Aggregator{}
 	aggregator.BaseService = *core.NewBaseService(logger, AggregatingService, aggregator)
-	aggregator.DB = db
+	DB, err := core.NewDB()
+	if err != nil {
+		panic(err)
+	}
+	aggregator.DB = DB
 	aggregator.LoadedBazooka = LoadedBazooka
 	return aggregator
 }
@@ -64,7 +68,7 @@ func (a *Aggregator) OnStart() error {
 // OnStop stops all necessary go routines
 func (a *Aggregator) OnStop() {
 	a.BaseService.OnStop() // Always call the overridden method.
-
+	a.DB.Close()
 	// cancel ack process
 	a.cancelAggregating()
 }
@@ -133,8 +137,9 @@ func (a *Aggregator) ProcessTx(txs []core.Tx) error {
 			return err
 		}
 
-		fromAccProof, toAccProof, PDAproof, err := a.GetTxVerificationData(tx)
+		fromAccProof, toAccProof, PDAproof, err := tx.GetVerificationData()
 		if err != nil {
+			a.Logger.Error("Unable to create verification data", "error", err)
 			return err
 		}
 
@@ -157,57 +162,5 @@ func (a *Aggregator) ProcessTx(txs []core.Tx) error {
 
 		currentRoot = updatedRoot
 	}
-
 	return nil
-}
-
-// GetTxVerificationData fetches all the data required to prove validity fo transaction
-func (a *Aggregator) GetTxVerificationData(tx core.Tx) (fromMerkleProof, toMerkleProof core.AccountMerkleProof, PDAProof core.PDAMerkleProof, err error) {
-	fromAcc, err := a.DB.GetAccountByID(tx.From)
-	if err != nil {
-		return
-	}
-
-	fromSiblings, err := a.DB.GetSiblings(fromAcc.Path)
-	if err != nil {
-		return
-	}
-	fromMerkleProof = core.NewAccountMerkleProof(fromAcc, fromSiblings)
-
-	toAcc, err := a.DB.GetAccountByID(tx.To)
-	if err != nil {
-		return
-	}
-	var toSiblings []core.UserAccount
-
-	mysqlTx := a.DB.Instance.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			mysqlTx.Rollback()
-		}
-	}()
-	dbCopy, _ := core.NewDB()
-	dbCopy.Instance = mysqlTx
-
-	updatedFromAccountBytes, _, err := a.LoadedBazooka.ApplyTx(fromMerkleProof, tx)
-	if err != nil {
-		return
-	}
-
-	fromAcc.Data = updatedFromAccountBytes
-	err = dbCopy.UpdateAccount(fromAcc)
-	if err != nil {
-		return
-	}
-
-	// TODO add a check to ensure that DB copy of state matches the one returned by ApplyTransferTx
-	toSiblings, err = dbCopy.GetSiblings(toAcc.Path)
-	if err != nil {
-		return
-	}
-
-	toMerkleProof = core.NewAccountMerkleProof(toAcc, toSiblings)
-	PDAProof = core.NewPDAProof(fromAcc.Path, fromAcc.PublicKey, fromSiblings)
-	mysqlTx.Rollback()
-	return fromMerkleProof, toMerkleProof, PDAProof, nil
 }

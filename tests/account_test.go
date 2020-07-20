@@ -32,7 +32,7 @@ func TestTxProcessing(t *testing.T) {
 	bazooka, err := core.NewPreLoadedBazooka()
 	require.Equal(t, err, nil, "Error while creating bazooka")
 	core.LoadedBazooka = bazooka
-	agg := aggregator.NewAggregator(db)
+	agg := aggregator.NewAggregator()
 	genesisAccounts, err := core.LoadedBazooka.GetGenesisAccounts()
 	require.Equal(t, err, nil, "error loading genesis accounts")
 	zeroAccount := genesisAccounts[0]

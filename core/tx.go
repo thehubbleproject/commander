@@ -69,6 +69,7 @@ func (tx *Tx) Apply(updatedFrom, updatedTo []byte) error {
 	if err != nil {
 		return err
 	}
+	defer db.Close()
 
 	// begin a transaction
 	mysqlTx := db.Instance.Begin()
@@ -185,9 +186,64 @@ func (tx *Tx) UpdateStatus(status uint64) error {
 	return DBInstance.Instance.Model(&tx).Update("status", status).Error
 }
 
+// GetVerificationData fetches all the data required to prove validity fo transaction
+func (tx *Tx) GetVerificationData() (fromMerkleProof, toMerkleProof AccountMerkleProof, PDAProof PDAMerkleProof, err error) {
+	fromAcc, err := DBInstance.GetAccountByID(tx.From)
+	if err != nil {
+		return
+	}
+	fromSiblings, err := DBInstance.GetSiblings(fromAcc.Path)
+	if err != nil {
+		return
+	}
+	fromMerkleProof = NewAccountMerkleProof(fromAcc, fromSiblings)
+	toAcc, err := DBInstance.GetAccountByID(tx.To)
+	if err != nil {
+		return
+	}
+	var toSiblings []UserAccount
+	mysqlTx := DBInstance.Instance.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			mysqlTx.Rollback()
+		}
+	}()
+	dbCopy, _ := NewDB()
+	dbCopy.Instance = mysqlTx
+	updatedFromAccountBytes, _, err := LoadedBazooka.ApplyTx(fromMerkleProof, *tx)
+	if err != nil {
+		return
+	}
+
+	fromAcc.Data = updatedFromAccountBytes
+	err = dbCopy.UpdateAccount(fromAcc)
+	if err != nil {
+		return
+	}
+
+	// TODO add a check to ensure that DB copy of state matches the one returned by ApplyTransferTx
+	toSiblings, err = dbCopy.GetSiblings(toAcc.Path)
+	if err != nil {
+		return
+	}
+
+	toMerkleProof = NewAccountMerkleProof(toAcc, toSiblings)
+	PDAProof = NewPDAProof(fromAcc.Path, fromAcc.PublicKey, fromSiblings)
+	mysqlTx.Rollback()
+	return fromMerkleProof, toMerkleProof, PDAProof, nil
+}
+
 func rlpHash(x interface{}) (h ethCmn.Hash) {
 	hw := sha3.NewLegacyKeccak256()
 	rlp.Encode(hw, x)
 	hw.Sum(h[:0])
 	return h
+}
+
+func ConcatTxs(txs [][]byte) []byte {
+	var concatenatedTxs []byte
+	for _, tx := range txs {
+		concatenatedTxs = append(concatenatedTxs, tx[:]...)
+	}
+	return concatenatedTxs
 }

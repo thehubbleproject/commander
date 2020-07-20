@@ -20,6 +20,8 @@ type Params struct {
 	// DepositSubTreeHeight is the maximum height of the deposit subtree that the coordinator wants to merge
 	// It is set on the contract and will be updated when that value changes
 	MaxDepositSubTreeHeight uint64 `json:"maxDepositSubTreeHeight"`
+
+	FinalisationTime uint64 `json:"finalisationTime"`
 }
 
 // Maintains sync information
@@ -71,6 +73,16 @@ func (db *DB) UpdateStakeAmount(newStakeAmount uint64) error {
 	return nil
 }
 
+// UpdateFinalisationTimePerBatch updates the max depth
+func (db *DB) UpdateFinalisationTimePerBatch(finalisationDuration uint64) error {
+	var updatedParams Params
+	updatedParams.MaxDepth = finalisationDuration
+	if err := db.Instance.Table("params").Assign(Params{FinalisationTime: finalisationDuration}).FirstOrCreate(&updatedParams).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 // UpdateMaxDepth updates the max depth
 func (db *DB) UpdateMaxDepth(newDepth uint64) error {
 	var updatedParams Params
@@ -89,6 +101,14 @@ func (db *DB) UpdateDepositSubTreeHeight(newHeight uint64) error {
 		return err
 	}
 	return nil
+}
+
+func (db *DB) GetBatchFinalisationTime() (uint64, error) {
+	var params Params
+	if err := db.Instance.First(&params).Error; err != nil {
+		return 0, err
+	}
+	return params.FinalisationTime, nil
 }
 
 // GetParams gets params from the DB

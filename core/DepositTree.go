@@ -106,7 +106,6 @@ func (db *DB) FinaliseDepositsAndAddBatch(accountsRoot ByteArray, pathToDepositS
 
 func (db *DB) FinaliseDeposits(pendingAccs []UserAccount, pathToDepositSubTree uint64, maxTreeDepth uint64) error {
 	var accounts []UserAccount
-
 	// fetch 2**DepositSubTree inactive accounts ordered by path
 	err := db.Instance.Limit(len(pendingAccs)).Order("path").Where("status = ?", STATUS_NON_INITIALIZED).Find(&accounts).Error
 	if err != nil {

@@ -44,7 +44,7 @@ func StartCmd() *cobra.Command {
 			//
 
 			// create aggregator service
-			aggregator := agg.NewAggregator(core.DBInstance)
+			aggregator := agg.NewAggregator()
 
 			// create the syncer service
 			syncer := listener.NewSyncer()
@@ -189,6 +189,7 @@ func LoadGenesisData(genesis config.Genesis) {
 	newParams := core.Params{StakeAmount: genesis.StakeAmount, MaxDepth: genesis.MaxTreeDepth, MaxDepositSubTreeHeight: genesis.MaxDepositSubTreeHeight}
 	core.DBInstance.UpdateStakeAmount(newParams.StakeAmount)
 	core.DBInstance.UpdateMaxDepth(newParams.MaxDepth)
+	core.DBInstance.UpdateFinalisationTimePerBatch(40320)
 	core.DBInstance.UpdateDepositSubTreeHeight(newParams.MaxDepositSubTreeHeight)
 
 	// load sync status
