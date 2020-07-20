@@ -14,6 +14,7 @@ import (
 	"github.com/BOPR/contracts/logger"
 )
 
+// ZEROROOT
 const ZEROROOT = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
 func (s *Syncer) processDepositQueued(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
@@ -46,7 +47,20 @@ func (s *Syncer) processDepositQueued(eventName string, abiObject *abi.ABI, vLog
 
 func (s *Syncer) processDepositSubtreeCreated(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
 	s.Logger.Info("New deposit subtree created")
-
+	// unpack event
+	event := new(logger.LoggerDepositSubTreeReady)
+	err := common.UnpackLog(abiObject, event, eventName, vLog)
+	if err != nil {
+		// TODO do something with this error
+		fmt.Println("Unable to unpack log:", err)
+		panic(err)
+	}
+	err = s.DBInstance.AttachDepositInfo(event.Root)
+	if err != nil {
+		// TODO do something with this error
+		fmt.Println("Unable to attack deposit information:", err)
+		panic(err)
+	}
 	// TODO add a sync flag, do not send transactions when in sync mode
 
 	// send deposit finalisation transction to ethereum chain

@@ -528,10 +528,9 @@ func (db *DB) AttachDepositInfo(root ByteArray) error {
 	// find all pending accounts
 	var account UserAccount
 	account.CreatedByDepositSubTree = root.String()
-	if err := db.Instance.Where("status = ?", STATUS_PENDING).Update(&account).Error; err != nil {
+	if err := db.Instance.Model(&account).Where("status = ?", STATUS_PENDING).Update(&account).Error; err != nil {
 		return err
 	}
-
 	return nil
 }
 

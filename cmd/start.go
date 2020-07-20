@@ -187,6 +187,7 @@ func LoadGenesisData(genesis config.Genesis) {
 	newParams := core.Params{StakeAmount: genesis.StakeAmount, MaxDepth: genesis.MaxTreeDepth, MaxDepositSubTreeHeight: genesis.MaxDepositSubTreeHeight}
 	core.DBInstance.UpdateStakeAmount(newParams.StakeAmount)
 	core.DBInstance.UpdateMaxDepth(newParams.MaxDepth)
+	core.DBInstance.UpdateDepositSubTreeHeight(newParams.MaxDepositSubTreeHeight)
 	core.DBInstance.UpdateFinalisationTimePerBatch(40320)
 
 	// load sync status
