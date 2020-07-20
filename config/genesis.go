@@ -5,33 +5,31 @@ import (
 	"io/ioutil"
 	"os"
 
-	"errors"
-	"math"
-
 	"github.com/BOPR/common"
 )
 
 type Genesis struct {
-	StartEthBlock           uint64          `json:"startEthBlock"`
-	MaxTreeDepth            uint64          `json:"maxTreeDepth"`
-	MaxDepositSubTreeHeight uint64          `json:"maxDepositSubTreeHeight"`
-	StakeAmount             uint64          `json:"stakeAmount"`
-	GenesisAccounts         GenesisAccounts `json:"genesisAccounts"`
+	StartEthBlock           uint64 `json:"startEthBlock"`
+	MaxTreeDepth            uint64 `json:"maxTreeDepth"`
+	MaxDepositSubTreeHeight uint64 `json:"maxDepositSubTreeHeight"`
+	StakeAmount             uint64 `json:"stakeAmount"`
+	GenesisAccountCount     uint64 `json:"genesisAccountCount"`
+	// GenesisAccounts         GenesisAccounts `json:"genesisAccounts"`
 }
 
 // Validate validates the genesis file and checks for basic things
 func (g Genesis) Validate() error {
-	if int(math.Exp2(float64(g.MaxTreeDepth)))-len(g.GenesisAccounts.Accounts) < 0 {
-		return errors.New("More accounts submitted than can be accomodated")
-	}
+	// if int(math.Exp2(float64(g.MaxTreeDepth)))-len(g.GenesisAccounts.Accounts) < 0 {
+	// 	return errors.New("More accounts submitted than can be accomodated")
+	// }
 
-	if len(g.GenesisAccounts.Accounts) < 1 {
-		return errors.New("Genesis file must contain atleast coordinator leaf")
-	}
+	// if len(g.GenesisAccounts.Accounts) < 1 {
+	// 	return errors.New("Genesis file must contain atleast coordinator leaf")
+	// }
 
-	if !g.GenesisAccounts.Accounts[0].IsCoordinator() {
-		return errors.New("First account in the genesis file should be the coordinator")
-	}
+	// if !g.GenesisAccounts.Accounts[0].IsCoordinator() {
+	// 	return errors.New("First account in the genesis file should be the coordinator")
+	// }
 
 	return nil
 }
@@ -93,7 +91,8 @@ func DefaultGenesis() Genesis {
 		MaxTreeDepth:            common.DEFAULT_DEPTH,
 		MaxDepositSubTreeHeight: common.DEFAULT_DEPTH,
 		StakeAmount:             32,
-		GenesisAccounts:         DefaultGenesisAccounts(),
+		GenesisAccountCount:     2,
+		// GenesisAccounts:         DefaultGenesisAccounts(),
 	}
 }
 

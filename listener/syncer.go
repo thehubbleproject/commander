@@ -7,7 +7,6 @@ import (
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 
-	bazooka "github.com/BOPR/bazooka"
 	"github.com/BOPR/core"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -27,7 +26,7 @@ type Syncer struct {
 	DBInstance core.DB
 
 	// contract caller to interact with contracts
-	loadedBazooka bazooka.Bazooka
+	loadedBazooka core.Bazooka
 
 	// header channel
 	HeaderChannel chan *ethTypes.Header
@@ -48,7 +47,7 @@ func NewSyncer() Syncer {
 	// create new base service
 	syncerService.BaseService = *core.NewBaseService(logger, SyncerServiceName, syncerService)
 
-	loadedBazooka, err := bazooka.NewPreLoadedBazooka()
+	loadedBazooka, err := core.NewPreLoadedBazooka()
 	if err != nil {
 		panic(err)
 	}

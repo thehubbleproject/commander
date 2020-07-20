@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	DATABASENAME                = "BOPR"
+	DATABASENAME                = "hubble"
 	DefaultMongoDB              = "mongodb://localhost:27017"
 	DefaultDB                   = "mysql"
 	DefaultDbUrlPrefix          = "mysql://root:root@(localhost:3306)"
@@ -31,6 +31,7 @@ const (
 var GlobalCfg Configuration
 var OperatorKey *ecdsa.PrivateKey
 var OperatorPubKey *ecdsa.PublicKey
+var OperatorAddress ethCmn.Address
 
 // Configuration represents heimdall config
 type Configuration struct {
@@ -46,8 +47,10 @@ type Configuration struct {
 	ServerPort         string        `mapstructure:"server_port"`
 	ConfirmationBlocks uint64        `mapstructure:"confirmation_blocks"` // Number of blocks for confirmation
 
-	RollupAddress string `mapstructure:"rollup_address"`
-	LoggerAddress string `mapstructure:"logger_address"`
+	RollupAddress      string `mapstructure:"rollup_address"`
+	LoggerAddress      string `mapstructure:"logger_address"`
+	FraudProofAddress  string `mapstructure:"fraud_proof_address"`
+	RollupUtilsAddress string `mapstructure:"rollup_utils_address"`
 
 	OperatorKey       string `mapstructure:"operator_key"`
 	OperatorAddress   string `mapstructure:"operator_address"`
@@ -68,6 +71,8 @@ func GetDefaultConfig() Configuration {
 		ConfirmationBlocks: DefaultConfirmationBlocks,
 		RollupAddress:      ethCmn.Address{}.String(),
 		LoggerAddress:      ethCmn.Address{}.String(),
+		FraudProofAddress:  ethCmn.Address{}.String(),
+		RollupUtilsAddress: ethCmn.Address{}.String(),
 		OperatorKey:        "",
 		OperatorAddress:    "",
 		LastRecordedBlock:  "0",
@@ -76,11 +81,16 @@ func GetDefaultConfig() Configuration {
 
 // ParseConfig retrieves the default environment configuration for the
 // application.
-func ParseConfig() (*Configuration, error) {
+func ParseConfig(path string) (*Configuration, error) {
 	conf := new(Configuration)
 	v := viper.New()
 	v.SetConfigName("config")
-	v.AddConfigPath(".")
+	if path == "" {
+		v.AddConfigPath(".")
+	} else {
+		v.AddConfigPath(path)
+	}
+
 	if err := v.ReadInConfig(); err != nil {
 		return conf, err
 	}
@@ -89,8 +99,8 @@ func ParseConfig() (*Configuration, error) {
 	return conf, err
 }
 
-func ParseAndInitGlobalConfig() error {
-	conf, err := ParseConfig()
+func ParseAndInitGlobalConfig(path string) error {
+	conf, err := ParseConfig(path)
 	if err != nil {
 		return err
 	}
@@ -130,12 +140,8 @@ func SetOperatorKeys(privKeyStr string) error {
 		return errors.New("cannot assert type: publicKey is not of type *ecdsa.PublicKey")
 	}
 	OperatorPubKey = ecsdaPubKey
+	OperatorAddress = crypto.PubkeyToAddress(*OperatorPubKey)
 	return nil
-}
-
-func OperatorAddress() ethCmn.Address {
-	address := crypto.PubkeyToAddress(*OperatorPubKey)
-	return address
 }
 
 func GenOperatorKey() ([]byte, error) {

@@ -47,7 +47,7 @@ type DB struct {
 // NOTE: it uses the configrations present in the config.toml file
 // returns error if not able to open the DB
 func NewDB() (DB, error) {
-	if err := config.ParseAndInitGlobalConfig(); err != nil {
+	if err := config.ParseAndInitGlobalConfig(""); err != nil {
 		return DB{}, err
 	}
 	db, err := gorm.Open(config.GlobalCfg.DB, config.GlobalCfg.FormattedDBURL())

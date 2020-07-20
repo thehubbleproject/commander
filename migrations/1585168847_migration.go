@@ -13,8 +13,8 @@ func init() {
 			if !db.HasTable(&types.Tx{}) {
 				db.CreateTable(&types.Tx{})
 			}
-			if !db.HasTable(&types.BatchModel{}) {
-				db.CreateTable(&types.BatchModel{})
+			if !db.HasTable(&types.Batch{}) {
+				db.CreateTable(&types.Batch{})
 			}
 			if !db.HasTable(&types.SyncStatus{}) {
 				db.CreateTable(&types.SyncStatus{})
@@ -32,7 +32,7 @@ func init() {
 		},
 		Down: func(db *gorm.DB) error {
 			db.DropTableIfExists(&types.Tx{})
-			db.DropTableIfExists(&types.BatchModel{})
+			db.DropTableIfExists(&types.Batch{})
 			db.DropTableIfExists(&types.Params{})
 			db.DropTableIfExists(&types.SyncStatus{})
 			db.DropTableIfExists(&types.Token{})

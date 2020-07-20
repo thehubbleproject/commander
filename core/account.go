@@ -20,15 +20,7 @@ type UserAccount struct {
 	// Cannot be changed once created
 	AccountID uint64 `gorm:"not null;index:AccountID"`
 
-	// Token type of the user account
-	// Cannot be changed once creation
-	TokenType uint64 `gorm:"not null;default:0"`
-
-	// Balance of the user account
-	Balance uint64 `gorm:"not null;"`
-
-	// Nonce of the account
-	Nonce uint64 `gorm:"not null;"`
+	Data []byte `gorm:"type:varbinary(255)" sql:"DEFAULT:0"`
 
 	// Public key for the user
 	PublicKey string `gorm:"size:1000"`
@@ -63,16 +55,14 @@ type UserAccount struct {
 }
 
 // NewUserAccount creates a new user account
-func NewUserAccount(id, balance, tokenType, nonce, status uint64, pubkey, path string) *UserAccount {
+func NewUserAccount(id, status uint64, pubkey, path string, data []byte) *UserAccount {
 	newAcccount := &UserAccount{
 		AccountID: id,
 		PublicKey: pubkey,
-		Balance:   balance,
-		TokenType: tokenType,
-		Nonce:     nonce,
 		Path:      path,
 		Status:    status,
 		Type:      TYPE_TERMINAL,
+		Data:      data,
 	}
 	newAcccount.UpdatePath(newAcccount.Path)
 	newAcccount.CreateAccountHash()
@@ -86,9 +76,6 @@ func NewAccountNode(path, hash, pubkeyHash string) *UserAccount {
 		AccountID:     ZERO,
 		PublicKey:     "",
 		PublicKeyHash: pubkeyHash,
-		Balance:       ZERO,
-		TokenType:     ZERO,
-		Nonce:         ZERO,
 		Path:          path,
 		Status:        STATUS_ACTIVE,
 		Type:          TYPE_NON_TERMINAL,
@@ -100,16 +87,14 @@ func NewAccountNode(path, hash, pubkeyHash string) *UserAccount {
 
 // NewAccountNode creates a new terminal user account but in pending state
 // It is to be used while adding new deposits while they are not finalised
-func NewPendingUserAccount(id, balance, tokenType uint64, _pubkey string) *UserAccount {
+func NewPendingUserAccount(id uint64, _pubkey string, data []byte) *UserAccount {
 	newAcccount := &UserAccount{
 		AccountID: id,
-		TokenType: tokenType,
-		Balance:   balance,
-		Nonce:     NONCE_ZERO,
 		Path:      UNINITIALIZED_PATH,
 		Status:    STATUS_PENDING,
 		PublicKey: _pubkey,
 		Type:      TYPE_TERMINAL,
+		Data:      data,
 	}
 	newAcccount.UpdatePath(newAcccount.Path)
 	newAcccount.CreateAccountHash()
@@ -122,16 +107,25 @@ func (acc *UserAccount) UpdatePath(path string) {
 }
 
 func (acc *UserAccount) String() string {
-	return fmt.Sprintf("ID: %d Bal: %d Path: %v Nonce: %v TokenType:%v NodeType: %d %v", acc.AccountID, acc.Balance, acc.Path, acc.Nonce, acc.TokenType, acc.Type, acc.Hash)
+	_, balance, nonce, token, _ := LoadedBazooka.DecodeAccount(acc.Data)
+	return fmt.Sprintf("ID: %d Bal: %d Nonce: %d Token: %v Path: %v TokenType:%v NodeType: %v", acc.AccountID, balance, nonce, token, acc.Path, acc.Type, acc.Hash)
 }
 
-func (acc *UserAccount) ToABIAccount() rollup.TypesUserAccount {
-	return rollup.TypesUserAccount{
-		ID:        UintToBigInt(acc.AccountID),
-		Balance:   UintToBigInt(acc.Balance),
-		TokenType: UintToBigInt(acc.TokenType),
-		Nonce:     UintToBigInt(acc.Nonce),
+func (acc *UserAccount) ToABIAccount() (rollupTx rollup.TypesUserAccount, err error) {
+	fmt.Println("accountData", acc.Type)
+	var ID, balance, nonce, token *big.Int = big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0)
+	if acc.Type == TYPE_TERMINAL {
+		ID, balance, nonce, token, err = LoadedBazooka.DecodeAccount(acc.Data)
+		if err != nil {
+			fmt.Println("unable to convert", err)
+			return
+		}
 	}
+	rollupTx.ID = ID
+	rollupTx.Balance = balance
+	rollupTx.Nonce = nonce
+	rollupTx.TokenType = token
+	return
 }
 
 func (acc *UserAccount) HashToByteArray() ByteArray {
@@ -150,23 +144,6 @@ func (acc *UserAccount) PubkeyHashToByteArray() ByteArray {
 	return ba
 }
 
-func (acc *UserAccount) UpdateBalance(newBalance uint64) {
-	acc.Balance = newBalance
-}
-
-func (acc *UserAccount) UpdateNonce() {
-	acc.Nonce = acc.Nonce + 1
-}
-
-func (acc *UserAccount) ApplyTx(tx Tx) {
-	if acc.AccountID == tx.From {
-		// decrease balance
-		acc.UpdateBalance(acc.Balance - tx.Amount)
-	}
-
-	acc.UpdateNonce()
-}
-
 func (acc *UserAccount) IsCoordinator() bool {
 	if acc.Path != "" {
 		return false
@@ -183,52 +160,20 @@ func (acc *UserAccount) IsCoordinator() bool {
 	return true
 }
 
-func (acc *UserAccount) AccountInclusionProof(path int64) rollup.TypesAccountInclusionProof {
-	return rollup.TypesAccountInclusionProof{
-		PathToAccount: big.NewInt(path),
-		Account:       acc.ToABIAccount(),
-	}
-}
-
-func (acc *UserAccount) ABIEncode() ([]byte, error) {
-	uint256Ty, err := abi.NewType("uint256", "uint256", nil)
-	if err != nil {
-		return []byte(""), err
-	}
-
-	arguments := abi.Arguments{
-		{
-			Type: uint256Ty,
-		},
-		{
-			Type: uint256Ty,
-		},
-		{
-			Type: uint256Ty,
-		},
-		{
-			Type: uint256Ty,
-		},
-	}
-	bytes, err := arguments.Pack(
-		big.NewInt(int64(acc.AccountID)),
-		big.NewInt(int64(acc.Balance)),
-		big.NewInt(int64(acc.Nonce)),
-		big.NewInt(int64(acc.TokenType)),
-	)
-	if err != nil {
-		return []byte(""), err
-	}
-
-	return bytes, nil
-}
-
-func (acc *UserAccount) CreateAccountHash() {
-	data, err := acc.ABIEncode()
+func (acc *UserAccount) AccountInclusionProof(path int64) (accInclusionProof rollup.TypesAccountInclusionProof, err error) {
+	accABI, err := acc.ToABIAccount()
 	if err != nil {
 		return
 	}
-	accountHash := common.Keccak256(data)
+	accInclusionProof = rollup.TypesAccountInclusionProof{
+		PathToAccount: big.NewInt(path),
+		Account:       accABI,
+	}
+	return accInclusionProof, nil
+}
+
+func (acc *UserAccount) CreateAccountHash() {
+	accountHash := common.Keccak256(acc.Data)
 	acc.Hash = accountHash.String()
 }
 
@@ -238,7 +183,7 @@ func (acc *UserAccount) CreateAccountHash() {
 
 // EmptyAcccount creates a new account which has the same hash as ZERO_VALUE_LEAF
 func EmptyAccount() UserAccount {
-	return *NewUserAccount(ZERO, ZERO, ZERO, ZERO, STATUS_ACTIVE, "", "")
+	return *NewUserAccount(ZERO, STATUS_INACTIVE, "", "", []byte(""))
 }
 
 //
@@ -362,7 +307,6 @@ func (db *DB) UpdateAccount(account UserAccount) error {
 	}
 
 	db.Logger.Debug("Updating account", "Hash", account.Hash, "Path", account.Path, "siblings", siblings, "countOfSiblings", len(siblings))
-
 	return db.StoreLeaf(account, account.Path, siblings)
 }
 

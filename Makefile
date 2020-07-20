@@ -6,11 +6,9 @@ dep:
 	
 contracts:
 	abigen --abi=contracts/rollup/rollup.abi --pkg=rollup --out=contracts/rollup/rollup.go
-	abigen --abi=contracts/merkleTree/merkleTree.abi --pkg=merkleTree --out=contracts/merkleTree/merkleTree.go
-	abigen --abi=contracts/trial/trial.abi --pkg=trial --out=contracts/trial/trial.go
 	abigen --abi=contracts/logger/logger.abi --pkg=logger --out=contracts/logger/logger.go
-	abigen --abi=contracts/depositmanager/depositmanager.abi --pkg=depositmanager --out=contracts/depositmanager/depositmanager.go
-	abigen --abi=contracts/coordinatorproxy/coordinatorproxy.abi --pkg=coordinatorproxy --out=contracts/coordinatorproxy/coordinatorproxy.go
+	abigen --abi=contracts/rolluputils/rolluputils.abi --pkg=rolluputils --out=contracts/rolluputils/rolluputils.go
+	abigen --abi=contracts/fraudproof/fraudproof.abi --pkg=fraudproof --out=contracts/fraudproof/fraudproof.go
 
 clean:
 	rm -rf build

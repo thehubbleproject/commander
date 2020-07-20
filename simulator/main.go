@@ -1,17 +1,11 @@
 package simulator
 
 import (
-	"bytes"
 	"context"
-	"encoding/hex"
-	"encoding/json"
-	"net/http"
 	"time"
 
 	"github.com/BOPR/common"
 	"github.com/BOPR/core"
-	"github.com/BOPR/rest"
-	"github.com/ethereum/go-ethereum/crypto"
 )
 
 const (
@@ -24,6 +18,9 @@ type Simulator struct {
 
 	// DB instance
 	DB core.DB
+
+	// contract caller to interact with contracts
+	LoadedBazooka core.Bazooka
 
 	// header listener subscription
 	cancelSimulator context.CancelFunc
@@ -40,6 +37,11 @@ func NewSimulator() *Simulator {
 	if err != nil {
 		panic(err)
 	}
+	sim.LoadedBazooka, err = core.NewPreLoadedBazooka()
+	if err != nil {
+		panic(err)
+	}
+
 	sim.DB = db
 	return sim
 }
@@ -60,7 +62,7 @@ func (s *Simulator) OnStart() error {
 // OnStop stops all necessary go routines
 func (s *Simulator) OnStop() {
 	s.BaseService.OnStop() // Always call the overridden method.
-
+	s.DB.Close()
 	s.cancelSimulator()
 }
 
@@ -83,92 +85,44 @@ func (s *Simulator) SimulationStart(ctx context.Context, interval time.Duration)
 
 // tries sending transactins to and fro accounts to the rollup node
 func (s *Simulator) sendTxsToAndFro() {
-	AlicePrivKey := "9b28f36fbd67381120752d6172ecdcf10e06ab2d9a1367aac00cdcd6ac7855d3"
-	BobPrivKey := "c8deb0bea5c41afe8e37b4d1bd84e31adff11b09c8c96ff4b605003cce067cd9"
-	From := AlicePrivKey
-	To := BobPrivKey
+	transferAmount := 1
 	FromID := uint64(2)
 	ToID := uint64(3)
+
 	if s.toSwap {
 		tempID := FromID
 		FromID = ToID
 		ToID = tempID
-		tempPrivKey := From
-		From = To
-		To = tempPrivKey
 		s.toSwap = !s.toSwap
 	}
-	for i := 0; i < 2; i++ {
-		privKeyBytes, err := hex.DecodeString(From)
-		if err != nil {
-			s.Logger.Error("unable to decode string", "error", err)
-			return
-		}
-		key := crypto.ToECDSAUnsafe(privKeyBytes)
 
+	for i := 0; i < 3; i++ {
 		latestFromAcc, err := s.DB.GetAccountByID(FromID)
 		if err != nil {
 			s.Logger.Error("unable to fetch latest account", "error", err)
 			return
 		}
-
-		if latestFromAcc.Balance < 3 {
-			tempID := FromID
-			FromID = ToID
-			ToID = tempID
-			tempPrivKey := From
-			From = To
-			To = tempPrivKey
-		}
-
-		var txCore = core.Tx{
-			From:    FromID,
-			To:      ToID,
-			Amount:  1,
-			TokenID: latestFromAcc.TokenType,
-			Nonce:   latestFromAcc.Nonce + 1,
-		}
-
-		signBytes, err := txCore.GetSignBytes()
+		_, _, nonce, token, err := s.LoadedBazooka.DecodeAccount(latestFromAcc.Data)
 		if err != nil {
+			s.Logger.Error("unable to decode account", "error", err)
 			return
 		}
-
-		signature, err := crypto.Sign(signBytes, key)
-
-		var tx = rest.TxReceiver{
-			From:      txCore.From,
-			To:        txCore.To,
-			Amount:    1,
-			TokenID:   txCore.TokenID,
-			Nonce:     txCore.Nonce,
-			Signature: hex.EncodeToString(signature),
-		}
-
-		payload, err := json.Marshal(tx)
+		txBytes, err := s.LoadedBazooka.EncodeTransferTx(int64(FromID), int64(ToID), int64(token.Uint64()), int64(nonce.Uint64())+1, int64(transferAmount), 1)
 		if err != nil {
+			s.Logger.Error("unable to encode tx", "error", err)
 			return
 		}
+		txCore := core.NewPendingTx(FromID, ToID, core.TX_TRANSFER_TYPE, "0x1ad4773ace8ee65b8f1d94a3ca7adba51ee2ca0bdb550907715b3b65f1e3ad9f69e610383dc9ceb8a50c882da4b1b98b96500bdf308c1bdce2187cb23b7d736f1b", txBytes)
 
-		request, err := http.NewRequest("POST", "http://localhost:3000/tx", bytes.NewBuffer(payload))
+		err = s.DB.InsertTx(&txCore)
 		if err != nil {
+			s.Logger.Error("unable to insert tx", "error", err)
 			return
 		}
+		s.Logger.Info("Sent a tx!", "TxHash", txCore.TxHash, "From", txCore.From, "To", txCore.To)
 
-		client := &http.Client{}
-		resp, err := client.Do(request)
-		if err != nil {
-			panic(err)
-		}
-
-		defer resp.Body.Close()
-
-		if resp.StatusCode == 200 {
-			s.Logger.Info("Tx sent!", "TxData", txCore.String())
-		}
 		if txCore.From == uint64(2) {
 			s.toSwap = true
 		}
 	}
-
 }

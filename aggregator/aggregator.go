@@ -1,11 +1,10 @@
-package poller
+package aggregator
 
 import (
 	"context"
 	"fmt"
 	"time"
 
-	"github.com/BOPR/bazooka"
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 	"github.com/BOPR/core"
@@ -26,7 +25,7 @@ type Aggregator struct {
 	core.BaseService
 
 	// contract caller to interact with contracts
-	LoadedBazooka bazooka.Bazooka
+	LoadedBazooka core.Bazooka
 
 	// DB instance
 	DB core.DB
@@ -36,16 +35,20 @@ type Aggregator struct {
 }
 
 // NewAggregator returns new aggregator object
-func NewAggregator(db core.DB) *Aggregator {
+func NewAggregator() *Aggregator {
 	// create logger
 	logger := common.Logger.With("module", AggregatingService)
-	LoadedBazooka, err := bazooka.NewPreLoadedBazooka()
+	LoadedBazooka, err := core.NewPreLoadedBazooka()
 	if err != nil {
 		panic(err)
 	}
 	aggregator := &Aggregator{}
 	aggregator.BaseService = *core.NewBaseService(logger, AggregatingService, aggregator)
-	aggregator.DB = db
+	DB, err := core.NewDB()
+	if err != nil {
+		panic(err)
+	}
+	aggregator.DB = DB
 	aggregator.LoadedBazooka = LoadedBazooka
 	return aggregator
 }
@@ -65,7 +68,7 @@ func (a *Aggregator) OnStart() error {
 // OnStop stops all necessary go routines
 func (a *Aggregator) OnStop() {
 	a.BaseService.OnStop() // Always call the overridden method.
-
+	a.DB.Close()
 	// cancel ack process
 	a.cancelAggregating()
 }
@@ -116,39 +119,48 @@ func (a *Aggregator) pickBatch() {
 // ProcessTx fetches all the data required to validate tx from smart contact
 // and calls the proccess tx function to return the updated balance root and accounts
 func (a *Aggregator) ProcessTx(txs []core.Tx) error {
-	rootAcc, err := a.DB.GetRoot()
-	if err != nil {
-		return err
-	}
-	a.Logger.Debug("Latest root", "root", rootAcc.Hash)
-
-	currentRoot, err := core.HexToByteArray(rootAcc.Hash)
-	if err != nil {
-		return err
-	}
-	currentAccountTreeRoot, err := core.HexToByteArray(rootAcc.PublicKeyHash)
-	if err != nil {
-		return err
-	}
-
 	for _, tx := range txs {
-		fromAccProof, toAccProof, PDAproof, err := a.DB.GetTxVerificationData(tx)
-		if err != nil {
-			return err
-		}
-		a.Logger.Debug("Fetched latest account proofs", "tx", tx.String(), "fromMP", fromAccProof, "toMP", toAccProof, "PDAProof", PDAproof)
-		updatedRoot, _, _, err := a.LoadedBazooka.ProcessTx(currentRoot, currentAccountTreeRoot, tx, fromAccProof, toAccProof, PDAproof)
+		rootAcc, err := a.DB.GetRoot()
 		if err != nil {
 			return err
 		}
 
-		err = tx.Apply()
+		a.Logger.Debug("Latest root", "root", rootAcc.Hash)
+
+		currentRoot, err := core.HexToByteArray(rootAcc.Hash)
+		if err != nil {
+			return err
+		}
+
+		currentAccountTreeRoot, err := core.HexToByteArray(rootAcc.PublicKeyHash)
+		if err != nil {
+			return err
+		}
+
+		fromAccProof, toAccProof, PDAproof, err := tx.GetVerificationData()
+		if err != nil {
+			a.Logger.Error("Unable to create verification data", "error", err)
+			return err
+		}
+
+		a.Logger.Debug("Fetched latest account proofs", "tx", tx.String(), "fromMP", fromAccProof, "toMP", toAccProof, "PDAProof", PDAproof)
+
+		updatedRoot, updatedFrom, updatedTo, err := a.LoadedBazooka.ProcessTx(currentRoot, currentAccountTreeRoot, tx, fromAccProof, toAccProof, PDAproof)
+		if err != nil {
+			err := tx.UpdateStatus(core.TX_STATUS_REVERTED)
+			if err != nil {
+				a.Logger.Error("Unable to update transaction status", "tx", tx.String())
+				return err
+			}
+		}
+
+		// if the transactions is valid, apply it
+		err = tx.Apply(updatedFrom, updatedTo)
 		if err != nil {
 			return err
 		}
 
 		currentRoot = updatedRoot
 	}
-
 	return nil
 }

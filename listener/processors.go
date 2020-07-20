@@ -9,9 +9,12 @@ import (
 	"github.com/BOPR/core"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/jinzhu/gorm"
 
 	"github.com/BOPR/contracts/logger"
 )
+
+const ZEROROOT = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
 func (s *Syncer) processDepositQueued(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
 	s.Logger.Info("New deposit found")
@@ -30,14 +33,12 @@ func (s *Syncer) processDepositQueued(eventName string, abiObject *abi.ABI, vLog
 		"⬜ New event found",
 		"event", eventName,
 		"accountID", event.AccountID.String(),
-		"Amount", event.Amount.String(),
-		"TokenID", event.Token.String(),
-		"AccountHash", event.AccountHash,
+		"Amount", hex.EncodeToString(event.Data),
 		"pubkey", event.Pubkey,
 	)
 
 	// add new account in pending state to DB and
-	newAccount := core.NewPendingUserAccount(event.AccountID.Uint64(), event.Amount.Uint64(), event.Token.Uint64(), hex.EncodeToString(event.Pubkey))
+	newAccount := core.NewPendingUserAccount(event.AccountID.Uint64(), hex.EncodeToString(event.Pubkey), event.Data)
 	if err := s.DBInstance.AddNewPendingAccount(*newAccount); err != nil {
 		panic(err)
 	}
@@ -95,6 +96,7 @@ func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *eth
 		fmt.Println("Unable to unpack log:", err)
 		panic(err)
 	}
+
 	s.Logger.Info(
 		"⬜ New event found",
 		"event", eventName,
@@ -109,46 +111,71 @@ func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *eth
 		return
 	}
 
+	// if the batch has some txs, parse them
 	var txs [][]byte
-	var stakeAmount uint64
-
-	if event.Index.Uint64() == 0 {
-		stakeAmount = 0
-	} else if "0x0000000000000000000000000000000000000000000000000000000000000000" == core.ByteArray(event.Txroot).String() {
-		stakeAmount = params.StakeAmount
-	} else {
+	if ZEROROOT != core.ByteArray(event.Txroot).String() {
 		// pick the calldata for the batch
-		txHash := vLog.TxHash
-		txs, err = s.loadedBazooka.FetchBatchInputData(txHash)
+		txs, err = s.loadedBazooka.FetchBatchInputData(vLog.TxHash)
 		if err != nil {
 			// TODO do something with this error
 			panic(err)
 		}
-		stakeAmount = params.StakeAmount
 	}
 
-	// TODO run the transactions through ProcessTx present on-chain
-	// if any tx is fraud, challenge
+	batch, err := s.DBInstance.GetBatchByIndex(event.Index.Uint64())
+	// if we havent seen the batch, apply txs and store batch
+	if err != nil && gorm.IsRecordNotFoundError(err) {
+		s.Logger.Info("Found a new batch, applying transactions and adding new batch", "index", event.Index.Uint64)
+		err := s.ApplyTxsFromBatch(txs)
+		if err != nil {
+			panic(err)
+		}
 
-	// TODO apply transactions and match state root
+		newBatch := core.Batch{
+			BatchID:              event.Index.Uint64(),
+			StateRoot:            core.ByteArray(event.UpdatedRoot).String(),
+			TxRoot:               core.ByteArray(event.Txroot).String(),
+			TransactionsIncluded: core.ConcatTxs(txs),
+			Committer:            event.Committer.String(),
+			StakeAmount:          params.StakeAmount,
+			FinalisesOn:          *big.NewInt(int64(params.FinalisationTime)),
+			Status:               core.BATCH_COMMITTED,
+		}
 
-	// create a new batch
-	newBatch := core.Batch{
-		Index:                event.Index.Uint64(),
-		StateRoot:            core.ByteArray(event.UpdatedRoot),
-		TxRoot:               core.ByteArray(event.Txroot),
-		TransactionsIncluded: txs,
-		Committer:            event.Committer.String(),
-		StakeAmount:          stakeAmount,
-		FinalisesOn:          *big.NewInt(100),
+		err = s.DBInstance.AddNewBatch(newBatch)
+		if err != nil {
+			// TODO do something with this error
+			panic(err)
+		}
+		return
+	} else if err != nil {
+		s.Logger.Error("Unable to fetch batch", "index", event.Index, "err", err)
+		return
 	}
 
-	err = s.DBInstance.AddNewBatch(newBatch)
-	if err != nil {
-		// TODO do something with this error
-		panic(err)
+	// if batch is present but in a non committed state we parse txs and commit batch
+	if batch.Status != core.BATCH_COMMITTED {
+		s.Logger.Info("Found a non committed batch")
+		if batch.StateRoot != core.ByteArray(event.UpdatedRoot).String() {
+			// State root mismatch error
+		}
+		// batch broadcasted by us
+		// txs applied but batch needs to be committed
+		// TODO add batch type
+		newBatch := core.Batch{
+			BatchID:              event.Index.Uint64(),
+			StateRoot:            core.ByteArray(event.UpdatedRoot).String(),
+			TxRoot:               core.ByteArray(event.Txroot).String(),
+			TransactionsIncluded: core.ConcatTxs(txs),
+			Committer:            event.Committer.String(),
+			StakeAmount:          params.StakeAmount,
+			FinalisesOn:          *big.NewInt(int64(params.FinalisationTime)),
+			Status:               core.BATCH_COMMITTED,
+		}
+		s.DBInstance.CommitBatch(newBatch)
 	}
 }
+
 func (s *Syncer) processRegisteredToken(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
 	s.Logger.Info("New token registered")
 	event := new(logger.LoggerRegisteredToken)
@@ -182,4 +209,63 @@ func (s *Syncer) SendDepositFinalisationTx() {
 	}
 
 	err = s.loadedBazooka.FireDepositFinalisation(nodeToBeReplaced, siblings, params.MaxDepositSubTreeHeight)
+}
+
+func (s *Syncer) ApplyTxsFromBatch(txs [][]byte) error {
+	if len(txs) == 0 {
+		s.Logger.Info("No txs to apply")
+		return nil
+	}
+
+	// Decompress all txs
+	from, to, amount, sig, err := s.loadedBazooka.DecompressTransferTxs(txs)
+	if err != nil {
+		return err
+	}
+	s.Logger.Debug("Fetched all data", "from", from, "to", to, "amount", amount, "sig", sig)
+
+	var coreTxs []core.Tx
+	for i := range txs {
+		fromAccount, err := s.DBInstance.GetAccountByID(from[i].Uint64())
+		if err != nil {
+			return err
+		}
+		_, _, nonce, token, err := s.loadedBazooka.DecodeAccount(fromAccount.Data)
+		if err != nil {
+			return err
+		}
+		s.Logger.Debug("Decoded account", "nonce", nonce, "token", token)
+		txData, err := s.loadedBazooka.EncodeTransferTx(from[i].Int64(), to[i].Int64(), token.Int64(), nonce.Int64(), amount[i].Int64(), core.TX_TRANSFER_TYPE)
+		if err != nil {
+			return err
+		}
+
+		coreTx := core.NewTx(fromAccount.AccountID, to[i].Uint64(), core.TX_TRANSFER_TYPE, txData, hex.EncodeToString(sig[i]))
+		coreTxs = append(coreTxs, coreTx)
+		fromMP, toMP, _, err := coreTx.GetVerificationData()
+		if err != nil {
+			return err
+		}
+
+		updatedFromAccData, _, err := s.loadedBazooka.ApplyTx(fromMP, coreTx)
+		if err != nil {
+			return err
+		}
+
+		updatedToAccData, _, err := s.loadedBazooka.ApplyTx(toMP, coreTx)
+		if err != nil {
+			return err
+		}
+
+		err = coreTx.Apply(updatedFromAccData, updatedToAccData)
+		if err != nil {
+			return err
+		}
+		// // validate updated root post application
+		// root, err := s.DBInstance.GetRoot()
+		// if err != nil {
+		// 	return err
+		// }
+	}
+	return nil
 }

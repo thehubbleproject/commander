@@ -12,7 +12,6 @@ import (
 	"github.com/BOPR/config"
 
 	agg "github.com/BOPR/aggregator"
-	"github.com/BOPR/bazooka"
 	"github.com/BOPR/core"
 	"github.com/BOPR/listener"
 	"github.com/BOPR/rest"
@@ -43,7 +42,7 @@ func StartCmd() *cobra.Command {
 			//
 
 			// create aggregator service
-			aggregator := agg.NewAggregator(core.DBInstance)
+			aggregator := agg.NewAggregator()
 
 			// create the syncer service
 			syncer := listener.NewSyncer()
@@ -143,7 +142,7 @@ func InitGlobalDBInstance() {
 func InitGlobalBazooka() {
 	var err error
 	// create and init global config object
-	bazooka.LoadedBazooka, err = bazooka.NewPreLoadedBazooka()
+	core.LoadedBazooka, err = core.NewPreLoadedBazooka()
 	common.PanicIfError(err)
 }
 
@@ -154,33 +153,26 @@ func LoadGenesisData(genesis config.Genesis) {
 		common.PanicIfError(err)
 	}
 
-	diff := int(math.Exp2(float64(genesis.MaxTreeDepth))) - len(genesis.GenesisAccounts.Accounts)
+	genesisAccounts, err := core.LoadedBazooka.GetGenesisAccounts()
+	common.PanicIfError(err)
+	zeroAccount := genesisAccounts[0]
+	diff := int(math.Exp2(float64(genesis.MaxTreeDepth))) - len(genesisAccounts)
 	var allAccounts []core.UserAccount
 
 	// convert genesis accounts to user accounts
-	for _, account := range genesis.GenesisAccounts.Accounts {
-		// bz, err := core.ABIEncodePubkey(account.PublicKey)
-		// if err != nil {
-		// 	common.PanicIfError(err)
-		// }
+	for _, account := range genesisAccounts {
 		pubkeyHash := core.ZERO_VALUE_LEAF.String()
+		account.PublicKeyHash = pubkeyHash
 		allAccounts = append(
 			allAccounts,
-			core.UserAccount{
-				AccountID:     account.ID,
-				Balance:       account.Balance,
-				TokenType:     account.TokenType,
-				Nonce:         account.Nonce,
-				Status:        account.Status,
-				PublicKey:     account.PublicKey,
-				PublicKeyHash: pubkeyHash,
-			},
+			account,
 		)
 	}
 
 	// fill the tree with zero leaves
 	for diff > 0 {
 		newAcc := core.EmptyAccount()
+		newAcc.Data = zeroAccount.Data
 		newAcc.Hash = core.ZERO_VALUE_LEAF.String()
 		newAcc.PublicKeyHash = core.ZERO_VALUE_LEAF.String()
 		allAccounts = append(allAccounts, newAcc)
@@ -195,6 +187,7 @@ func LoadGenesisData(genesis config.Genesis) {
 	newParams := core.Params{StakeAmount: genesis.StakeAmount, MaxDepth: genesis.MaxTreeDepth, MaxDepositSubTreeHeight: genesis.MaxDepositSubTreeHeight}
 	core.DBInstance.UpdateStakeAmount(newParams.StakeAmount)
 	core.DBInstance.UpdateMaxDepth(newParams.MaxDepth)
+	core.DBInstance.UpdateFinalisationTimePerBatch(40320)
 
 	// load sync status
 	core.DBInstance.UpdateSyncStatusWithBlockNumber(genesis.StartEthBlock)
