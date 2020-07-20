@@ -397,6 +397,42 @@
       "inputs": [
         {
           "internalType": "bytes",
+          "name": "txBytes",
+          "type": "bytes"
+        }
+      ],
+      "name": "DecompressTx",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "from",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "to",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "sig",
+          "type": "bytes"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "internalType": "bytes",
           "name": "message",
           "type": "bytes"
         },
