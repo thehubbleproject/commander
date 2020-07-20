@@ -14,6 +14,7 @@ import (
 	"github.com/BOPR/contracts/logger"
 )
 
+// ZEROROOT
 const ZEROROOT = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
 func (s *Syncer) processDepositQueued(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
@@ -44,48 +45,30 @@ func (s *Syncer) processDepositQueued(eventName string, abiObject *abi.ABI, vLog
 	}
 }
 
-func (s *Syncer) processDepositLeafMerged(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
-	s.Logger.Info("Deposit Leaf merged")
+func (s *Syncer) processDepositSubtreeCreated(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
+	s.Logger.Info("New deposit subtree created")
 	// unpack event
-	event := new(logger.LoggerDepositLeafMerged)
+	event := new(logger.LoggerDepositSubTreeReady)
 	err := common.UnpackLog(abiObject, event, eventName, vLog)
 	if err != nil {
 		// TODO do something with this error
 		fmt.Println("Unable to unpack log:", err)
 		panic(err)
 	}
-
-	leftLeaf := core.ByteArray(event.Left)
-	rightLeaf := core.ByteArray(event.Right)
-	newRoot := core.ByteArray(event.NewRoot)
-
-	s.Logger.Info(
-		"⬜ New event found",
-		"event", eventName,
-		"prevDepositRoot", leftLeaf.String(),
-		"incomingLeaf", rightLeaf.String(),
-		"newDepositRoot", newRoot.String(),
-	)
-
-	// update deposit sub tree root
-	newheight, err := s.DBInstance.OnDepositLeafMerge(leftLeaf, rightLeaf, newRoot)
+	err = s.DBInstance.AttachDepositInfo(event.Root)
 	if err != nil {
+		// TODO do something with this error
+		fmt.Println("Unable to attack deposit information:", err)
 		panic(err)
 	}
-	params, err := s.DBInstance.GetParams()
-	if err != nil {
-		panic(err)
-	}
+	// TODO add a sync flag, do not send transactions when in sync mode
 
-	// if deposit subtree height = deposit finalisation height then
-	if newheight == params.MaxDepositSubTreeHeight {
-		// send deposit finalisation transction to ethereum chain
-		s.SendDepositFinalisationTx()
-	}
+	// send deposit finalisation transction to ethereum chain
+	s.SendDepositFinalisationTx()
 }
 
 func (s *Syncer) processDepositFinalised(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
-	s.Logger.Info("Deposits finalised")
+	s.Logger.Info("Deposit batch finalised!")
 
 	// unpack event
 	event := new(logger.LoggerDepositsFinalised)
@@ -96,21 +79,23 @@ func (s *Syncer) processDepositFinalised(eventName string, abiObject *abi.ABI, v
 		fmt.Println("Unable to unpack log:", err)
 		panic(err)
 	}
-	accountsRoot := core.ByteArray(event.DepositSubTreeRoot)
+
+	depositRoot := core.ByteArray(event.DepositSubTreeRoot)
 	pathToDepositSubTree := event.PathToSubTree
 
 	s.Logger.Info(
 		"⬜ New event found",
 		"event", eventName,
-		"DepositSubTreeRoot", accountsRoot.String(),
+		"DepositSubTreeRoot", depositRoot.String(),
 		"PathToDepositSubTreeInserted", pathToDepositSubTree.String(),
 	)
 
 	// TODO handle error
-	newRoot, err := s.DBInstance.FinaliseDepositsAndAddBatch(accountsRoot, pathToDepositSubTree.Uint64())
+	newRoot, err := s.DBInstance.FinaliseDepositsAndAddBatch(depositRoot, pathToDepositSubTree.Uint64())
 	if err != nil {
 		fmt.Println("Error while finalising deposits", err)
 	}
+
 	fmt.Println("new root", newRoot)
 }
 

@@ -49,6 +49,9 @@ type UserAccount struct {
 	Hash string `gorm:"not null;index:Hash"`
 
 	Level uint64 `gorm:"not null;index:Level"`
+
+	// Add the deposit hash for the account
+	CreatedByDepositSubTree string
 }
 
 // NewUserAccount creates a new user account
@@ -442,6 +445,7 @@ func (db *DB) GetAccountByID(ID uint64) (UserAccount, error) {
 	}
 	return account, nil
 }
+
 func (db *DB) GetDepositSubTreeRoot(hash string, level uint64) (UserAccount, error) {
 	var account UserAccount
 	err := db.Instance.Where("level = ? AND hash = ?", level, hash).First(&account).Error
@@ -517,9 +521,26 @@ func ABIEncodePubkey(pubkey string) ([]byte, error) {
 }
 
 //
-// Account changes post transaction processing
+// Deposit Account Handling
 //
 
-func (db *DB) TransactionProcessing(account *UserAccount, newBalance uint64) error {
+func (db *DB) AttachDepositInfo(root ByteArray) error {
+	// find all pending accounts
+	var account UserAccount
+	account.CreatedByDepositSubTree = root.String()
+	if err := db.Instance.Model(&account).Where("status = ?", STATUS_PENDING).Update(&account).Error; err != nil {
+		return err
+	}
 	return nil
+}
+
+func (db *DB) GetPendingAccByDepositRoot(root ByteArray) ([]UserAccount, error) {
+	// find all accounts with CreatedByDepositSubTree as `root`
+	var pendingAccounts []UserAccount
+
+	if err := db.Instance.Where("created_by_deposit_sub_tree = ? AND status = ?", root.String(), STATUS_PENDING).Find(&pendingAccounts).Error; err != nil {
+		return pendingAccounts, err
+	}
+
+	return pendingAccounts, nil
 }
