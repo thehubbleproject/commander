@@ -1,7 +1,6 @@
 package core
 
 import (
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"math"
@@ -9,7 +8,6 @@ import (
 
 	"github.com/BOPR/common"
 	"github.com/BOPR/contracts/rollup"
-	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/jinzhu/gorm"
 	gormbulk "github.com/t-tiger/gorm-bulk-insert"
 )
@@ -21,12 +19,6 @@ type UserAccount struct {
 	AccountID uint64 `gorm:"not null;index:AccountID"`
 
 	Data []byte `gorm:"type:varbinary(255)" sql:"DEFAULT:0"`
-
-	// Public key for the user
-	PublicKey string `gorm:"size:1000"`
-
-	// PublicKeyHash = Hash(publicKey)
-	PublicKeyHash string `gorm:""`
 
 	// Path from root to leaf
 	// NOTE: not a part of the leaf
@@ -55,10 +47,9 @@ type UserAccount struct {
 }
 
 // NewUserAccount creates a new user account
-func NewUserAccount(id, status uint64, pubkey, path string, data []byte) *UserAccount {
+func NewUserAccount(id, status uint64, path string, data []byte) *UserAccount {
 	newAcccount := &UserAccount{
 		AccountID: id,
-		PublicKey: pubkey,
 		Path:      path,
 		Status:    status,
 		Type:      TYPE_TERMINAL,
@@ -71,14 +62,12 @@ func NewUserAccount(id, status uint64, pubkey, path string, data []byte) *UserAc
 
 // NewAccountNode creates a new non-terminal user account, the only this useful in this is
 // Path, Status, Hash, PubkeyHash
-func NewAccountNode(path, hash, pubkeyHash string) *UserAccount {
+func NewAccountNode(path, hash string) *UserAccount {
 	newAcccount := &UserAccount{
-		AccountID:     ZERO,
-		PublicKey:     "",
-		PublicKeyHash: pubkeyHash,
-		Path:          path,
-		Status:        STATUS_ACTIVE,
-		Type:          TYPE_NON_TERMINAL,
+		AccountID: ZERO,
+		Path:      path,
+		Status:    STATUS_ACTIVE,
+		Type:      TYPE_NON_TERMINAL,
 	}
 	newAcccount.UpdatePath(newAcccount.Path)
 	newAcccount.Hash = hash
@@ -87,12 +76,11 @@ func NewAccountNode(path, hash, pubkeyHash string) *UserAccount {
 
 // NewAccountNode creates a new terminal user account but in pending state
 // It is to be used while adding new deposits while they are not finalised
-func NewPendingUserAccount(id uint64, _pubkey string, data []byte) *UserAccount {
+func NewPendingUserAccount(id uint64, data []byte) *UserAccount {
 	newAcccount := &UserAccount{
 		AccountID: id,
 		Path:      UNINITIALIZED_PATH,
 		Status:    STATUS_PENDING,
-		PublicKey: _pubkey,
 		Type:      TYPE_TERMINAL,
 		Data:      data,
 	}
@@ -112,7 +100,6 @@ func (acc *UserAccount) String() string {
 }
 
 func (acc *UserAccount) ToABIAccount() (rollupTx rollup.TypesUserAccount, err error) {
-	fmt.Println("accountData", acc.Type)
 	var ID, balance, nonce, token *big.Int = big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0)
 	if acc.Type == TYPE_TERMINAL {
 		ID, balance, nonce, token, err = LoadedBazooka.DecodeAccount(acc.Data)
@@ -130,14 +117,6 @@ func (acc *UserAccount) ToABIAccount() (rollupTx rollup.TypesUserAccount, err er
 
 func (acc *UserAccount) HashToByteArray() ByteArray {
 	ba, err := HexToByteArray(acc.Hash)
-	if err != nil {
-		panic(err)
-	}
-	return ba
-}
-
-func (acc *UserAccount) PubkeyHashToByteArray() ByteArray {
-	ba, err := HexToByteArray(acc.PublicKeyHash)
 	if err != nil {
 		panic(err)
 	}
@@ -183,7 +162,7 @@ func (acc *UserAccount) CreateAccountHash() {
 
 // EmptyAcccount creates a new account which has the same hash as ZERO_VALUE_LEAF
 func EmptyAccount() UserAccount {
-	return *NewUserAccount(ZERO, STATUS_INACTIVE, "", "", []byte(""))
+	return *NewUserAccount(ZERO, STATUS_INACTIVE, "", []byte(""))
 }
 
 //
@@ -255,20 +234,8 @@ func (db *DB) InitBalancesTree(depth uint64, genesisAccounts []UserAccount) erro
 			if err != nil {
 				return err
 			}
-			left, err = HexToByteArray(accs[i].PublicKeyHash)
-			if err != nil {
-				return err
-			}
-			right, err = HexToByteArray(accs[i+1].PublicKeyHash)
-			if err != nil {
-				return err
-			}
-			parentPubkeyHash, err := GetParent(left, right)
-			if err != nil {
-				return err
-			}
 			parentPath := GetParentPath(accs[i].Path)
-			newAccNode := *NewAccountNode(parentPath, parentHash.String(), parentPubkeyHash.String())
+			newAccNode := *NewAccountNode(parentPath, parentHash.String())
 			nextLevelAccounts = append(nextLevelAccounts, newAccNode)
 		}
 
@@ -293,12 +260,6 @@ func (db *DB) GetAccountsAtDepth(depth uint64) ([]UserAccount, error) {
 }
 
 func (db *DB) UpdateAccount(account UserAccount) error {
-	// update the pubkey hash of the account
-	bz, err := ABIEncodePubkey(account.PublicKey)
-	if err != nil {
-		return err
-	}
-	account.PublicKeyHash = common.Keccak256(bz).String()
 	db.Logger.Info("Updated account pubkey", "ID", account.AccountID, "PubkeyHash", account.PublicKeyHash)
 	account.CreateAccountHash()
 	siblings, err := db.GetSiblings(account.Path)
@@ -315,7 +276,6 @@ func (db *DB) StoreLeaf(account UserAccount, path string, siblings []UserAccount
 	computedNode := account
 	for i := 0; i < len(siblings); i++ {
 		var parentHash ByteArray
-		var parentPubkeyHash ByteArray
 		sibling := siblings[i]
 		isComputedRightSibling := GetNthBitFromRight(
 			path,
@@ -326,13 +286,8 @@ func (db *DB) StoreLeaf(account UserAccount, path string, siblings []UserAccount
 			if err != nil {
 				return err
 			}
-			parentPubkeyHash, err = GetParent(computedNode.PubkeyHashToByteArray(), sibling.PubkeyHashToByteArray())
-			if err != nil {
-				return err
-			}
-
 			// Store the node!
-			err = db.StoreNode(parentHash, parentPubkeyHash, computedNode, sibling)
+			err = db.StoreNode(parentHash, computedNode, sibling)
 			if err != nil {
 				return err
 			}
@@ -341,12 +296,8 @@ func (db *DB) StoreLeaf(account UserAccount, path string, siblings []UserAccount
 			if err != nil {
 				return err
 			}
-			parentPubkeyHash, err = GetParent(sibling.PubkeyHashToByteArray(), computedNode.PubkeyHashToByteArray())
-			if err != nil {
-				return err
-			}
 			// Store the node!
-			err = db.StoreNode(parentHash, parentPubkeyHash, sibling, computedNode)
+			err = db.StoreNode(parentHash, sibling, computedNode)
 			if err != nil {
 				return err
 			}
@@ -360,7 +311,7 @@ func (db *DB) StoreLeaf(account UserAccount, path string, siblings []UserAccount
 	}
 
 	// Store the new root
-	err = db.UpdateRootNodeHashes(computedNode.HashToByteArray(), computedNode.PubkeyHashToByteArray())
+	err = db.UpdateRootNodeHashes(computedNode.HashToByteArray())
 	if err != nil {
 		return err
 	}
@@ -369,7 +320,7 @@ func (db *DB) StoreLeaf(account UserAccount, path string, siblings []UserAccount
 }
 
 // StoreNode updates the nodes given the parent hash
-func (db *DB) StoreNode(parentHash, parentPubkeyHash ByteArray, leftNode UserAccount, rightNode UserAccount) (err error) {
+func (db *DB) StoreNode(parentHash ByteArray, leftNode UserAccount, rightNode UserAccount) (err error) {
 	// update left account
 	err = db.updateAccount(leftNode, leftNode.Path)
 	if err != nil {
@@ -381,23 +332,21 @@ func (db *DB) StoreNode(parentHash, parentPubkeyHash ByteArray, leftNode UserAcc
 		return err
 	}
 	// update the parent with the new hashes
-	return db.UpdateParentWithHash(GetParentPath(leftNode.Path), parentHash, parentPubkeyHash)
+	return db.UpdateParentWithHash(GetParentPath(leftNode.Path), parentHash)
 }
 
-func (db *DB) UpdateParentWithHash(pathToParent string, newHash, newPubkeyHash ByteArray) error {
+func (db *DB) UpdateParentWithHash(pathToParent string, newHash ByteArray) error {
 	// Update the root hash
 	var tempAccount UserAccount
 	tempAccount.Path = pathToParent
 	tempAccount.Hash = newHash.String()
-	tempAccount.PublicKeyHash = newPubkeyHash.String()
 	return db.updateAccount(tempAccount, pathToParent)
 }
 
-func (db *DB) UpdateRootNodeHashes(newRoot ByteArray, newPubkeyHash ByteArray) error {
+func (db *DB) UpdateRootNodeHashes(newRoot ByteArray) error {
 	var tempAccount UserAccount
 	tempAccount.Path = ""
 	tempAccount.Hash = newRoot.String()
-	tempAccount.PublicKeyHash = newPubkeyHash.String()
 	return db.updateAccount(tempAccount, tempAccount.Path)
 }
 
@@ -488,36 +437,6 @@ func (db *DB) DeletePendingAccount(ID uint64) error {
 		return ErrRecordNotFound(fmt.Sprintf("unable to delete record for ID: %v", ID))
 	}
 	return nil
-}
-
-//
-// Pubkey related interactions
-//
-func ABIEncodePubkey(pubkey string) ([]byte, error) {
-	pubkeyBytes, err := hex.DecodeString(pubkey)
-	if err != nil {
-		panic(err)
-	}
-	uint256Ty, err := abi.NewType("bytes", "bytes", nil)
-	if err != nil {
-		return []byte(""), err
-	}
-
-	arguments := abi.Arguments{
-		{
-			Type: uint256Ty,
-		},
-	}
-
-	bytes, err := arguments.Pack(
-		pubkeyBytes,
-	)
-
-	if err != nil {
-		return []byte(""), err
-	}
-
-	return bytes, nil
 }
 
 //
