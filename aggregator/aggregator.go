@@ -137,7 +137,6 @@ func (a *Aggregator) ProcessTx(txs []core.Tx) error {
 			return err
 		}
 		currentAccountTreeRoot := pdaRoot.HashToByteArray()
-
 		fromAccProof, toAccProof, PDAproof, err := tx.GetVerificationData()
 		if err != nil {
 			a.Logger.Error("Unable to create verification data", "error", err)

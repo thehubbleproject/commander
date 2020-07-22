@@ -37,7 +37,13 @@ func (s *Syncer) processNewPubkeyAddition(eventName string, abiObject *abi.ABI, 
 	)
 
 	// add new account in pending state to DB and
-	newPDAAccount, err := core.NewPDA(event.AccountID.Uint64(), hex.EncodeToString(event.Pubkey), core.UintToString(event.AccountID.Uint64()))
+	pathToNode, err := core.SolidityPathToNodePath(event.AccountID.Uint64(), 4)
+	if err != nil {
+		// TODO do something with this error
+		fmt.Println("Unable to convert path", err)
+		panic(err)
+	}
+	newPDAAccount, err := core.NewPDA(event.AccountID.Uint64(), hex.EncodeToString(event.Pubkey), pathToNode)
 	if err != nil {
 		fmt.Println("unable to create new account")
 		panic(err)

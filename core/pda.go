@@ -55,15 +55,15 @@ func NewEmptyPDA() *PDA {
 	return &PDA{AccountID: ZERO, PublicKey: "", Type: TYPE_TERMINAL}
 }
 
-func NewPDANode(path, hash string) *UserAccount {
-	newAcccount := &UserAccount{
+func NewPDANode(path, hash string) *PDA {
+	newPDALeaf := &PDA{
 		AccountID: ZERO,
 		Path:      path,
 		Type:      TYPE_NON_TERMINAL,
 	}
-	newAcccount.UpdatePath(newAcccount.Path)
-	newAcccount.Hash = hash
-	return newAcccount
+	newPDALeaf.UpdatePath(path)
+	newPDALeaf.Hash = hash
+	return newPDALeaf
 }
 
 func (p *PDA) UpdatePath(path string) {
@@ -325,7 +325,7 @@ func abiEncodePubkey(pubkey string) ([]byte, error) {
 
 func (db *DB) GetPDALeafByID(ID uint64) (PDA, error) {
 	var pda PDA
-	if err := db.Instance.Where("account_id = ? AND status = ?", ID, STATUS_ACTIVE).Find(&pda).Error; err != nil {
+	if err := db.Instance.Where("account_id = ?", ID).Find(&pda).Error; err != nil {
 		return pda, ErrRecordNotFound(fmt.Sprintf("unable to find record for ID: %v", ID))
 	}
 	return pda, nil
