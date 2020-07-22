@@ -255,9 +255,9 @@ func (db *DB) InitPDATree(depth uint64, genesisPDA []PDA) error {
 	// 2. Iterate 2 of them and create parents and store
 	// 3. Persist all parents to database
 	// 4. Start with next round
-	for i := depth; i > 0; i-- {
+	for j := depth; j > 0; j-- {
 		// get all leaves at depth N
-		accs, err := db.GetAccountsAtDepth(i)
+		accs, err := db.GetPDAAccountByDepth(j)
 		if err != nil {
 			return err
 		}
@@ -344,6 +344,15 @@ func (db *DB) GetPDARoot() (PDA, error) {
 	err := db.Instance.Where("level = ?", 0).Find(&PDAAccount).GetErrors()
 	if len(err) != 0 {
 		return PDAAccount, ErrRecordNotFound(fmt.Sprintf("unable to find record. err:%v", err))
+	}
+	return PDAAccount, nil
+}
+
+func (db *DB) GetPDAAccountByDepth(depth uint64) ([]PDA, error) {
+	var PDAAccount []PDA
+	err := db.Instance.Where("level = ?", depth).Find(&PDAAccount).Error
+	if err != nil {
+		return PDAAccount, err
 	}
 	return PDAAccount, nil
 }
