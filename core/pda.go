@@ -295,11 +295,7 @@ func (db *DB) InitPDATree(depth uint64, genesisPDA []PDA) error {
 // InsertCoordinatorPubkeyAccounts inserts the coordinator accounts
 func (db *DB) InsertCoordinatorPubkeyAccounts(coordinatorPDA *PDA, depth uint64) error {
 	coordinatorPDA.UpdatePath(GenCoordinatorPath(depth))
-	fmt.Println("coordinator PDA", coordinatorPDA.Hash, coordinatorPDA.PublicKey)
-
 	coordinatorPDA.PopulateHash()
-
-	fmt.Println("coordinator PDA", coordinatorPDA.Hash, coordinatorPDA.PublicKey)
 	coordinatorPDA.Type = TYPE_TERMINAL
 	return db.Instance.Create(&coordinatorPDA).Error
 }
