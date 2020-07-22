@@ -139,39 +139,58 @@ func (db *DB) InsertTx(t *Tx) error {
 }
 
 func (db *DB) PopTxs() (txs []Tx, err error) {
+	txType, err := db.FetchTxType()
 	tx := db.Instance.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
 		}
 	}()
-
 	if err := tx.Error; err != nil {
 		return txs, err
 	}
 	var pendingTxs []Tx
-
 	// select N number of transactions which are pending in mempool and
-	if err := tx.Limit(config.GlobalCfg.TxsPerBatch).Where(&Tx{Status: TX_STATUS_PENDING, Type: TX_TRANSFER_TYPE}).Find(&pendingTxs).Error; err != nil {
+	if err := tx.Limit(config.GlobalCfg.TxsPerBatch).Where(&Tx{Status: TX_STATUS_PENDING, Type: txType}).Find(&pendingTxs).Error; err != nil {
 		db.Logger.Error("error while fetching pending transactions", err)
 		return txs, err
 	}
-
 	db.Logger.Info("found txs", "pendingTxs", pendingTxs)
-
 	var ids []string
 	for _, tx := range pendingTxs {
 		ids = append(ids, tx.ID)
 	}
-
 	// update the transactions from pending to processing
 	errs := tx.Table("txes").Where("id IN (?)", ids).Updates(map[string]interface{}{"status": TX_STATUS_PROCESSING}).GetErrors()
 	if err != nil {
 		db.Logger.Error("errors while processing transactions", errs)
 		return
 	}
-
 	return pendingTxs, tx.Commit().Error
+}
+
+func (db *DB) FetchTxType() (txType uint64, err error) {
+	// find out which txType has the highest count
+	var maxTxType uint64
+	var maxCount uint64
+	txTypes := []uint64{TX_TRANSFER_TYPE}
+	for _, txType := range txTypes {
+		count, err := db.GetCountPerTxType(txType)
+		if err != nil {
+			return 0, err
+		}
+		if count > maxCount {
+			maxTxType = txType
+			maxCount = count
+		}
+	}
+	return maxTxType, nil
+}
+
+func (db *DB) GetCountPerTxType(txType uint64) (uint64, error) {
+	var count uint64
+	err := db.Instance.Model(&Tx{}).Where("type = ? AND status = ?", txType, TX_STATUS_PENDING).Count(&count).Error
+	return count, err
 }
 
 func (db *DB) GetTx() (tx []Tx, err error) {
