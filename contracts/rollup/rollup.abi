@@ -105,6 +105,11 @@
           "internalType": "uint256",
           "name": "timestamp",
           "type": "uint256"
+        },
+        {
+          "internalType": "enum Types.Usage",
+          "name": "batchType",
+          "type": "uint8"
         }
       ],
       "payable": false,
@@ -193,6 +198,11 @@
               "internalType": "uint256",
               "name": "timestamp",
               "type": "uint256"
+            },
+            {
+              "internalType": "enum Types.Usage",
+              "name": "batchType",
+              "type": "uint8"
             }
           ],
           "internalType": "struct Types.Batch",
@@ -336,6 +346,11 @@
           "internalType": "bytes32",
           "name": "_updatedRoot",
           "type": "bytes32"
+        },
+        {
+          "internalType": "enum Types.Usage",
+          "name": "batchType",
+          "type": "uint8"
         }
       ],
       "name": "submitBatch",

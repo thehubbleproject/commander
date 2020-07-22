@@ -41,10 +41,10 @@ func (m *AccountMerkleProof) ToABIVersion() (AccMP rollup.TypesAccountMerkleProo
 type PDAMerkleProof struct {
 	Path      string
 	PublicKey string
-	Siblings  []UserAccount
+	Siblings  []PDA
 }
 
-func NewPDAProof(path string, publicKey string, siblings []UserAccount) PDAMerkleProof {
+func NewPDAProof(path string, publicKey string, siblings []PDA) PDAMerkleProof {
 	return PDAMerkleProof{PublicKey: publicKey, Siblings: siblings, Path: path}
 }
 
@@ -52,7 +52,7 @@ func (m *PDAMerkleProof) ToABIVersion() rollup.TypesPDAMerkleProof {
 	// create siblings
 	var siblingNodes [][32]byte
 	for _, s := range m.Siblings {
-		siblingNodes = append(siblingNodes, s.PubkeyHashToByteArray())
+		siblingNodes = append(siblingNodes, s.HashToByteArray())
 	}
 	pubkey, err := hex.DecodeString(m.PublicKey)
 	if err != nil {

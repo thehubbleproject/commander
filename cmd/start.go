@@ -158,11 +158,12 @@ func LoadGenesisData(genesis config.Genesis) {
 	zeroAccount := genesisAccounts[0]
 	diff := int(math.Exp2(float64(genesis.MaxTreeDepth))) - len(genesisAccounts)
 	var allAccounts []core.UserAccount
+	var allPDALeaf []core.PDA
 
 	// convert genesis accounts to user accounts
 	for _, account := range genesisAccounts {
 		pubkeyHash := core.ZERO_VALUE_LEAF.String()
-		account.PublicKeyHash = pubkeyHash
+		allPDALeaf = append(allPDALeaf, core.PDA{Hash: pubkeyHash})
 		allAccounts = append(
 			allAccounts,
 			account,
@@ -174,13 +175,18 @@ func LoadGenesisData(genesis config.Genesis) {
 		newAcc := core.EmptyAccount()
 		newAcc.Data = zeroAccount.Data
 		newAcc.Hash = core.ZERO_VALUE_LEAF.String()
-		newAcc.PublicKeyHash = core.ZERO_VALUE_LEAF.String()
 		allAccounts = append(allAccounts, newAcc)
+		newPDA := core.NewEmptyPDA()
+		newPDA.Hash = core.ZERO_VALUE_LEAF.String()
+		allPDALeaf = append(allPDALeaf, *newPDA)
 		diff--
 	}
 
 	// load accounts
 	err = core.DBInstance.InitBalancesTree(genesis.MaxTreeDepth, allAccounts)
+	common.PanicIfError(err)
+
+	err = core.DBInstance.InitPDATree(genesis.MaxTreeDepth, allPDALeaf)
 	common.PanicIfError(err)
 
 	// load params

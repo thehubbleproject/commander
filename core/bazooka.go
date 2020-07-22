@@ -293,7 +293,7 @@ func (b *Bazooka) GetGenesisAccounts() (genesisAccount []UserAccount, err error)
 
 	for _, account := range accounts {
 		ID, _, _, _, _ := b.DecodeAccount(account)
-		genesisAccount = append(genesisAccount, *NewUserAccount(ID.Uint64(), STATUS_ACTIVE, "", UintToString(ID.Uint64()), account))
+		genesisAccount = append(genesisAccount, *NewUserAccount(ID.Uint64(), STATUS_ACTIVE, UintToString(ID.Uint64()), account))
 	}
 	return
 }
@@ -382,6 +382,10 @@ func (b *Bazooka) SubmitBatch(updatedRoot ByteArray, txs []Tx) error {
 		"txs",
 		len(txs),
 	)
+	if len(txs) == 0 {
+		b.log.Info("No transactions to submit, waiting....")
+		return nil
+	}
 	var compressedTxs [][]byte
 	for _, tx := range txs {
 		compressedTx, err := tx.Compress()
@@ -391,7 +395,7 @@ func (b *Bazooka) SubmitBatch(updatedRoot ByteArray, txs []Tx) error {
 		compressedTxs = append(compressedTxs, compressedTx)
 	}
 
-	data, err := b.ContractABI[common.ROLLUP_CONTRACT_KEY].Pack("submitBatch", compressedTxs, updatedRoot)
+	data, err := b.ContractABI[common.ROLLUP_CONTRACT_KEY].Pack("submitBatch", compressedTxs, updatedRoot, uint8(txs[0].Type))
 	if err != nil {
 		return err
 	}
@@ -428,7 +432,7 @@ func (b *Bazooka) SubmitBatch(updatedRoot ByteArray, txs []Tx) error {
 	if err != nil {
 		return err
 	}
-	tx, err := b.RollupContract.SubmitBatch(auth, compressedTxs, updatedRoot)
+	tx, err := b.RollupContract.SubmitBatch(auth, compressedTxs, updatedRoot, uint8(txs[0].Type))
 	if err != nil {
 		return err
 	}

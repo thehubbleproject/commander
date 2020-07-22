@@ -46,7 +46,6 @@ func NewSyncer() Syncer {
 
 	// create new base service
 	syncerService.BaseService = *core.NewBaseService(logger, SyncerServiceName, syncerService)
-
 	loadedBazooka, err := core.NewPreLoadedBazooka()
 	if err != nil {
 		panic(err)
@@ -205,6 +204,8 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 					s.processRegisteredToken(selectedEvent.Name, &abiObject, &vLog)
 				case "NewBatch":
 					s.processNewBatch(selectedEvent.Name, &abiObject, &vLog)
+				case "NewPubkeyAdded":
+					s.processNewPubkeyAddition(selectedEvent.Name, &abiObject, &vLog)
 				case "DepositQueued":
 					s.processDepositQueued(selectedEvent.Name, &abiObject, &vLog)
 				case "DepositSubTreeReady":
