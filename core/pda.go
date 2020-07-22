@@ -88,31 +88,31 @@ func (p *PDA) PopulateHash() error {
 	return nil
 }
 
-func abiEncodePubkey(pubkey string) ([]byte, error) {
-	pubkeyBytes, err := hex.DecodeString(pubkey)
+func (db *DB) UpdatePDALeaf(leaf PDA) error {
+	db.Logger.Info("Updated account pubkey", "ID", leaf.AccountID)
+	leaf.PopulateHash()
+	siblings, err := db.GetPDASiblings(leaf.Path)
 	if err != nil {
-		panic(err)
-	}
-	uint256Ty, err := abi.NewType("bytes", "bytes", nil)
-	if err != nil {
-		return []byte(""), err
+		return err
 	}
 
-	arguments := abi.Arguments{
-		{
-			Type: uint256Ty,
-		},
+	db.Logger.Debug("Updating account", "Hash", leaf.Hash, "Path", leaf.Path, "siblings", siblings, "countOfSiblings", len(siblings))
+	return db.StorePDALeaf(leaf, leaf.Path, siblings)
+}
+
+func (db *DB) GetPDASiblings(path string) ([]PDA, error) {
+	var relativePath = path
+	var siblings []PDA
+	for i := len(path); i > 0; i-- {
+		otherChild := GetOtherChild(relativePath)
+		otherNode, err := db.GetPDALeafByPath(otherChild)
+		if err != nil {
+			return siblings, err
+		}
+		siblings = append(siblings, otherNode)
+		relativePath = GetParentPath(relativePath)
 	}
-
-	bytes, err := arguments.Pack(
-		pubkeyBytes,
-	)
-
-	if err != nil {
-		return []byte(""), err
-	}
-
-	return bytes, nil
+	return siblings, nil
 }
 
 func (db *DB) StorePDALeaf(pdaLeaf PDA, path string, siblings []PDA) error {
@@ -220,32 +220,30 @@ func (db *DB) InitPDATree(depth uint64, genesisPDA []PDA) error {
 	var err error
 
 	// insert coodinator leaf
-
-	// TODO fix
-	err = db.InsertCoordinatorAccount(&genesisPDA[0], depth)
+	err = db.InsertCoordinatorPubkeyAccounts(&genesisPDA[0], depth)
 	if err != nil {
 		db.Logger.Error("Unable to insert coodinator account", "err", err)
 		return err
 	}
 
 	var insertRecords []interface{}
-	prevNodePath := genesisAccounts[0].Path
+	prevNodePath := genesisPDA[0].Path
 
-	for i := 1; i < len(genesisAccounts); i++ {
+	for i := 1; i < len(genesisPDA); i++ {
 		pathToAdjacentNode, err := GetAdjacentNodePath(prevNodePath)
 		if err != nil {
 			return err
 		}
-		genesisAccounts[i].UpdatePath(pathToAdjacentNode)
-		insertRecords = append(insertRecords, genesisAccounts[i])
-		prevNodePath = genesisAccounts[i].Path
+		genesisPDA[i].UpdatePath(pathToAdjacentNode)
+		insertRecords = append(insertRecords, genesisPDA[i])
+		prevNodePath = genesisPDA[i].Path
 	}
 
-	db.Logger.Info("Inserting all accounts to DB", "count", len(insertRecords))
+	db.Logger.Info("Inserting all leaves to DB", "count", len(insertRecords))
 	err = gormbulk.BulkInsert(db.Instance, insertRecords, len(insertRecords))
 	if err != nil {
-		db.Logger.Error("Unable to insert accounts to DB", "err", err)
-		return errors.New("Unable to insert accounts")
+		db.Logger.Error("Unable to insert leaves to DB", "err", err)
+		return errors.New("Unable to insert leaves")
 	}
 
 	// merkelise
@@ -282,11 +280,62 @@ func (db *DB) InitPDATree(depth uint64, genesisPDA []PDA) error {
 
 		err = gormbulk.BulkInsert(db.Instance, nextLevelAccounts, len(nextLevelAccounts))
 		if err != nil {
-			db.Logger.Error("Unable to insert accounts to DB", "err", err)
-			return errors.New("Unable to insert accounts")
+			db.Logger.Error("Unable to insert PDA leaves to DB", "err", err)
+			return errors.New("Unable to insert PDA leaves")
 		}
 	}
-
 	// mark the root node type correctly
 	return nil
+}
+
+// InsertCoordinatorPubkeyAccounts inserts the coordinator accounts
+func (db *DB) InsertCoordinatorPubkeyAccounts(coordinatorPDA *PDA, depth uint64) error {
+	coordinatorPDA.UpdatePath(GenCoordinatorPath(depth))
+	coordinatorPDA.PopulateHash()
+	coordinatorPDA.Type = TYPE_TERMINAL
+	return db.Instance.Create(&coordinatorPDA).Error
+}
+
+func abiEncodePubkey(pubkey string) ([]byte, error) {
+	pubkeyBytes, err := hex.DecodeString(pubkey)
+	if err != nil {
+		panic(err)
+	}
+	uint256Ty, err := abi.NewType("bytes", "bytes", nil)
+	if err != nil {
+		return []byte(""), err
+	}
+
+	arguments := abi.Arguments{
+		{
+			Type: uint256Ty,
+		},
+	}
+
+	bytes, err := arguments.Pack(
+		pubkeyBytes,
+	)
+
+	if err != nil {
+		return []byte(""), err
+	}
+
+	return bytes, nil
+}
+
+func (db *DB) GetPDALeafByID(ID uint64) (PDA, error) {
+	var pda PDA
+	if err := db.Instance.Where("account_id = ? AND status = ?", ID, STATUS_ACTIVE).Find(&pda).Error; err != nil {
+		return pda, ErrRecordNotFound(fmt.Sprintf("unable to find record for ID: %v", ID))
+	}
+	return pda, nil
+}
+
+func (db *DB) GetPDARoot() (PDA, error) {
+	var PDAAccount PDA
+	err := db.Instance.Where("level = ?", 0).Find(&PDAAccount).GetErrors()
+	if len(err) != 0 {
+		return PDAAccount, ErrRecordNotFound(fmt.Sprintf("unable to find record. err:%v", err))
+	}
+	return PDAAccount, nil
 }

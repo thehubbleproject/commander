@@ -293,7 +293,7 @@ func (b *Bazooka) GetGenesisAccounts() (genesisAccount []UserAccount, err error)
 
 	for _, account := range accounts {
 		ID, _, _, _, _ := b.DecodeAccount(account)
-		genesisAccount = append(genesisAccount, *NewUserAccount(ID.Uint64(), STATUS_ACTIVE, "", UintToString(ID.Uint64()), account))
+		genesisAccount = append(genesisAccount, *NewUserAccount(ID.Uint64(), STATUS_ACTIVE, UintToString(ID.Uint64()), account))
 	}
 	return
 }

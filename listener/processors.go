@@ -17,6 +17,35 @@ import (
 // ZEROROOT
 const ZEROROOT = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
+func (s *Syncer) processNewPubkeyAddition(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
+	s.Logger.Info("New deposit found")
+
+	// unpack event
+	event := new(logger.LoggerNewPubkeyAdded)
+	err := common.UnpackLog(abiObject, event, eventName, vLog)
+	if err != nil {
+		// TODO do something with this error
+		fmt.Println("Unable to unpack log:", err)
+		panic(err)
+	}
+
+	s.Logger.Info(
+		"⬜ New event found",
+		"event", eventName,
+		"accountID", event.AccountID.String(),
+		"pubkey", event.Pubkey,
+	)
+
+	// add new account in pending state to DB and
+	newPDAAccount, err := core.NewPDA(event.AccountID.Uint64(), hex.EncodeToString(event.Pubkey), core.UintToString(event.AccountID.Uint64()))
+	if err != nil {
+		fmt.Println("unable to create new account")
+		panic(err)
+	}
+	if err := s.DBInstance.UpdatePDALeaf(*newPDAAccount); err != nil {
+		panic(err)
+	}
+}
 func (s *Syncer) processDepositQueued(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
 	s.Logger.Info("New deposit found")
 
@@ -39,7 +68,7 @@ func (s *Syncer) processDepositQueued(eventName string, abiObject *abi.ABI, vLog
 	)
 
 	// add new account in pending state to DB and
-	newAccount := core.NewPendingUserAccount(event.AccountID.Uint64(), hex.EncodeToString(event.Pubkey), event.Data)
+	newAccount := core.NewPendingUserAccount(event.AccountID.Uint64(), event.Data)
 	if err := s.DBInstance.AddNewPendingAccount(*newAccount); err != nil {
 		panic(err)
 	}

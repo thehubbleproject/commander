@@ -175,9 +175,10 @@ func LoadGenesisData(genesis config.Genesis) {
 		newAcc := core.EmptyAccount()
 		newAcc.Data = zeroAccount.Data
 		newAcc.Hash = core.ZERO_VALUE_LEAF.String()
+		allAccounts = append(allAccounts, newAcc)
 		newPDA := core.NewEmptyPDA()
 		newPDA.Hash = core.ZERO_VALUE_LEAF.String()
-		allAccounts = append(allAccounts, newAcc)
+		allPDALeaf = append(allPDALeaf, *newPDA)
 		diff--
 	}
 

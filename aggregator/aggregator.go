@@ -132,10 +132,11 @@ func (a *Aggregator) ProcessTx(txs []core.Tx) error {
 			return err
 		}
 
-		currentAccountTreeRoot, err := core.HexToByteArray(rootAcc.PublicKeyHash)
+		pdaRoot, err := a.DB.GetPDARoot()
 		if err != nil {
 			return err
 		}
+		currentAccountTreeRoot := pdaRoot.HashToByteArray()
 
 		fromAccProof, toAccProof, PDAproof, err := tx.GetVerificationData()
 		if err != nil {

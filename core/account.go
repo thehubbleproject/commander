@@ -181,7 +181,7 @@ func (db *DB) InitBalancesTree(depth uint64, genesisAccounts []UserAccount) erro
 	var err error
 
 	// insert coodinator leaf
-	err = db.InsertCoordinatorAccount(&genesisAccounts[0], depth)
+	err = db.InsertCoordinatorAccounts(&genesisAccounts[0], depth)
 	if err != nil {
 		db.Logger.Error("Unable to insert coodinator account", "err", err)
 		return err
@@ -260,7 +260,7 @@ func (db *DB) GetAccountsAtDepth(depth uint64) ([]UserAccount, error) {
 }
 
 func (db *DB) UpdateAccount(account UserAccount) error {
-	db.Logger.Info("Updated account pubkey", "ID", account.AccountID, "PubkeyHash", account.PublicKeyHash)
+	db.Logger.Info("Updated account pubkey", "ID", account.AccountID)
 	account.CreateAccountHash()
 	siblings, err := db.GetSiblings(account.Path)
 	if err != nil {
@@ -413,10 +413,10 @@ func (db *DB) GetRoot() (UserAccount, error) {
 	return account, nil
 }
 
-func (db *DB) InsertCoordinatorAccount(acc *UserAccount, depth uint64) error {
+func (db *DB) InsertCoordinatorAccounts(acc *UserAccount, depth uint64) error {
 	acc.UpdatePath(GenCoordinatorPath(depth))
 	acc.CreateAccountHash()
-	acc.Type = 1
+	acc.Type = TYPE_TERMINAL
 	return db.Instance.Create(&acc).Error
 }
 
