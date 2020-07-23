@@ -244,6 +244,15 @@ func (b *Bazooka) CompressTransferTx(tx Tx) ([]byte, error) {
 	return b.RollupUtils.CompressTxWithMessage(&opts, tx.Data, sigBytes)
 }
 
+func (b *Bazooka) DecompressTransferTx(compressedTx []byte) (from, to, amount *big.Int, sig []byte, err error) {
+	opts := bind.CallOpts{From: config.OperatorAddress}
+	decompressedTx, err := b.RollupUtils.DecompressTx(&opts, compressedTx)
+	if err != nil {
+		return
+	}
+	return decompressedTx.From, decompressedTx.To, decompressedTx.Amount, decompressedTx.Sig, nil
+}
+
 func (b *Bazooka) DecompressTransferTxs(compressedTxs [][]byte) (from, to, amount []*big.Int, sig [][]byte, err error) {
 	for _, compressedTx := range compressedTxs {
 		opts := bind.CallOpts{From: config.OperatorAddress}
