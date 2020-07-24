@@ -2,6 +2,7 @@ package listener
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/BOPR/common"
@@ -35,6 +36,9 @@ type Syncer struct {
 
 	// header listener subscription
 	cancelHeaderProcess context.CancelFunc
+
+	// wait group
+	wg sync.WaitGroup
 }
 
 func NewSyncer() Syncer {
@@ -190,9 +194,13 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 	} else if len(logs) > 0 {
 		s.Logger.Debug("New logs found", "numberOfLogs", len(logs))
 	}
+	s.wg.Wait()
+	s.wg.Add(1)
+	go s.processEvents(logs, header)
+}
 
-	// TODO add a mutex to lock processing of events if an update is in progress
-	// already
+func (s *Syncer) processEvents(logs []ethTypes.Log, header ethTypes.Header) {
+	defer s.wg.Done()
 	for _, vLog := range logs {
 		topic := vLog.Topics[0].Bytes()
 		for _, abiObject := range s.abis {
@@ -212,17 +220,16 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 					s.processDepositSubtreeCreated(selectedEvent.Name, &abiObject, &vLog)
 				case "DepositsFinalised":
 					s.processDepositFinalised(selectedEvent.Name, &abiObject, &vLog)
+				default:
+					s.Logger.Debug("Unable to match with any event", "event", selectedEvent.Name)
 				}
-				break
 			} else {
-				s.Logger.Debug("Unable to match with any event", "topics", topic)
+				s.Logger.Info("Unable to find an event", "topic", topic)
 			}
 		}
 	}
-
-	err = s.DBInstance.UpdateSyncStatusWithBlockNumber(header.Number.Uint64())
+	err := s.DBInstance.UpdateSyncStatusWithBlockNumber(header.Number.Uint64())
 	if err != nil {
 		s.Logger.Error("Unable to update listener log", "error", err)
 	}
-
 }
