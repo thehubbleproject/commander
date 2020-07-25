@@ -2,3 +2,4 @@ vendor
 logs
 build
 config.toml
+users.json
