@@ -1,8 +1,13 @@
 package main
 
 import (
+	"crypto/ecdsa"
 	"database/sql"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"os/signal"
@@ -11,8 +16,8 @@ import (
 	"github.com/BOPR/common"
 	"github.com/BOPR/config"
 	"github.com/BOPR/simulator"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/gorilla/mux"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -53,6 +58,7 @@ func main() {
 	rootCmd.AddCommand(AddGenesisAcccountsCmd())
 	rootCmd.AddCommand(SendTransferTx())
 	rootCmd.AddCommand(CreateDatabase())
+	rootCmd.AddCommand(CreateUsers())
 	rootCmd.AddCommand(migrationCmd)
 
 	executor := Executor{rootCmd, os.Exit}
@@ -83,6 +89,48 @@ func ResetCmd() *cobra.Command {
 	}
 }
 
+type UserList struct {
+	Users []User `json:"users"`
+}
+
+type User struct {
+	Address   string `json:"address"`
+	PublicKey string `json:"pubkey"`
+	PrivKey   string `json:"privkey"`
+}
+
+// CreateUsers creates the database
+func CreateUsers() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "create-users",
+		Short: "Create users to be used in simulations",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var users []User
+			for i := 0; i < 3; i++ {
+				privKey, err := crypto.GenerateKey()
+				if err != nil {
+					fmt.Println("Error generating private key", err)
+					return err
+				}
+				publicKey := privKey.Public()
+				ecsdaPubKey, ok := publicKey.(*ecdsa.PublicKey)
+				if !ok {
+					return errors.New("Unable to convert public key")
+				}
+				newUser := User{Address: crypto.PubkeyToAddress(*ecsdaPubKey).String(), PublicKey: "0x" + hex.EncodeToString(crypto.FromECDSAPub(ecsdaPubKey)), PrivKey: hex.EncodeToString(crypto.FromECDSA(privKey))}
+				users = append(users, newUser)
+			}
+			bz, err := json.MarshalIndent(UserList{Users: users}, "", " ")
+			if err != nil {
+				return err
+			}
+			return ioutil.WriteFile("users.json", bz, 0644)
+		},
+	}
+	// cmd.Flags().Int64(FlagNumberOfUsers, 2, "--count=<count>")
+	// cmd.MarkFlagRequired(FlagNumberOfUsers)
+	return cmd
+}
 func AddGenesisAcccountsCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "add-gen-accounts",

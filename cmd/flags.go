@@ -9,4 +9,5 @@ const (
 	FlagNonce         = "nonce"
 	FlagTokenID       = "token"
 	FlagDatabaseName  = "dbname"
+	FlagNumberOfUsers = "count"
 )
