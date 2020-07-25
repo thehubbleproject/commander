@@ -174,8 +174,13 @@ func (s *Syncer) processHeader(header ethTypes.Header) {
 	syncStatus, err := s.DBInstance.GetSyncStatus()
 	if err != nil {
 		s.Logger.Error("Unable to fetch listener log", "error", err)
+		return
 	}
-	s.Logger.Debug("Fetched last block indexed", "LastLogIndexed", syncStatus.LastEthBlockBigInt().String())
+	s.Logger.Info("Sync status", "LastLogIndexed", syncStatus.LastEthBlockBigInt().String(), "LastBatch", syncStatus.LastBatchRecorded)
+	if header.Number.Uint64() <= syncStatus.LastEthBlockBigInt().Uint64() {
+		s.Logger.Error("No need to sync more events", "currentEthBlock", header.Number.String(), "lastSyncedBlock", syncStatus.LastEthBlockBigInt().String())
+		return
+	}
 	// we need to filter only by logger contracts
 	// since all events are emitted by it
 	query := ethereum.FilterQuery{

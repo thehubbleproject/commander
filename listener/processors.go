@@ -223,6 +223,7 @@ func (s *Syncer) processNewBatch(eventName string, abiObject *abi.ABI, vLog *eth
 		}
 		s.DBInstance.CommitBatch(newBatch)
 	}
+	s.DBInstance.UpdateSyncStatusWithBatchNumber(event.Index.Uint64())
 }
 
 func (s *Syncer) processRegisteredToken(eventName string, abiObject *abi.ABI, vLog *ethTypes.Log) {
